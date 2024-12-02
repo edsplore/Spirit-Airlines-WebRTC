@@ -1,7 +1,7 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
-import { Mic, X, Phone, MapPin, Clock, Wifi, Smartphone, Tv, Globe } from 'lucide-react';
+import { Mic, X, Phone, MapPin, Clock, Wifi, Smartphone, Globe } from 'lucide-react';
 
 interface RegisterCallResponse {
   access_token?: string;
