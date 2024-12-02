@@ -86,7 +86,7 @@ const M1Limited: React.FC = () => {
   };
 
   const initiateConversation = async () => {
-    const agentId = "agent_a5f400ead1ed28ad6343fed790";
+    const agentId = "agent_a6075c48f5a298374c1c314357";
     try {
       const registerCallResponse = await registerCall(agentId);
       if (registerCallResponse.callId) {
@@ -106,7 +106,7 @@ const M1Limited: React.FC = () => {
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
     console.log("Registering call for agent:", agentId);
 
-    const apiKey = "02e501b4-1b05-40f4-af3e-351f0819e13f";
+    const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59";
     const sampleRate = parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10);
 
     try {
