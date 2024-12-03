@@ -192,7 +192,7 @@ export default function Component() {
                     type="text"
                     id="accountNumber"
                     name="accountNumber"
-                    defaultValue="1.15416371T"
+                    defaultValue="604299478"
                     readOnly
                     className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
                   />
