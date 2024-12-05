@@ -1,6 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from 'react'
-import { Mic, Wifi, Tv, Globe, User} from 'lucide-react'
+import { Mic, Wifi, Tv, Globe, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface RegisterCallResponse {
@@ -165,66 +165,60 @@ export default function Component() {
   return (
     <div className="min-h-screen bg-white">
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#e68818] rounded-3xl p-8 max-w-3xl w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#e68818] rounded-3xl p-4 sm:p-8 w-full max-w-[90%] sm:max-w-2xl max-h-[90vh] sm:max-h-none overflow-y-auto">
             <h2 className="text-2xl font-bold text-black mb-6">
               Customer details required for verification and authentication
             </h2>
-            <form onSubmit={handleSubmitDetails} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
-                <div className="grid grid-cols-[auto,1fr] items-center">
-                  <label htmlFor="name" className="w-32 text-white flex-shrink-0 text-lg font-bold">
-                    Enter Name<span className="text-black-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    className="p-2 rounded bg-[#fff2e3] text-black w-full font-bold"
-                  />
-                </div>
-                <div className="grid grid-cols-[auto,1fr] items-center">
-                  <label htmlFor="accountNumber" className="w-32 text-white flex-shrink-0 text-lg font-bold">
-                    Account#
-                  </label>
-                  <input
-                    type="text"
-                    id="accountNumber"
-                    name="accountNumber"
-                    defaultValue="604299478"
-                    readOnly
-                    className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
-                  />
-                </div>
-                <div className="grid grid-cols-[auto,1fr] items-center">
-                  <label htmlFor="address" className="w-32 text-white flex-shrink-0 text-lg font-bold">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    defaultValue="64 Tanamerah 465534"
-                    readOnly
-                    className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
-                  />
-                </div>
-                <div className="flex justify-end pr-32">
-                  <button
-                    type="submit"
-                    className="w-40 px-8 bg-[#703d01] text-white py-3 text-lg rounded-full hover:bg-[#bd6602] transition-colors font-bold"
-                  >
-                    Submit
-                  </button>
-                </div>
+            <form onSubmit={handleSubmitDetails} className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr,2fr] gap-2 sm:gap-4 items-center">
+                <label htmlFor="name" className="text-white text-base sm:text-lg font-bold sm:text-right">
+                  Enter Name<span className="text-black-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  className="p-2 rounded bg-[#fff2e3] text-black w-full font-bold"
+                />
+                <label htmlFor="accountNumber" className="text-white text-base sm:text-lg font-bold sm:text-right">
+                  Account#
+                </label>
+                <input
+                  type="text"
+                  id="accountNumber"
+                  name="accountNumber"
+                  defaultValue="604299478"
+                  readOnly
+                  className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
+                />
+                <label htmlFor="address" className="text-white text-base sm:text-lg font-bold sm:text-right">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  defaultValue="64 Tanamerah 465534"
+                  readOnly
+                  className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
+                />
               </div>
-              <div className="mt-6 bg-[#fff2e3] p-4 rounded-lg">
-                <p className="font-bold mb-2 text-red-500">Note:</p>
-                <ul className="space-y-2 text-black">
+              <div className="flex justify-center mt-4 sm:mt-6">
+                <button
+                  type="submit"
+                  className="px-6 sm:px-8 bg-[#703d01] text-white py-2 text-base sm:text-lg rounded-full hover:bg-[#bd6602] transition-colors font-bold"
+                >
+                  Submit
+                </button>
+              </div>
+              <div className="mt-4 sm:mt-6 bg-[#fff2e3] p-3 sm:p-4 rounded-lg">
+                <p className="font-bold mb-1 sm:mb-2 text-red-500 text-sm sm:text-base">Note:</p>
+                <ul className="space-y-1 text-black text-xs sm:text-sm">
                   {notes.map((note, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="text-[#000000] mr-2">➤</span>
+                      <span className="text-[#000000] mr-1 sm:mr-2">➤</span>
                       {index === 1 ? (
                         <>
                           <span className="text-red-500 mr-1 font-bold">*</span>
@@ -242,53 +236,61 @@ export default function Component() {
         </div>
       )}
 
-      <nav className="bg-[#ffffff]">
+      <nav className="bg-[#ffffff] mb-6">
         <div className="container mx-auto px-2 py-1">
-          <div className="flex items-center justify-between">
-            <img src="/m1-logo.svg" alt="M1" className="h-12" />
+          <div className="flex flex-col sm:flex-row items-center justify-between">
+            <img src="/m1-logo.svg" alt="M1" className="h-12 mb-2 sm:mb-0" />
             {userDetails.name && (
-              <div className="flex items-center gap-1 text-sm text-black">
-                <User className="w-7 h-7 text-black" />
-                <span>{userDetails.name}</span>
-                <span className="font-bold ml-4">Account#</span>{userDetails.accountNumber}
-                <span className="font-bold ml-4">Address:</span>{userDetails.address}
+              <div className="flex flex-col sm:flex-row items-center gap-1 text-xs sm:text-sm text-black">
+                <div className="flex items-center">
+                  <User className="w-5 h-5 sm:w-7 sm:h-7 text-black mr-1" />
+                  <span>{userDetails.name}</span>
+                </div>
+                <div className="flex flex-wrap justify-center sm:justify-start">
+                  <span className="font-bold mr-1">Account#</span>
+                  <span className="mr-2">{userDetails.accountNumber}</span>
+                  <span className="font-bold mr-1">Address:</span>
+                  <span>{userDetails.address}</span>
+                </div>
               </div>
             )}
           </div>
         </div>
       </nav>
 
-      <div className="relative w-full h-[400px] flex">
-        <div className="w-1/2 flex items-center">
-          <div className="pl-24 pr-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">about us</h1>
-            <div className="w-26 h-1 bg-[#ff9e1b] mb-6"></div>
-            <p className="text-lg text-gray-600">
-              Singapore's most vibrant and dynamic communications company
-            </p>
+      <div className="relative w-full">
+        <div className="flex flex-col sm:flex-row">
+          <div className="w-full sm:w-1/2 flex items-center bg-white p-4 sm:p-8">
+            <div className="w-full sm:pl-8 md:pl-24">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:mb-6">about us</h1>
+              <div className="w-16 h-1 bg-[#ff9e1b] mb-2 sm:mb-6"></div>
+              <p className="text-base sm:text-lg text-gray-600">
+                Singapore's most vibrant and dynamic communications company
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="w-1/2">
-          <img
-            src="About-Us.png"
-            alt="M1 family"
-            className="w-full h-full object-cover object-center"
-          />
+          <div className="w-full sm:w-1/2 h-[200px] sm:h-[400px]">
+            <img
+              src="About-Us.png"
+              alt="M1 family"
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
         </div>
       </div>
 
-      <main className="container mx-auto px-6 pt-10">
-        <div className="grid grid-cols-4 gap-8">
+      <main className="container mx-auto px-4 sm:px-6 pt-8 sm:pt-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           <div className="text-center">
             <button
               onClick={toggleConversation}
-              className={`relative bg-[#ff9e1b] rounded-full p-8 transition-all duration-300 hover:scale-105 ${
+              className={`relative bg-[#ff9e1b] rounded-full p-6 sm:p-8 transition-all duration-300 hover:scale-105 ${
                 callStatus === "active" ? "ring-4 ring-[#ff9e1b]/50 animate-pulse" : ""
               }`}
             >
-              <Mic className={`w-12 h-12 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
+              <Mic className={`w-8 h-8 sm:w-12 sm:h-12 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
             </button>
-            <p className={`mt-4 text-lg ${
+            <p className={`mt-4 text-base sm:text-lg ${
               callStatus === "active" ? "text-red-500" : "text-[#ff9e1b]"
             }`}>
               {callStatus === "active"
@@ -319,3 +321,4 @@ export default function Component() {
     </div>
   )
 }
+
