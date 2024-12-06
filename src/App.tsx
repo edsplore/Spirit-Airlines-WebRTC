@@ -227,7 +227,7 @@ export default function Component() {
               <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="px-10 py-1.5 bg-black text-[#F8EC4D] text-base rounded-full hover:bg-gray-800 transition-colors"
+                  className="px-10 py-1.5 bg-black text-[#F8EC4D] text-base rounded-full hover:bg-gray-800 transition-colors font-bold"
                 >
                   Submit
                 </button>
@@ -262,9 +262,9 @@ export default function Component() {
             {userDetails.name && (
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-black">
                 <User className="w-5 h-5" />
-                <span className="font-bold">{userDetails.name}</span>
-                <span className="font-bold">PNR# {userDetails.confirmationCode}</span>
-                <span className="font-bold">Email id: {userDetails.email}</span>
+                <span>{userDetails.name}</span>
+                <span className="font-bold">PNR# </span>{userDetails.confirmationCode}
+                <span className="font-bold">Email id: </span>{userDetails.email}
               </div>
             )}
           </div>
