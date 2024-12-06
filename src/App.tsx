@@ -1,6 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from 'react'
-import { Mic, Wifi, Tv, Globe, User } from 'lucide-react'
+import { Mic, MessageCircle, QrCode, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface RegisterCallResponse {
@@ -11,26 +11,27 @@ interface RegisterCallResponse {
 
 interface UserDetails {
   name: string
-  accountNumber: string
-  address: string
+  phone: string
+  email: string
+  confirmationCode: string
 }
 
 const webClient = new RetellWebClient()
 
 const notes = [
-  "The platform is not integrated into the company systems, therefore asking for specific detail for authentication and verification",
-  <span>Please enter the name that you want the Virtual Assistant to address you as.</span>,
-  "Upon authentication request by Virtual Assistant, please mention the account# and address.",
-  "Personal details will be shown on the top right side of the bar for reference upon this form submission.",
-  "Account# and Address fields are pre-filled and cannot be edited."
+  "The platform is not integrated into the company systems, therefore asking for specific details for authentication and verification",
+  <span>Please enter the name that the Virtual Assistant want to address you as.</span>,
+  "Upon authentication request by Virtual Assistant please mention confirmation code # and full name as shown on the top right side of the bar for reference upon this form submission.",
+  "Phone# and Email id is required to send instant messages and confirmation"
 ]
 
 export default function Component() {
   const [showVerificationForm, setShowVerificationForm] = useState(true)
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: '',
-    accountNumber: '',
-    address: ''
+    phone: '',
+    email: '',
+    confirmationCode: ''
   })
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
@@ -71,8 +72,9 @@ export default function Component() {
     const formData = new FormData(e.currentTarget)
     setUserDetails({
       name: formData.get('name') as string,
-      accountNumber: formData.get('accountNumber') as string,
-      address: formData.get('address') as string
+      phone: formData.get('phone') as string,
+      email: formData.get('email') as string,
+      confirmationCode: formData.get('confirmationCode') as string
     })
     setShowVerificationForm(false)
   }
@@ -104,7 +106,7 @@ export default function Component() {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_a6075c48f5a298374c1c314357"
+    const agentId = "agent_cc5c2d67725bc20c61d6d70e4e"
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -138,8 +140,9 @@ export default function Component() {
           agent_id: agentId,
           retell_llm_dynamic_variables: {
             member_name: userDetails.name,
-            account_number: userDetails.accountNumber,
-            address: userDetails.address            
+            phone: userDetails.phone,
+            email: userDetails.email,
+            confirmation_code: userDetails.confirmationCode            
           },
         }),
       })
@@ -165,93 +168,109 @@ export default function Component() {
   return (
     <div className="min-h-screen bg-white">
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#e68818] rounded-3xl p-4 sm:p-8 w-full max-w-[90%] sm:max-w-2xl max-h-[90vh] sm:max-h-none overflow-y-auto">
-            <h2 className="text-2xl font-bold text-black mb-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#F8EC4D] rounded-[40px] p-8 max-w-2xl w-full mx-4 border-2 border-black shadow-lg">
+            <h2 className="text-2xl font-medium text-black mb-8">
               Customer details required for verification and authentication
             </h2>
-            <form onSubmit={handleSubmitDetails} className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-[1fr,2fr] gap-2 sm:gap-4 items-center">
-                <label htmlFor="name" className="text-white text-base sm:text-lg font-bold sm:text-right">
-                  Enter Name<span className="text-black-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="p-2 rounded bg-[#fff2e3] text-black w-full font-bold"
-                />
-                <label htmlFor="accountNumber" className="text-white text-base sm:text-lg font-bold sm:text-right">
-                  Account#
-                </label>
-                <input
-                  type="text"
-                  id="accountNumber"
-                  name="accountNumber"
-                  defaultValue="604299478"
-                  readOnly
-                  className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
-                />
-                <label htmlFor="address" className="text-white text-base sm:text-lg font-bold sm:text-right">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  defaultValue="64 Tanamerah 465534"
-                  readOnly
-                  className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
-                />
+            <form onSubmit={handleSubmitDetails} className="space-y-6">
+              <div className="grid gap-6 max-w-lg mx-auto">
+                <div className="grid gap-6">
+                  <div className="flex items-center">
+                    <label htmlFor="name" className="w-48 text-black text-lg text-right pr-4">
+                      Enter full name<span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      defaultValue="Kevin Grant"
+                      required
+                      className="flex-1 p-2 rounded bg-white text-black border border-gray-300 font-bold"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <label htmlFor="phone" className="w-48 text-black text-lg text-right pr-4">
+                      Phone #
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      defaultValue="6502937925"
+                      required
+                      className="flex-1 p-2 rounded bg-white text-black border border-gray-300 font-bold"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <label htmlFor="email" className="w-48 text-black text-lg text-right pr-4">
+                      Email id
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      defaultValue="Kevingrant@gmail.com"
+                      required
+                      className="flex-1 p-2 rounded bg-white text-black border border-gray-300 font-bold"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <label htmlFor="confirmationCode" className="w-48 text-black text-lg text-right pr-4">
+                      Confirmation Code#
+                    </label>
+                    <input
+                      type="text"
+                      id="confirmationCode"
+                      name="confirmationCode"
+                      defaultValue="XIIMM"
+                      readOnly
+                      className="flex-1 p-2 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-center mt-4 sm:mt-6">
+              <div className="flex justify-center mt-8">
                 <button
                   type="submit"
-                  className="px-6 sm:px-8 bg-[#703d01] text-white py-2 text-base sm:text-lg rounded-full hover:bg-[#bd6602] transition-colors font-bold"
+                  className="px-12 py-2 bg-black text-[#F8EC4D] text-lg rounded-full hover:bg-gray-800 transition-colors"
                 >
                   Submit
                 </button>
               </div>
-              <div className="mt-4 sm:mt-6 bg-[#fff2e3] p-3 sm:p-4 rounded-lg">
-                <p className="font-bold mb-1 sm:mb-2 text-red-500 text-sm sm:text-base">Note:</p>
-                <ul className="space-y-1 text-black text-xs sm:text-sm">
-                  {notes.map((note, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-[#000000] mr-1 sm:mr-2">➤</span>
-                      {index === 1 ? (
-                        <>
-                          <span className="text-red-500 mr-1 font-bold">*</span>
-                          {note}
-                        </>
-                      ) : (
-                        <span>{note}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </form>
+            <div className="mt-6 bg-white p-4 rounded-lg">
+              <p className="font-medium text-red-500 mb-2">Note:</p>
+              <ul className="space-y-2 text-black text-[15px]">
+                {notes.map((note, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-black">➤</span>
+                    {index === 1 ? (
+                      <span>
+                        <span className="text-red-500">*</span>
+                        {note}
+                      </span>
+                    ) : (
+                      <span>{note}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}
 
-      <nav className="bg-[#ffffff] mb-6">
-        <div className="container mx-auto px-2 py-1">
-          <div className="flex flex-col sm:flex-row items-center justify-between">
-            <img src="/m1-logo.svg" alt="M1" className="h-12 mb-2 sm:mb-0" />
+      <nav className="bg-[#F8EC4D]">
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex items-center justify-between">
+            <img src="/spirit-logo.svg" alt="Spirit" className="h-8" />
             {userDetails.name && (
-              <div className="flex flex-col sm:flex-row items-center gap-1 text-xs sm:text-sm text-black">
-                <div className="flex items-center">
-                  <User className="w-5 h-5 sm:w-7 sm:h-7 text-black mr-1" />
-                  <span>{userDetails.name}</span>
-                </div>
-                <div className="flex flex-wrap justify-center sm:justify-start">
-                  <span className="font-bold mr-1">Account#</span>
-                  <span className="mr-2">{userDetails.accountNumber}</span>
-                  <span className="font-bold mr-1">Address:</span>
-                  <span>{userDetails.address}</span>
-                </div>
+              <div className="flex items-center gap-4 text-sm text-black">
+                <User className="w-5 h-5" />
+                <span className="font-bold">{userDetails.name}</span>
+                <span className="font-bold">PNR# {userDetails.confirmationCode}</span>
+                <span className="font-bold">Email id: {userDetails.email}</span>
               </div>
             )}
           </div>
@@ -259,66 +278,62 @@ export default function Component() {
       </nav>
 
       <div className="relative w-full">
-        <div className="flex flex-col sm:flex-row">
-          <div className="w-full sm:w-1/2 flex items-center bg-white p-4 sm:p-8">
-            <div className="w-full sm:pl-8 md:pl-24">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:mb-6">about us</h1>
-              <div className="w-16 h-1 bg-[#ff9e1b] mb-2 sm:mb-6"></div>
-              <p className="text-base sm:text-lg text-gray-600">
-                Singapore's most vibrant and dynamic communications company
+        <div className="flex flex-col md:flex-row">
+          <div className="w-full md:w-2/3 h-[400px] relative">
+            <img
+              src="/Picture1.png"
+              alt="Spirit Airlines beach scene"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="w-full md:w-1/3 bg-white p-12 flex items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-black mb-4">ABOUT SPIRIT</h2>
+              <p className="text-lg text-gray-600 mb-4">
+                We are dedicated to pairing great value with excellent service while
+                re-imagining the airline experience.
+              </p>
+              <p className="text-lg text-gray-600">
+                We make it possible for our Guests to venture further, travel often and
+                discover more than ever before. We believe it should be easy to take off
+                and Go have some fun.
               </p>
             </div>
-          </div>
-          <div className="w-full sm:w-1/2 h-[200px] sm:h-[400px]">
-            <img
-              src="About-Us.png"
-              alt="M1 family"
-              className="w-full h-full object-cover object-center"
-            />
           </div>
         </div>
       </div>
 
-      <main className="container mx-auto px-4 sm:px-6 pt-8 sm:pt-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          <div className="text-center">
-            <button
-              onClick={toggleConversation}
-              className={`relative bg-[#ff9e1b] rounded-full p-6 sm:p-8 transition-all duration-300 hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-[#ff9e1b]/50 animate-pulse" : ""
-              }`}
-            >
-              <Mic className={`w-8 h-8 sm:w-12 sm:h-12 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
-            </button>
-            <p className={`mt-4 text-base sm:text-lg ${
-              callStatus === "active" ? "text-red-500" : "text-[#ff9e1b]"
+      <div className="bg-white pt-10 px-4"> {/* Updated padding */}
+        <div className="flex justify-center gap-24"> {/* Updated gap */}
+          <button
+            onClick={toggleConversation}
+            className="flex flex-col items-center group"
+          >
+            <div className={`p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+              callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
             }`}>
-              {callStatus === "active"
-                ? "Click the icon to disconnect the call"
-                : "Click the icon to start the call"}
-            </p>
-          </div>
+              <Mic className={`w-16 h-16 text-[#F8EC4D] ${
+                callStatus === "active" ? "animate-bounce" : ""
+              }`} />
+            </div>
+            <span className="mt-4 text-xl font-medium">Let's Talk</span>
+          </button>
 
-          <div className="p-4 border border-[#ff9e1b] rounded-lg flex flex-col items-center">
-            <Wifi className="w-6 h-6 text-[#ff9e1b] mb-2" />
-            <h3 className="text-lg font-semibold text-[#ff9e1b] mb-1">Connectivity</h3>
-            <p className="text-gray-600 text-sm text-center">
-              Extensive fibre and wireless infrastructure for quality mobile and fixed services
-            </p>
-          </div>
-          <div className="p-4 border border-[#ff9e1b] rounded-lg flex flex-col items-center">
-            <Tv className="w-6 h-6 text-[#ff9e1b] mb-2" />
-            <h3 className="text-lg font-semibold text-[#ff9e1b] mb-1">Entertainment</h3>
-            <p className="text-gray-600 text-sm text-center">Broad suite of premium content for diverse entertainment options</p>
-          </div>
-          <div className="p-4 border border-[#ff9e1b] rounded-lg flex flex-col items-center">
-            <Globe className="w-6 h-6 text-[#ff9e1b] mb-2" />
-            <h3 className="text-lg font-semibold text-[#ff9e1b] mb-1">Digital Solutions</h3>
-            <p className="text-gray-600 text-sm text-center">Innovative digital services for businesses and consumers</p>
-          </div>
+          <button className="flex flex-col items-center group">
+            <div className="p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
+              <MessageCircle className="w-16 h-16 text-[#F8EC4D]" />
+            </div>
+            <span className="mt-4 text-xl font-medium">Let's Chat</span>
+          </button>
+
+          <button className="flex flex-col items-center group">
+            <div className="p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
+              <QrCode className="w-16 h-16 text-[#F8EC4D]" />
+            </div>
+            <span className="mt-4 text-xl font-medium">Scan to WhatsApp</span>
+          </button>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
-
