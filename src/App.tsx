@@ -138,12 +138,6 @@ export default function Component() {
         },
         body: JSON.stringify({
           agent_id: agentId,
-          retell_llm_dynamic_variables: {
-            member_name: userDetails.name,
-            phone: userDetails.phone,
-            email: userDetails.email,
-            confirmation_code: userDetails.confirmationCode            
-          },
         }),
       })
 
@@ -168,16 +162,16 @@ export default function Component() {
   return (
     <div className="min-h-screen bg-white">
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#F8EC4D] rounded-[40px] p-8 max-w-2xl w-full mx-4 border-2 border-black shadow-lg">
-            <h2 className="text-2xl font-medium text-black mb-8">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#F8EC4D] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg">
+            <h2 className="text-lg sm:text-xl font-medium text-black mb-4 sm:mb-6">
               Customer details required for verification and authentication
             </h2>
-            <form onSubmit={handleSubmitDetails} className="space-y-6">
-              <div className="grid gap-6 max-w-lg mx-auto">
-                <div className="grid gap-6">
-                  <div className="flex items-center">
-                    <label htmlFor="name" className="w-48 text-black text-lg text-right pr-4">
+            <form onSubmit={handleSubmitDetails} className="space-y-4">
+              <div className="grid gap-4 max-w-lg mx-auto">
+                <div className="grid gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="name" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Enter full name<span className="text-red-500">*</span>
                     </label>
                     <input
@@ -186,11 +180,11 @@ export default function Component() {
                       name="name"
                       defaultValue="Kevin Grant"
                       required
-                      className="flex-1 p-2 rounded bg-white text-black border border-gray-300 font-bold"
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
-                  <div className="flex items-center">
-                    <label htmlFor="phone" className="w-48 text-black text-lg text-right pr-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="phone" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Phone #
                     </label>
                     <input
@@ -199,11 +193,11 @@ export default function Component() {
                       name="phone"
                       defaultValue="6502937925"
                       required
-                      className="flex-1 p-2 rounded bg-white text-black border border-gray-300 font-bold"
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
-                  <div className="flex items-center">
-                    <label htmlFor="email" className="w-48 text-black text-lg text-right pr-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="email" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Email id
                     </label>
                     <input
@@ -212,11 +206,11 @@ export default function Component() {
                       name="email"
                       defaultValue="Kevingrant@gmail.com"
                       required
-                      className="flex-1 p-2 rounded bg-white text-black border border-gray-300 font-bold"
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
-                  <div className="flex items-center">
-                    <label htmlFor="confirmationCode" className="w-48 text-black text-lg text-right pr-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="confirmationCode" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Confirmation Code#
                     </label>
                     <input
@@ -225,23 +219,23 @@ export default function Component() {
                       name="confirmationCode"
                       defaultValue="XIIMM"
                       readOnly
-                      className="flex-1 p-2 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold"
+                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="px-12 py-2 bg-black text-[#F8EC4D] text-lg rounded-full hover:bg-gray-800 transition-colors"
+                  className="px-10 py-1.5 bg-black text-[#F8EC4D] text-base rounded-full hover:bg-gray-800 transition-colors"
                 >
                   Submit
                 </button>
               </div>
             </form>
-            <div className="mt-6 bg-white p-4 rounded-lg">
-              <p className="font-medium text-red-500 mb-2">Note:</p>
-              <ul className="space-y-2 text-black text-[15px]">
+            <div className="mt-4 bg-white p-3 rounded-lg">
+              <p className="font-medium text-red-500 mb-1">Note:</p>
+              <ul className="space-y-1 text-black text-sm">
                 {notes.map((note, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="text-black">➤</span>
@@ -261,12 +255,12 @@ export default function Component() {
         </div>
       )}
 
-      <nav className="bg-[#F8EC4D]">
+      <nav className="bg-[#F8EC4D] mb-4">
         <div className="container mx-auto px-4 py-2">
-          <div className="flex items-center justify-between">
-            <img src="/spirit-logo.svg" alt="Spirit" className="h-8" />
+          <div className="flex flex-col sm:flex-row items-center justify-between">
+            <img src="/spirit-logo.svg" alt="Spirit" className="h-8 mb-2 sm:mb-0" />
             {userDetails.name && (
-              <div className="flex items-center gap-4 text-sm text-black">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-black">
                 <User className="w-5 h-5" />
                 <span className="font-bold">{userDetails.name}</span>
                 <span className="font-bold">PNR# {userDetails.confirmationCode}</span>
@@ -279,21 +273,21 @@ export default function Component() {
 
       <div className="relative w-full">
         <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-2/3 h-[400px] relative">
+          <div className="w-full md:w-2/3 h-[250px] md:h-[350px] relative">
             <img
               src="/Picture1.png"
               alt="Spirit Airlines beach scene"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="w-full md:w-1/3 bg-white p-12 flex items-center">
+          <div className="w-full md:w-1/3 bg-white p-6 md:p-12 flex items-center">
             <div>
-              <h2 className="text-2xl font-bold text-black mb-4">ABOUT SPIRIT</h2>
-              <p className="text-lg text-gray-600 mb-4">
+              <h2 className="text-xl md:text-2xl font-bold text-black mb-4">ABOUT SPIRIT</h2>
+              <p className="text-base md:text-lg text-gray-600 mb-4">
                 We are dedicated to pairing great value with excellent service while
                 re-imagining the airline experience.
               </p>
-              <p className="text-lg text-gray-600">
+              <p className="text-base md:text-lg text-gray-600">
                 We make it possible for our Guests to venture further, travel often and
                 discover more than ever before. We believe it should be easy to take off
                 and Go have some fun.
@@ -303,34 +297,34 @@ export default function Component() {
         </div>
       </div>
 
-      <div className="bg-white pt-10 px-4"> {/* Updated padding */}
-        <div className="flex justify-center gap-24"> {/* Updated gap */}
+      <div className="bg-white py-12 :py-20 px-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
           <button
             onClick={toggleConversation}
             className="flex flex-col items-center group"
           >
-            <div className={`p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+            <div className={`p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
               callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
             }`}>
-              <Mic className={`w-16 h-16 text-[#F8EC4D] ${
+              <Mic className={`w-12 h-12 md:w-16 md:h-16 text-[#F8EC4D] ${
                 callStatus === "active" ? "animate-bounce" : ""
               }`} />
             </div>
-            <span className="mt-4 text-xl font-medium">Let's Talk</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">Let's Talk</span>
           </button>
 
           <button className="flex flex-col items-center group">
-            <div className="p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-              <MessageCircle className="w-16 h-16 text-[#F8EC4D]" />
+            <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
+              <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#F8EC4D]" />
             </div>
-            <span className="mt-4 text-xl font-medium">Let's Chat</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">Let's Chat</span>
           </button>
 
           <button className="flex flex-col items-center group">
-            <div className="p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-              <QrCode className="w-16 h-16 text-[#F8EC4D]" />
+            <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
+              <QrCode className="w-12 h-12 md:w-16 md:h-16 text-[#F8EC4D]" />
             </div>
-            <span className="mt-4 text-xl font-medium">Scan to WhatsApp</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">Scan to WhatsApp</span>
           </button>
         </div>
       </div>
