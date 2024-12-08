@@ -18,5 +18,39 @@
     <body>
       <noscript>You need to enable JavaScript to run this app.</noscript>
       <div id="root"></div>
+      <div id="VG_OVERLAY_CONTAINER">
+      <!-- Here is where TIXAE Agents renders the widget. -->
+      <!-- Set width, height for 500px as an example after changing render to 'full-width' -->
+      </div>
+
+      <!-- Remove 'defer' if you want widget to load faster (Will affect website loading) -->
+      <script defer>
+          (function() {
+              window.VG_CONFIG = {
+                  ID: "ndi4smw8v1pzi7gp",
+                  region: 'eu', // 'eu' or 'na'corresponding to Europe and North America
+                  render: 'popup', // popup or full-width
+                  stylesheets: [
+                      // Base TIXAE Agents CSS
+                      "https://vg-bunny-cdn.b-cdn.net/vg_live_build/styles.css",
+                      // Add your custom css stylesheets, Can also add relative URL ('/public/your-file.css)
+                  ],
+                  // (SHOULD BE REMOVED OR CHANGED, PROVIDED AS AN EXAMPLE TO USE)
+                  // user: {
+                  //     name: 'John Doe', // User's name
+                  //     email: 'johndoe@gmail.com', // User's email
+                  //     phone: '+1234567890', // User's phone number
+                  // }
+                  //
+                  // **
+                  // userID: 'USER_ID', // If you want to use your own user_id
+                  // autostart: true, // Whether to autostart the chatbot with the proactive message
+              }
+              var VG_SCRIPT = document.createElement("script");
+              VG_SCRIPT.src = "https://vg-bunny-cdn.b-cdn.net/vg_live_build/vg_bundle.js";
+              VG_SCRIPT.defer = true; // Remove 'defer' if you want widget to load faster (Will affect website loading)
+              document.body.appendChild(VG_SCRIPT);
+          })()
+      </script>
     </body>
   </html>

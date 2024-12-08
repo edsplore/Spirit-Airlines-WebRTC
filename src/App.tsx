@@ -1,6 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from 'react'
-import { Mic, MessageCircle, QrCode, User } from 'lucide-react'
+import { Mic, MessageCircle, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface RegisterCallResponse {
@@ -322,7 +322,7 @@ export default function Component() {
 
           <button className="flex flex-col items-center group">
             <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-              <QrCode className="w-12 h-12 md:w-16 md:h-16 text-[#F8EC4D]" />
+              <img src="whatsapp.png" alt="WhatsApp" className="w-12 h-12 md:w-16 md:h-16" />
             </div>
             <span className="mt-4 text-lg md:text-xl font-medium">Scan to WhatsApp</span>
           </button>
