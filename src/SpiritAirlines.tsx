@@ -327,7 +327,7 @@ export default function SpiritAirlinesDemo() {
           </button>
 
           <button 
-            onClick={() => window.location.href = 'https://wa.me/16508008958?text=Hi'}
+            onClick={() => window.open('https://wa.me/16508008958?text=Hi', '_blank')}
             className="flex flex-col items-center group">
             <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
               <img src="/whatsapp.png" alt="WhatsApp" className="w-14 h-14 md:w-16 md:h-16" />
