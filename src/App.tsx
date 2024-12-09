@@ -302,7 +302,7 @@ export default function Component() {
         </div>
       </div>
 
-      <div className="bg-white py-12 md:py-20 px-4">
+      <div className="bg-white pt-6 px-4">
         <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
           <button
             onClick={toggleConversation}
