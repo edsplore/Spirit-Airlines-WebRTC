@@ -130,6 +130,7 @@ export default function Component() {
     const sampleRate = parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
 
     try {
+      const formattedConfirmationCode = userDetails.confirmationCode.split('').join(' - ');
       const response = await fetch("https://api.retellai.com/v2/create-web-call", {
         method: "POST",
         headers: {
@@ -142,7 +143,7 @@ export default function Component() {
             customer_name: userDetails.name,
             email: userDetails.email,
             phone: userDetails.phone,
-            confirmation_code: userDetails.confirmationCode,
+            confirmation_code: formattedConfirmationCode,
           },
         }),
       })
