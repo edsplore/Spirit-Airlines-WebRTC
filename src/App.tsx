@@ -163,54 +163,51 @@ export default function Component() {
     <div className="min-h-screen bg-white">
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#F8EC4D] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg">
-            <h2 className="text-lg sm:text-xl font-medium text-black mb-4 sm:mb-6">
+          <div className="bg-[#F8EC4D] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
+            <h2 className="text-base sm:text-xl font-medium text-black mb-4 sm:mb-6">
               Customer details required for verification and authentication
             </h2>
             <form onSubmit={handleSubmitDetails} className="space-y-4">
               <div className="grid gap-4 max-w-lg mx-auto">
                 <div className="grid gap-4">
                   <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label htmlFor="name" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                    <label htmlFor="name" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Enter full name<span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       id="name"
                       name="name"
-                      defaultValue="Kevin Grant"
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label htmlFor="phone" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
-                      Phone #
+                    <label htmlFor="phone" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                      Whatsapp Number
                     </label>
                     <input
                       type="tel"
                       id="phone"
                       name="phone"
-                      defaultValue="6502937925"
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label htmlFor="email" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                    <label htmlFor="email" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Email id
                     </label>
                     <input
                       type="email"
                       id="email"
                       name="email"
-                      defaultValue="Kevingrant@gmail.com"
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label htmlFor="confirmationCode" className="w-full sm:w-40 text-black text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                    <label htmlFor="confirmationCode" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       Confirmation Code#
                     </label>
                     <input
@@ -297,7 +294,7 @@ export default function Component() {
         </div>
       </div>
 
-      <div className="bg-white py-12 :py-20 px-4">
+      <div className="bg-white py-12 md:py-20 px-4">
         <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
           <button
             onClick={toggleConversation}
