@@ -138,6 +138,12 @@ export default function Component() {
         },
         body: JSON.stringify({
           agent_id: agentId,
+          retell_llm_dynamic_variables: {
+            customer_name: userDetails.name,
+            email: userDetails.email,
+            phone: userDetails.phone,
+            confirmation_code: userDetails.confirmationCode,
+          },
         }),
       })
 
