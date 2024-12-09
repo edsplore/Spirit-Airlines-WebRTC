@@ -270,13 +270,21 @@ export default function Component() {
 
       <div className="relative w-full">
         <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-2/3 h-[250px] md:h-[350px] relative">
+          <div className="w-full md:w-2/3 relative">
+
             <img
+
               src="/Picture1.png"
+
               alt="Spirit Airlines beach scene"
-              className="w-full h-full object-cover"
+
+              className="w-full h-auto md:h-[350px] object-contain md:object-cover"
+
             />
+
           </div>
+          
+          
           <div className="w-full md:w-1/3 bg-white p-6 md:p-12 flex items-center">
             <div>
               <h2 className="text-xl md:text-2xl font-bold text-black mb-4">ABOUT SPIRIT</h2>
@@ -310,16 +318,20 @@ export default function Component() {
             <span className="mt-4 text-lg md:text-xl font-medium">Let's Talk</span>
           </button>
 
-          <button className="flex flex-col items-center group">
+          <button 
+            onClick={() => window.voiceflow.chat.open()}
+            className="flex flex-col items-center group">
             <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
               <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#F8EC4D]" />
             </div>
             <span className="mt-4 text-lg md:text-xl font-medium">Let's Chat</span>
           </button>
 
-          <button className="flex flex-col items-center group">
+          <button 
+            onClick={() => window.location.href = 'https://wa.me/16508008958?text=Hi'}
+            className="flex flex-col items-center group">
             <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-              <img src="whatsapp.png" alt="WhatsApp" className="w-12 h-12 md:w-16 md:h-16" />
+              <img src="whatsapp.png" alt="WhatsApp" className="w-14 h-14 md:w-16 md:h-16" />
             </div>
             <span className="mt-4 text-lg md:text-xl font-medium">Scan to WhatsApp</span>
           </button>
