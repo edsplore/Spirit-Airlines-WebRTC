@@ -7,6 +7,7 @@ export default function App() {
     <Routes>
       {/* Add more routes as needed */}
       <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
+      <Route path="*" element={<div>Not Found</div>} />
     </Routes>
   );
 }
