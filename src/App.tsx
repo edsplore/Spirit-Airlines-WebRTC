@@ -6,7 +6,7 @@ export default function App() {
   return (
     <Routes>
       {/* Add more routes as needed */}
-      <Route path="/demos/airlines/spirit" element={<SpiritAirlinesDemo />} />
+      <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
     </Routes>
   );
 }
