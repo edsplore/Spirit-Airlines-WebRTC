@@ -1,5 +1,6 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
-import "./App.css";
 import { Mic, MessageCircle, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
@@ -14,6 +15,7 @@ interface UserDetails {
   phone: string
   email: string
   confirmationCode: string
+  language: string
 }
 
 const webClient = new RetellWebClient()
@@ -31,7 +33,8 @@ export default function SpiritAirlinesDemo() {
     name: '',
     phone: '',
     email: '',
-    confirmationCode: ''
+    confirmationCode: '',
+    language: 'English'
   })
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
@@ -61,13 +64,16 @@ export default function SpiritAirlinesDemo() {
 
     // Add chatbot script
     const script = document.createElement('script')
+    const projectId = userDetails.language === 'Spanish'
+    ? "agent_b16bbe5e6fa810fae50bef4763"
+    : "669833f4ca2c7886e6638f93";
     script.type = 'text/javascript'
     script.innerHTML = `
       (function(d, t) {
         var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
         v.onload = function() {
           window.voiceflow.chat.load({
-            verify: { projectID: '669833f4ca2c7886e6638f93' },
+            verify: { projectID: '${projectId}' },
             url: 'https://general-runtime.voiceflow.com',
             versionID: 'production'
           });
@@ -77,12 +83,12 @@ export default function SpiritAirlinesDemo() {
     `
     document.body.appendChild(script)
 
-    
     return () => {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
       webClient.off("error")
       webClient.off("update")
+      document.body.removeChild(script)
     }
   }, [])
 
@@ -93,7 +99,8 @@ export default function SpiritAirlinesDemo() {
       name: formData.get('name') as string,
       phone: formData.get('phone') as string,
       email: formData.get('email') as string,
-      confirmationCode: formData.get('confirmationCode') as string
+      confirmationCode: formData.get('confirmationCode') as string,
+      language: formData.get('language') as string
     })
     setShowVerificationForm(false)
   }
@@ -125,7 +132,9 @@ export default function SpiritAirlinesDemo() {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_f43f5317639c9ed51ec1a11c83"
+    const agentId = userDetails.language === 'Spanish'
+    ? "agent_b16bbe5e6fa810fae50bef4763"
+    : "agent_7c443079f65a33b75f9275f5a1";
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -185,9 +194,12 @@ export default function SpiritAirlinesDemo() {
     }
   }
 
+  const getTranslatedText = (englishText: string, spanishText: string) => {
+    return userDetails.language === 'Spanish' ? spanishText : englishText;
+  }
+
   return (
     <div className="min-h-screen bg-white relative">
-      {/* Rotated triangle anti-clockwise by 90 degrees */}
       <div
         className="absolute"
         style={{
@@ -200,8 +212,6 @@ export default function SpiritAirlinesDemo() {
           borderBottom: '0 solid transparent',
           borderTop: '20px solid #F8EC4D',
           zIndex: 10,
-          // transform: 'rotate(-90deg)', 
-          // transformOrigin: 'bottom left'
         }}
       ></div>
 
@@ -209,14 +219,17 @@ export default function SpiritAirlinesDemo() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-[#F8EC4D] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
             <h2 className="text-base sm:text-xl font-medium text-black mb-4 sm:mb-6">
-              Customer details required for verification and authentication
+              {getTranslatedText(
+                "Customer details required for verification and authentication",
+                "Detalles del cliente requeridos para verificación y autenticación"
+              )}
             </h2>
             <form onSubmit={handleSubmitDetails} className="space-y-4">
               <div className="grid gap-4 max-w-lg mx-auto">
                 <div className="grid gap-4">
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="name" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
-                      Enter full name<span className="text-red-500">*</span>
+                      {getTranslatedText("Enter full name", "Ingrese nombre completo")}<span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -228,7 +241,7 @@ export default function SpiritAirlinesDemo() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="phone" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
-                      Whatsapp Number
+                      {getTranslatedText("Whatsapp Number", "Número de Whatsapp")}
                     </label>
                     <input
                       type="tel"
@@ -240,7 +253,7 @@ export default function SpiritAirlinesDemo() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="email" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
-                      Email
+                      {getTranslatedText("Email", "Correo electrónico")}
                     </label>
                     <input
                       type="email"
@@ -252,7 +265,7 @@ export default function SpiritAirlinesDemo() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="confirmationCode" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
-                      Confirmation Code#
+                      {getTranslatedText("Confirmation Code#", "Código de confirmación#")}
                     </label>
                     <input
                       type="text"
@@ -263,6 +276,19 @@ export default function SpiritAirlinesDemo() {
                       className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="language" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                      {getTranslatedText("Language", "Idioma")}
+                    </label>
+                    <select
+                      id="language"
+                      name="language"
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                    >
+                      <option value="English">English</option>
+                      <option value="Spanish">Español</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-center mt-6">
@@ -270,12 +296,12 @@ export default function SpiritAirlinesDemo() {
                   type="submit"
                   className="px-10 py-1.5 bg-black text-[#F8EC4D] text-base rounded-full hover:bg-gray-800 transition-colors font-bold"
                 >
-                  Submit
+                  {getTranslatedText("Submit", "Enviar")}
                 </button>
               </div>
             </form>
             <div className="mt-4 bg-white p-3 rounded-lg">
-              <p className="font-medium text-red-500 mb-1">Note:</p>
+              <p className="font-medium text-red-500 mb-1">{getTranslatedText("Note:", "Nota:")}</p>
               <ul className="space-y-1 text-black text-sm">
                 {notes.map((note, index) => (
                   <li key={index} className="flex items-start gap-2">
@@ -304,8 +330,8 @@ export default function SpiritAirlinesDemo() {
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-black">
                 <User className="w-5 h-5" />
                 <span>{userDetails.name}</span>
-                <span className="font-bold">PNR# </span>{userDetails.confirmationCode}
-                <span className="font-bold">Email id: </span>{userDetails.email}
+                <span className="font-bold">{getTranslatedText("PNR#", "PNR#")} </span>{userDetails.confirmationCode}
+                <span className="font-bold">{getTranslatedText("Email id:", "Correo electrónico:")} </span>{userDetails.email}
               </div>
             )}
           </div>
@@ -323,15 +349,20 @@ export default function SpiritAirlinesDemo() {
           </div>
           <div className="w-full md:w-1/3 bg-white p-6 md:p-12 flex items-center">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-black mb-4">ABOUT SPIRIT</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-black mb-4">
+                {getTranslatedText("ABOUT SPIRIT", "ACERCA DE SPIRIT")}
+              </h2>
               <p className="text-base md:text-lg text-gray-600 mb-4">
-                We are dedicated to pairing great value with excellent service while
-                re-imagining the airline experience.
+                {getTranslatedText(
+                  "We are dedicated to pairing great value with excellent service while re-imagining the airline experience.",
+                  "Nos dedicamos a combinar un gran valor con un excelente servicio mientras reinventamos la experiencia de volar."
+                )}
               </p>
               <p className="text-base md:text-lg text-gray-600">
-                We make it possible for our Guests to venture further, travel often and
-                discover more than ever before. We believe it should be easy to take off
-                and Go have some fun.
+                {getTranslatedText(
+                  "We make it possible for our Guests to venture further, travel often and discover more than ever before. We believe it should be easy to take off and Go have some fun.",
+                  "Hacemos posible que nuestros Huéspedes se aventuren más lejos, viajen con frecuencia y descubran más que nunca. Creemos que debería ser fácil despegar e ir a divertirse."
+                )}
               </p>
             </div>
           </div>
@@ -351,7 +382,7 @@ export default function SpiritAirlinesDemo() {
                 callStatus === "active" ? "animate-bounce" : ""
               }`} />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">Let's Talk</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">{getTranslatedText("Let's Talk", "Hablemos")}</span>
           </button>
 
           <button 
@@ -360,7 +391,7 @@ export default function SpiritAirlinesDemo() {
             <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
               <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#F8EC4D]" />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">Let's Chat</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">{getTranslatedText("Let's Chat", "Chateemos")}</span>
           </button>
 
           <button 
@@ -369,11 +400,10 @@ export default function SpiritAirlinesDemo() {
             <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
               <img src="/whatsapp.png" alt="WhatsApp" className="w-14 h-14 md:w-16 md:h-16" />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">Scan to WhatsApp</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">{getTranslatedText("Scan to WhatsApp", "Escanear para WhatsApp")}</span>
           </button>
         </div>
       </div>
     </div>
-    
   )
 }
