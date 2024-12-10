@@ -59,6 +59,25 @@ export default function SpiritAirlinesDemo() {
       console.log("Update received", update)
     })
 
+    // Add chatbot script
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.innerHTML = `
+      (function(d, t) {
+        var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        v.onload = function() {
+          window.voiceflow.chat.load({
+            verify: { projectID: '669833f4ca2c7886e6638f93' },
+            url: 'https://general-runtime.voiceflow.com',
+            versionID: 'production'
+          });
+        }
+        v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+      })(document, 'script');
+    `
+    document.body.appendChild(script)
+
+    
     return () => {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
@@ -106,7 +125,7 @@ export default function SpiritAirlinesDemo() {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_7c443079f65a33b75f9275f5a1"
+    const agentId = "agent_f43f5317639c9ed51ec1a11c83"
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -167,7 +186,25 @@ export default function SpiritAirlinesDemo() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      {/* Rotated triangle anti-clockwise by 90 degrees */}
+      <div
+        className="absolute"
+        style={{
+          bottom: 0,
+          left: 0,
+          width: 0,
+          height: 0,
+          borderLeft: '0 solid transparent',
+          borderRight: '100vw solid transparent',
+          borderBottom: '0 solid transparent',
+          borderTop: '20px solid #F8EC4D',
+          zIndex: 10,
+          // transform: 'rotate(-90deg)', 
+          // transformOrigin: 'bottom left'
+        }}
+      ></div>
+
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-[#F8EC4D] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
@@ -203,7 +240,7 @@ export default function SpiritAirlinesDemo() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="email" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
-                      Email id
+                      Email
                     </label>
                     <input
                       type="email"
@@ -337,5 +374,6 @@ export default function SpiritAirlinesDemo() {
         </div>
       </div>
     </div>
+    
   )
 }
