@@ -1,5 +1,4 @@
-'use client'
-
+import "./App.css";
 import React, { useEffect, useState } from 'react'
 import { Mic, MessageCircle, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
