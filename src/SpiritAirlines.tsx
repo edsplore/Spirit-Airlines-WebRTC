@@ -200,17 +200,58 @@ export default function SpiritAirlinesDemo() {
 
   return (
     <div className="min-h-screen bg-white relative">
+
+      <style>
+        {`
+          @media (max-width: 640px) {
+            .decorative-triangle {
+              display: none;
+            }
+          }
+        `}
+      </style>
+      
       <div
-        className="absolute"
+        className="absolute decorative-triangle"
         style={{
           bottom: 0,
           left: 0,
           width: 0,
           height: 0,
-          borderLeft: '0 solid transparent',
-          borderRight: '100vw solid transparent',
+          borderLeft: '50px solid #F8EC4D',
+          borderRight: '20px solid transparent',
+          borderTop: '50vw solid transparent',
           borderBottom: '0 solid transparent',
-          borderTop: '20px solid #F8EC4D',
+          zIndex: 10,
+        }}
+      ></div>
+
+      <div
+        className="absolute decorative-triangle"
+        style={{
+          bottom: 0,
+          right: 0,  // Changed from left: 0 to right: 0
+          width: 0,
+          height: 0,
+          borderRight: '50px solid #F8EC4D',  // Changed from borderLeft to borderRight
+          borderLeft: '20px solid transparent',  // Changed from borderRight to borderLeft
+          borderTop: '50vw solid transparent',
+          borderBottom: '0 solid transparent',
+          zIndex: 10,
+        }}
+      ></div>
+
+      <div
+        className="absolute decorative-triangle"
+        style={{
+          top: 0,
+          right: 0,
+          width: 0,
+          height: 0,
+          borderRight: '700px solid #F8EC4D',
+          borderLeft: '100px solid transparent',
+          borderBottom: '8vw solid transparent',
+          borderTop: '0 solid transparent',
           zIndex: 10,
         }}
       ></div>
