@@ -1,5 +1,5 @@
-import "./App.css";
 import React, { useEffect, useState } from 'react'
+import "./App.css";
 import { Mic, MessageCircle, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
@@ -63,9 +63,7 @@ export default function SpiritAirlinesDemo() {
 
     // Add chatbot script
     const script = document.createElement('script')
-    const projectId = userDetails.language === 'Spanish'
-    ? "agent_b16bbe5e6fa810fae50bef4763"
-    : "669833f4ca2c7886e6638f93";
+    const projectId = "669833f4ca2c7886e6638f93";
     script.type = 'text/javascript'
     script.innerHTML = `
       (function(d, t) {
@@ -199,7 +197,6 @@ export default function SpiritAirlinesDemo() {
 
   return (
     <div className="min-h-screen bg-white relative">
-
       <style>
         {`
           @media (max-width: 640px) {
@@ -209,7 +206,7 @@ export default function SpiritAirlinesDemo() {
           }
         `}
       </style>
-      
+
       <div
         className="absolute decorative-triangle"
         style={{
@@ -229,11 +226,11 @@ export default function SpiritAirlinesDemo() {
         className="absolute decorative-triangle"
         style={{
           bottom: 0,
-          right: 0,  // Changed from left: 0 to right: 0
+          right: 0,
           width: 0,
           height: 0,
-          borderRight: '50px solid #F8EC4D',  // Changed from borderLeft to borderRight
-          borderLeft: '20px solid transparent',  // Changed from borderRight to borderLeft
+          borderRight: '50px solid #F8EC4D',
+          borderLeft: '20px solid transparent',
           borderTop: '50vw solid transparent',
           borderBottom: '0 solid transparent',
           zIndex: 10,
@@ -387,26 +384,39 @@ export default function SpiritAirlinesDemo() {
               className="w-full h-auto md:h-[350px] object-contain md:object-cover"
             />
           </div>
-          <div className="w-full md:w-1/3 bg-white p-6 md:p-12 flex items-center">
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold text-black mb-4">
-                {getTranslatedText("ABOUT SPIRIT", "ACERCA DE SPIRIT")}
-              </h2>
-              <p className="text-base md:text-lg text-gray-600 mb-4">
-                {getTranslatedText(
-                  "We are dedicated to pairing great value with excellent service while re-imagining the airline experience.",
-                  "Nos dedicamos a combinar un gran valor con un excelente servicio mientras reinventamos la experiencia de volar."
-                )}
-              </p>
-              <p className="text-base md:text-lg text-gray-600">
-                {getTranslatedText(
-                  "We make it possible for our Guests to venture further, travel often and discover more than ever before. We believe it should be easy to take off and Go have some fun.",
-                  "Hacemos posible que nuestros Huéspedes se aventuren más lejos, viajen con frecuencia y descubran más que nunca. Creemos que debería ser fácil despegar e ir a divertirse."
-                )}
-              </p>
+          <div className="w-full md:w-1/3 bg-white p-6 md:p-12">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="font-semibold">Confirmation Code</div>
+                <div>XIIMM</div>
+                <div className="font-semibold">Flight from</div>
+                <div>Miami, FL (MIA)</div>
+                <div className="font-semibold">Flight to</div>
+                <div>Las Vegas, NV (LAS)</div>
+                <div className="font-semibold">Travel Date</div>
+                <div>12 Dec 2024</div>
+                <div className="font-semibold">Flight#</div>
+                <div>NK 3168</div>
+                <div className="font-semibold">Depart Time</div>
+                <div>18:10 PM</div>
+                <div className="font-semibold">Arrival Time</div>
+                <div>20:44 PM</div>
+                <div className="font-semibold"># of PAX</div>
+                <div>2</div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="text-center max-w-4xl mx-auto px-4 py-8">
+        <p className="text-base md:text-lg text-gray-600 mb-4">
+          We are dedicated to pairing great value with excellent service while re-imagining the airline experience.
+          We make it possible for our Guests to venture further, travel often and discover more than ever before.
+        </p>
+        <p className="text-base md:text-lg bg-[#F8EC4D] inline-block px-2">
+          We believe it should be easy to take off and Go have some fun.
+        </p>
       </div>
 
       <div className="bg-white pt-6 px-4">
