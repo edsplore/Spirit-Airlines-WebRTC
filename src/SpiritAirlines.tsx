@@ -240,13 +240,13 @@ export default function SpiritAirlinesDemo() {
       <div
         className="absolute decorative-triangle"
         style={{
-          top: 0,
+          top: 63,
           right: 0,
           width: 0,
           height: 0,
           borderRight: '700px solid #F8EC4D',
           borderLeft: '100px solid transparent',
-          borderBottom: '8vw solid transparent',
+          borderBottom: '4vw solid transparent',
           borderTop: '0 solid transparent',
           zIndex: 10,
         }}
@@ -360,14 +360,13 @@ export default function SpiritAirlinesDemo() {
       )}
 
       <nav className="bg-[#F8EC4D] mb-4">
-        <div className="container mx-auto px-4 py-2">
+        <div className="container mx-auto px-4 py-2" style={{zIndex: 12}}>
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <img src="/spirit-logo.svg" alt="Spirit" className="h-8 mb-2 sm:mb-0" />
             {userDetails.name && (
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-black">
                 <User className="w-5 h-5" />
-                <span>{userDetails.name}</span>
-                <span className="font-bold">{getTranslatedText("PNR#", "PNR#")} </span>{userDetails.confirmationCode}
+                <span>{userDetails.name}</span>                
                 <span className="font-bold">{getTranslatedText("Email id:", "Correo electrónico:")} </span>{userDetails.email}
               </div>
             )}
@@ -386,40 +385,39 @@ export default function SpiritAirlinesDemo() {
           </div>
           <div className="w-full md:w-1/3 bg-white p-6 md:p-12">
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="font-semibold">Confirmation Code</div>
-                <div>XIIMM</div>
-                <div className="font-semibold">Flight from</div>
-                <div>Miami, FL (MIA)</div>
-                <div className="font-semibold">Flight to</div>
-                <div>Las Vegas, NV (LAS)</div>
-                <div className="font-semibold">Travel Date</div>
-                <div>12 Dec 2024</div>
-                <div className="font-semibold">Flight#</div>
-                <div>NK 3168</div>
-                <div className="font-semibold">Depart Time</div>
-                <div>18:10 PM</div>
-                <div className="font-semibold">Arrival Time</div>
-                <div>20:44 PM</div>
-                <div className="font-semibold"># of PAX</div>
-                <div>2</div>
+              <div className="grid grid-cols-2 text-sm border border-gray-300">
+                <div className="font-semibold bg-[#F8EC4D] p-2 border-r border-b border-gray-300">Confirmation Code</div>
+                <div className="bg-[#F8EC4D] p-2 border-b border-gray-300">XIIMM</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Flight from</div>
+                <div className="p-2 border-b border-gray-300">Miami, FL (MIA)</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Flight to</div>
+                <div className="p-2 border-b border-gray-300">Las Vegas, NV (LAS)</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Travel Date</div>
+                <div className="p-2 border-b border-gray-300">12 Dec 2024</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Flight#</div>
+                <div className="p-2 border-b border-gray-300">NK 3168</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Depart Time</div>
+                <div className="p-2 border-b border-gray-300">18:10 PM</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Arrival Time</div>
+                <div className="p-2 border-b border-gray-300">20:44 PM</div>
+                <div className="font-semibold p-2 border-r border-gray-300"># of PAX</div>
+                <div className="p-2">2</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="text-center max-w-4xl mx-auto px-4 py-8">
-        <p className="text-base md:text-lg text-gray-600 mb-4">
+      <div className="text-left pl-10 pb-4">
+        <p className="text-sm md:text-sm text-gray-600 mb-2">
           We are dedicated to pairing great value with excellent service while re-imagining the airline experience.
-          We make it possible for our Guests to venture further, travel often and discover more than ever before.
         </p>
-        <p className="text-base md:text-lg bg-[#F8EC4D] inline-block px-2">
+        <p className="text-xs md:text-sm bg-[#F8EC4D] inline-block px-2">
           We believe it should be easy to take off and Go have some fun.
         </p>
       </div>
 
-      <div className="bg-white pt-6 px-4">
+      <div className="bg-white pt-2 px-4">
         <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
           <button
             onClick={toggleConversation}
