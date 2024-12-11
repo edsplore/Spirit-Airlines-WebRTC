@@ -11,6 +11,7 @@
     "axios": "^1.7.4",
     "buffer": "^6.0.3",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "express": "^4.19.2",
     "lucide-react": "^0.451.0",
     "node-fetch": "^2.6.7",

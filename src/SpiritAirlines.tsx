@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import "./App.css";
 import { Mic, MessageCircle, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
+import { addDays, format } from 'date-fns';
 
 interface RegisterCallResponse {
   access_token?: string
@@ -393,7 +394,7 @@ export default function SpiritAirlinesDemo() {
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Flight to</div>
                 <div className="p-2 border-b border-gray-300">Las Vegas, NV (LAS)</div>
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Travel Date</div>
-                <div className="p-2 border-b border-gray-300">12 Dec 2024</div>
+                <div className="p-2 border-b border-gray-300">{format(addDays(new Date(), 2), 'dd MMM yyyy')}</div>
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Flight#</div>
                 <div className="p-2 border-b border-gray-300">NK 3168</div>
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Depart Time</div>
@@ -430,7 +431,12 @@ export default function SpiritAirlinesDemo() {
                 callStatus === "active" ? "animate-bounce" : ""
               }`} />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">{getTranslatedText("Let's Talk", "Hablemos")}</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">
+              {callStatus === "active" 
+                ? <span className="text-brown-500">{getTranslatedText("Click to Disconnect", "Haga clic para desconectar")}</span>
+                : getTranslatedText("Let's Talk", "Hablemos")
+              }
+            </span>
           </button>
 
           <button 
@@ -455,3 +461,4 @@ export default function SpiritAirlinesDemo() {
     </div>
   )
 }
+
