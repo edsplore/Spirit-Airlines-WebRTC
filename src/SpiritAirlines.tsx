@@ -95,7 +95,7 @@ export default function SpiritAirlinesDemo() {
     const formData = new FormData(e.currentTarget)
     setUserDetails({
       name: formData.get('name') as string,
-      phone: formData.get('phone') as string,
+      phone: `${formData.get('countryCode')}${formData.get('phone')}` as string,
       email: formData.get('email') as string,
       confirmationCode: formData.get('confirmationCode') as string,
       language: formData.get('language') as string
@@ -281,13 +281,30 @@ export default function SpiritAirlinesDemo() {
                     <label htmlFor="phone" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       {getTranslatedText("Whatsapp Number", "Número de Whatsapp")}
                     </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                    />
+                    <div className="flex-1 flex">
+                      <select
+                        id="countryCode"
+                        name="countryCode"
+                        className="p-1.5 rounded-l bg-white text-black border border-gray-300 border-r-0 font-bold text-sm"
+                      >
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                        <option value="+91">+91</option>
+                        <option value="+61">+61</option>  {/* Australia */}
+                        <option value="+81">+81</option>  {/* Japan */}
+                        <option value="+49">+49</option>  {/* Germany */}
+                        <option value="+86">+86</option>  {/* China */}
+                        <option value="+33">+33</option>  {/* France */}
+                        <option value="+39">+39</option>  {/* Italy */}
+                      </select>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        required
+                        className="flex-1 p-1.5 rounded-r bg-white text-black border border-gray-300 font-bold text-sm"
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="email" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
@@ -384,7 +401,7 @@ export default function SpiritAirlinesDemo() {
               className="w-full h-auto md:h-[350px] object-contain md:object-cover"
             />
           </div>
-          <div className="w-full md:w-1/3 bg-white p-6 md:p-12">
+          <div className="w-full md:w-1/3 bg-white pt-12 pl-8 pr-8">
             <div className="space-y-4">
               <div className="grid grid-cols-2 text-sm border border-gray-300">
                 <div className="font-semibold bg-[#F8EC4D] p-2 border-r border-b border-gray-300">Confirmation Code</div>
@@ -409,11 +426,11 @@ export default function SpiritAirlinesDemo() {
         </div>
       </div>
 
-      <div className="text-left pl-10 pb-4">
-        <p className="text-sm md:text-sm text-gray-600 mb-2">
+      <div className="text-center py-4 bg-white md:w-2/3">
+        <p className="text-base md:text-lg text-gray-800 mb-2 font-semibold">
           We are dedicated to pairing great value with excellent service while re-imagining the airline experience.
         </p>
-        <p className="text-xs md:text-sm bg-[#F8EC4D] inline-block px-2">
+        <p className="text-sm md:text-base bg-[#F8EC4D] inline-block px-3 py-1 font-semibold">
           We believe it should be easy to take off and Go have some fun.
         </p>
       </div>
