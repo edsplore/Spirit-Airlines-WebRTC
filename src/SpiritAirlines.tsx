@@ -63,44 +63,102 @@ export default function SpiritAirlinesDemo() {
     })
 
     // Add chatbot script
-    const script = document.createElement('script')
-    const projectId = "669833f4ca2c7886e6638f93";
-    script.type = 'text/javascript'
-    script.innerHTML = `
-      (function(d, t) {
-        var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-        v.onload = function() {
-          window.voiceflow.chat.load({
-            verify: { projectID: '${projectId}' },
-            url: 'https://general-runtime.voiceflow.com',
-            versionID: 'production'
-          });
-        }
-        v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-      })(document, 'script');
-    `
-    document.body.appendChild(script)
+    const addChatbotScript = () => {
+      const script = document.createElement('script')
+      const projectId = "669833f4ca2c7886e6638f93";
+      script.type = 'text/javascript'
+      script.innerHTML = `
+        (function(d, t) {
+          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+          v.onload = function() {
+            window.voiceflow.chat.load({
+              verify: { projectID: '${projectId}' },
+              url: 'https://general-runtime.voiceflow.com',
+              versionID: 'production',
+              launch: {
+                event: {
+                  type: "launch",
+                  payload: {
+                    customer_name: "${userDetails.name}",
+                    email: "${userDetails.email}",
+                    phone: "${userDetails.phone}",
+                    confirmation_code: "${userDetails.confirmationCode}",                  
+                    language: "${userDetails.language}"
+                  }
+                }
+              },
+            });
+          }
+          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+      `
+      document.body.appendChild(script)
+      return script;
+    }
+
+    const chatbotScript = addChatbotScript();
 
     return () => {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
       webClient.off("error")
       webClient.off("update")
-      document.body.removeChild(script)
+      if (chatbotScript && chatbotScript.parentNode) {
+        chatbotScript.parentNode.removeChild(chatbotScript)
+      }
     }
-  }, [])
+  }, [userDetails])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    setUserDetails({
+    const newUserDetails = {
       name: formData.get('name') as string,
       phone: `${formData.get('countryCode')}${formData.get('phone')}` as string,
       email: formData.get('email') as string,
       confirmationCode: formData.get('confirmationCode') as string,
       language: formData.get('language') as string
-    })
+    }
+    setUserDetails(newUserDetails)
     setShowVerificationForm(false)
+
+    // Reload the chatbot script with new user details
+    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]');
+    if (existingScript && existingScript.parentNode) {
+      existingScript.parentNode.removeChild(existingScript);
+    }
+    const addChatbotScript = () => {
+      const script = document.createElement('script')
+      const projectId = "669833f4ca2c7886e6638f93";
+      script.type = 'text/javascript'
+      script.innerHTML = `
+        (function(d, t) {
+          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+          v.onload = function() {
+            window.voiceflow.chat.load({
+              verify: { projectID: '${projectId}' },
+              url: 'https://general-runtime.voiceflow.com',
+              versionID: 'production',
+              launch: {
+                event: {
+                  type: "launch",
+                  payload: {
+                    customer_name: "${newUserDetails.name}",
+                    email: "${newUserDetails.email}",
+                    phone: "${newUserDetails.phone}",
+                    confirmation_code: "${newUserDetails.confirmationCode}",                  
+                    language: "${newUserDetails.language}"
+                  }
+                }
+              },
+            });
+          }
+          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+      `
+      document.body.appendChild(script)
+    }
+    addChatbotScript();
   }
 
   const toggleConversation = async () => {
@@ -418,7 +476,7 @@ export default function SpiritAirlinesDemo() {
                 <div className="p-2 border-b border-gray-300">18:10 PM</div>
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Arrival Time</div>
                 <div className="p-2 border-b border-gray-300">20:44 PM</div>
-                <div className="font-semibold p-2 border-r border-gray-300"># of PAX</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300"># of PAX</div>
                 <div className="p-2">2</div>
               </div>
             </div>
@@ -426,7 +484,7 @@ export default function SpiritAirlinesDemo() {
         </div>
       </div>
 
-      <div className="text-center py-4 bg-white md:w-2/3">
+      <div className="text-center pt-2 bg-white md:w-2/3">
         <p className="text-base md:text-lg text-gray-800 mb-2 font-semibold">
           We are dedicated to pairing great value with excellent service while re-imagining the airline experience.
         </p>
