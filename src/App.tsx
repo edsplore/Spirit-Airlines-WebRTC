@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import SpiritAirlinesDemo from "./SpiritAirlines.tsx";
+import AON from "./AON.tsx";
 import McAfeeDemo from "./McAfee.tsx";
 
 export default function App() {
@@ -9,6 +10,7 @@ export default function App() {
       {/* Add more routes as needed */}
       <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
       <Route path="/demo/security/mcafee" element={<McAfeeDemo />} />
+      <Route path="/demo/riskmanagement/aon" element={<AON />} />
       <Route path="*" element={<div>Coming Soon</div>} />
     </Routes>
   );

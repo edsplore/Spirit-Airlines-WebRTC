@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import "./App.css";
 import { Mic, MessageCircle, User } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
+import { addDays, format } from 'date-fns';
 
 interface RegisterCallResponse {
   access_token?: string
@@ -62,44 +63,102 @@ export default function SpiritAirlinesDemo() {
     })
 
     // Add chatbot script
-    const script = document.createElement('script')
-    const projectId = "669833f4ca2c7886e6638f93";
-    script.type = 'text/javascript'
-    script.innerHTML = `
-      (function(d, t) {
-        var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-        v.onload = function() {
-          window.voiceflow.chat.load({
-            verify: { projectID: '${projectId}' },
-            url: 'https://general-runtime.voiceflow.com',
-            versionID: 'production'
-          });
-        }
-        v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-      })(document, 'script');
-    `
-    document.body.appendChild(script)
+    const addChatbotScript = () => {
+      const script = document.createElement('script')
+      const projectId = "669833f4ca2c7886e6638f93";
+      script.type = 'text/javascript'
+      script.innerHTML = `
+        (function(d, t) {
+          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+          v.onload = function() {
+            window.voiceflow.chat.load({
+              verify: { projectID: '${projectId}' },
+              url: 'https://general-runtime.voiceflow.com',
+              versionID: 'production',
+              launch: {
+                event: {
+                  type: "launch",
+                  payload: {
+                    customer_name: "${userDetails.name}",
+                    email: "${userDetails.email}",
+                    phone: "${userDetails.phone}",
+                    confirmation_code: "${userDetails.confirmationCode}",                  
+                    language: "${userDetails.language}"
+                  }
+                }
+              },
+            });
+          }
+          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+      `
+      document.body.appendChild(script)
+      return script;
+    }
+
+    const chatbotScript = addChatbotScript();
 
     return () => {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
       webClient.off("error")
       webClient.off("update")
-      document.body.removeChild(script)
+      if (chatbotScript && chatbotScript.parentNode) {
+        chatbotScript.parentNode.removeChild(chatbotScript)
+      }
     }
-  }, [])
+  }, [userDetails])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    setUserDetails({
+    const newUserDetails = {
       name: formData.get('name') as string,
-      phone: formData.get('phone') as string,
+      phone: `${formData.get('countryCode')}${formData.get('phone')}` as string,
       email: formData.get('email') as string,
       confirmationCode: formData.get('confirmationCode') as string,
       language: formData.get('language') as string
-    })
+    }
+    setUserDetails(newUserDetails)
     setShowVerificationForm(false)
+
+    // Reload the chatbot script with new user details
+    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]');
+    if (existingScript && existingScript.parentNode) {
+      existingScript.parentNode.removeChild(existingScript);
+    }
+    const addChatbotScript = () => {
+      const script = document.createElement('script')
+      const projectId = "669833f4ca2c7886e6638f93";
+      script.type = 'text/javascript'
+      script.innerHTML = `
+        (function(d, t) {
+          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+          v.onload = function() {
+            window.voiceflow.chat.load({
+              verify: { projectID: '${projectId}' },
+              url: 'https://general-runtime.voiceflow.com',
+              versionID: 'production',
+              launch: {
+                event: {
+                  type: "launch",
+                  payload: {
+                    customer_name: "${newUserDetails.name}",
+                    email: "${newUserDetails.email}",
+                    phone: "${newUserDetails.phone}",
+                    confirmation_code: "${newUserDetails.confirmationCode}",                  
+                    language: "${newUserDetails.language}"
+                  }
+                }
+              },
+            });
+          }
+          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+      `
+      document.body.appendChild(script)
+    }
+    addChatbotScript();
   }
 
   const toggleConversation = async () => {
@@ -280,13 +339,30 @@ export default function SpiritAirlinesDemo() {
                     <label htmlFor="phone" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
                       {getTranslatedText("Whatsapp Number", "Número de Whatsapp")}
                     </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                    />
+                    <div className="flex-1 flex">
+                      <select
+                        id="countryCode"
+                        name="countryCode"
+                        className="p-1.5 rounded-l bg-white text-black border border-gray-300 border-r-0 font-bold text-sm"
+                      >
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                        <option value="+91">+91</option>
+                        <option value="+61">+61</option>  {/* Australia */}
+                        <option value="+81">+81</option>  {/* Japan */}
+                        <option value="+49">+49</option>  {/* Germany */}
+                        <option value="+86">+86</option>  {/* China */}
+                        <option value="+33">+33</option>  {/* France */}
+                        <option value="+39">+39</option>  {/* Italy */}
+                      </select>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        required
+                        className="flex-1 p-1.5 rounded-r bg-white text-black border border-gray-300 font-bold text-sm"
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label htmlFor="email" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
@@ -383,41 +459,41 @@ export default function SpiritAirlinesDemo() {
               className="w-full h-auto md:h-[350px] object-contain md:object-cover"
             />
           </div>
-          <div className="w-full md:w-1/3 bg-white p-6 md:p-12">
+          <div className="w-full md:w-1/3 bg-white pt-12 pl-8 pr-8">
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="font-bold bg-[#F8EC4D]">Confirmation Code</div>
-                <div className="bg-[#F8EC4D]">XIIMM</div>
-                <div className="font-semibold">Flight from</div>
-                <div>Miami, FL (MIA)</div>
-                <div className="font-semibold">Flight to</div>
-                <div>Las Vegas, NV (LAS)</div>
-                <div className="font-semibold">Travel Date</div>
-                <div>12 Dec 2024</div>
-                <div className="font-semibold">Flight#</div>
-                <div>NK 3168</div>
-                <div className="font-semibold">Depart Time</div>
-                <div>18:10 PM</div>
-                <div className="font-semibold">Arrival Time</div>
-                <div>20:44 PM</div>
-                <div className="font-semibold"># of PAX</div>
-                <div>2</div>
+              <div className="grid grid-cols-2 text-sm border border-gray-300">
+                <div className="font-semibold bg-[#F8EC4D] p-2 border-r border-b border-gray-300">Confirmation Code</div>
+                <div className="bg-[#F8EC4D] p-2 border-b border-gray-300">XIIMM</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Flight from</div>
+                <div className="p-2 border-b border-gray-300">Miami, FL (MIA)</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Flight to</div>
+                <div className="p-2 border-b border-gray-300">Las Vegas, NV (LAS)</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Travel Date</div>
+                <div className="p-2 border-b border-gray-300">{format(addDays(new Date(), 2), 'dd MMM yyyy')}</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Flight#</div>
+                <div className="p-2 border-b border-gray-300">NK 3168</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Depart Time</div>
+                <div className="p-2 border-b border-gray-300">10:00 AM</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300">Arrival Time</div>
+                <div className="p-2 border-b border-gray-300">12:34 PM</div>
+                <div className="font-semibold p-2 border-r border-b border-gray-300"># of PAX</div>
+                <div className="p-2">2</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="text-left max-w-4xl px-4 py-8">
-        <p className="text-sm md:text-base text-gray-600 mb-4">
-          We are dedicated to pairing great value with excellent service while re-imagining the airline experience.          
+      <div className="text-center pt-2 bg-white md:w-2/3">
+        <p className="text-base md:text-lg text-gray-800 mb-2 font-semibold">
+          We are dedicated to pairing great value with excellent service while re-imagining the airline experience.
         </p>
-        <p className="text-sm md:text-base bg-[#F8EC4D] inline-block px-2">
+        <p className="text-sm md:text-base bg-[#F8EC4D] inline-block px-3 py-1 font-semibold">
           We believe it should be easy to take off and Go have some fun.
         </p>
       </div>
 
-      <div className="bg-white pt-6 px-4">
+      <div className="bg-white pt-2 px-4">
         <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
           <button
             onClick={toggleConversation}
@@ -430,7 +506,12 @@ export default function SpiritAirlinesDemo() {
                 callStatus === "active" ? "animate-bounce" : ""
               }`} />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">{getTranslatedText("Let's Talk", "Hablemos")}</span>
+            <span className="mt-4 text-lg md:text-xl font-medium">
+              {callStatus === "active" 
+                ? <span className="text-brown-500">{getTranslatedText("Click to Disconnect", "Haga clic para desconectar")}</span>
+                : getTranslatedText("Let's Talk", "Hablemos")
+              }
+            </span>
           </button>
 
           <button 
@@ -455,3 +536,4 @@ export default function SpiritAirlinesDemo() {
     </div>
   )
 }
+
