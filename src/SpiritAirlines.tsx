@@ -475,7 +475,7 @@ export default function SpiritAirlinesDemo() {
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Depart Time</div>
                 <div className="p-2 border-b border-gray-300">10:00 AM</div>
                 <div className="font-semibold p-2 border-r border-b border-gray-300">Arrival Time</div>
-                <div className="p-2 border-b border-gray-300">12:34 PM</div>
+                <div className="p-2 border-b border-gray-300">4:00 PM</div>
                 <div className="font-semibold p-2 border-r border-b border-gray-300"># of PAX</div>
                 <div className="p-2">2</div>
               </div>
