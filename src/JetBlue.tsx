@@ -65,7 +65,7 @@ export default function SpiritAirlinesDemo() {
     // Add chatbot script
     const addChatbotScript = () => {
       const script = document.createElement('script')
-      const projectId = "669833f4ca2c7886e6638f93";
+      const projectId = "676471f9262abee922cce364";
       script.type = 'text/javascript'
       script.innerHTML = `
         (function(d, t) {
@@ -129,7 +129,7 @@ export default function SpiritAirlinesDemo() {
     }
     const addChatbotScript = () => {
       const script = document.createElement('script')
-      const projectId = "669833f4ca2c7886e6638f93";
+      const projectId = "676471f9262abee922cce364";
       script.type = 'text/javascript'
       script.innerHTML = `
         (function(d, t) {

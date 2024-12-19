@@ -227,6 +227,8 @@ export default function SpiritAirlinesDemo() {
           retell_llm_dynamic_variables: {
             customer_name: userDetails.name,
             email: userDetails.email,
+            address: userDetails.address,
+            zip_code: userDetails.zipCode,
           },
         }),
       })
