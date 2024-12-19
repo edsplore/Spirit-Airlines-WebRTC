@@ -486,14 +486,14 @@ export default function SpiritAirlinesDemo() {
 
       <div className="text-center pt-2 bg-white md:w-2/3">
         <p className="text-base md:text-lg text-gray-800 mb-2 font-semibold">
-          We are dedicated to pairing great value with excellent service while re-imagining the airline experience.
+          Born at JFK in 2000, JetBlue is now a global, award-winning travel company.
         </p>
         <p className="text-sm md:text-base bg-[#00205B] inline-block px-3 py-1 font-semibold text-white">
-          We believe it should be easy to take off and Go have some fun.
+          Get to know us and our commitment to customers and communities.
         </p>
       </div>
 
-      <div className="bg-white pt-2 px-4">
+      <div className="bg-white pt-6 px-4">
         <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
           <button
             onClick={toggleConversation}
