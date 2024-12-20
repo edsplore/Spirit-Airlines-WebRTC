@@ -454,7 +454,7 @@ export default function SpiritAirlinesDemo() {
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-2/3 relative">
             <img
-              src="/jetblue-hero.jpg"
+              src="/jetblue-hero.png"
               alt="Spirit Airlines beach scene"
               className="w-full h-auto md:h-[350px] object-contain md:object-cover"
             />
