@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import "./App.css";
-import { Mic, MessageCircle, User } from 'lucide-react'
+import { Mic, MessageCircle } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from 'date-fns';
 
