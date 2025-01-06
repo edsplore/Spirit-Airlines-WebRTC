@@ -28,7 +28,7 @@ const notes = [
     "Phone# and Email id is required to send instant messages and confirmation"
 ]
 
-export default function CentreAirlines() {
+export default function Centene() {
     const [showVerificationForm, setShowVerificationForm] = useState(true)
     const [userDetails, setUserDetails] = useState<UserDetails>({
         name: '',

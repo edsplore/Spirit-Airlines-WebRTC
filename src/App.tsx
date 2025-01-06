@@ -4,14 +4,14 @@ import SpiritAirlinesDemo from "./SpiritAirlines.tsx";
 import JetBlueDemo from "./JetBlue.tsx";
 import AON from "./AON.tsx";
 import McAfeeDemo from "./McAfee.tsx";
-import CentreAirlines from "./Centene.tsx";
+import Centene from "./Centene.tsx";
 
 export default function App() {
   return (
     <Routes>
       {/* Add more routes as needed */}
       <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
-      <Route path="/demo/healthcare/centene" element={<CentreAirlines />} />
+      <Route path="/demo/healthcare/centene" element={<Centene />} />
 
       <Route path="/demo/airline/jetblue" element={<JetBlueDemo />} />
       <Route path="/demo/security/mcafee" element={<McAfeeDemo />} />
