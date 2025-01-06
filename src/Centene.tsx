@@ -486,20 +486,16 @@ export default function Centene() {
 
             <div className="text-center pt-2 bg-white md:w-2/3">
                 <p className="text-base md:text-lg text-[#1e81b0] font-bold mb-2">
-                    Centene is committed to helping people live healthier lives.
+                    Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
                 </p>
                 <p className="text-base md:text-lg text-[#1e81b0] font-bold mb-2">
-                    We provide access to high-quality healthcare,
+                innovative programs and health solutions that help families and individuals get well, stay well and be well.
                 </p>
-                <p className="text-base md:text-lg text-[#1e81b0] font-bold mb-2">
-                    innovative programs and health solutions                </p>
-                <p className="text-base md:text-lg text-[#1e81b0] font-bold mb-2">
-                    that help families and individuals get well, stay well and be well.                        </p>
             </div>
 
 
 
-            <div className="bg-white pt-2 px-4">
+            <div className="bg-white pt-2 px-2">
                 <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
                     <button
                         onClick={toggleConversation}
