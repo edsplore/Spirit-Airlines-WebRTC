@@ -1,5 +1,4 @@
 import React from 'react';
-
 import "./App.css";
 import { useEffect, useState } from 'react'
 import { Mic, Wifi, Tv, Globe, User, Video } from 'lucide-react';
@@ -266,7 +265,7 @@ export default function Component() {
                     <img
                         src="/m1_Aboutus.png"
                         alt="M1 family"
-                        className="w-full h-full object-fit object-center"
+                        className="w-full h-full object-cover object-bottom"
                     />
                     {/* Text Section */}
                     <div className="absolute top-4 left-4 sm:top-8 sm:left-8 bg-white bg-opacity-75 p-4 sm:p-8 rounded-md">
@@ -330,8 +329,8 @@ export default function Component() {
                 </div>
 
                 {/* Additional Feature Section */}
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-black">Our Services</h2>
+                <div className="text-center mt-20 mb-8">
+                    <h2 className="mb-20 text-2xl sm:text-3xl font-bold text-black">Our Services</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                     <div className="p-4 border border-[#ff9e1b] rounded-lg flex flex-col items-center">
@@ -365,13 +364,13 @@ export default function Component() {
                 </div>
 
                 {/* New Section */}
-                <div className="mt-12 text-center">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-black">Save the hassle, sign up online here</h2>
+                <div className="text-center">
+                    <h2 className="mt-20 mb-20 text-2xl sm:text-3xl font-bold text-black">Save the hassle, sign up online here</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
                     <div className="flex flex-col items-center text-center">
                         <img
-                            src="/jetblue-hero.jpg"
+                            src="/m1first.jpg"
                             alt="Service 1"
                             className="w-62 h-62 object-cover rounded-lg"
                         />
@@ -385,7 +384,7 @@ export default function Component() {
                     </div>
                     <div className="flex flex-col items-center text-center">
                         <img
-                            src="/jetblue-hero.jpg"
+                            src="/m1second.jpg"
                             alt="Service 2"
                             className="w-62 h-62 object-cover rounded-lg"
                         />
@@ -399,7 +398,7 @@ export default function Component() {
                     </div>
                     <div className="flex flex-col items-center text-center">
                         <img
-                            src="/jetblue-hero.jpg"
+                            src="/m1third.jpg"
                             alt="Service 3"
                             className="w-62 h-62 object-cover rounded-lg"
                         />
@@ -416,7 +415,7 @@ export default function Component() {
 
             </main>
 
-            <footer className="bg-gray-200 py-8">
+            <footer className="bg-gray-200 py-8 mt-20">
                 <div className="container mx-auto px-4 sm:px-6 flex justify-center">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-screen-xl">
                         {/* About Section */}
