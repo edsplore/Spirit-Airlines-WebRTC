@@ -432,17 +432,17 @@ export default function Component() {
                             <h3 className="text-xl font-bold text-black mb-4">Quick Links</h3>
                             <ul className="space-y-2 text-center sm:text-left">
                                 <li>
-                                    <a href="#" className="text-black text-sm hover:underline">
+                                    <a href="https://voicebot.everailabs.com/demo/telecom/m1" className="text-black text-sm hover:underline">
                                         Careers
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-black text-sm hover:underline">
+                                    <a href="https://voicebot.everailabs.com/demo/telecom/m1" className="text-black text-sm hover:underline">
                                         Investor Relations
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-black text-sm hover:underline">
+                                    <a href="https://voicebot.everailabs.com/demo/telecom/m1" className="text-black text-sm hover:underline">
                                         News & Media
                                     </a>
                                 </li>
@@ -454,17 +454,17 @@ export default function Component() {
                             <h3 className="text-xl font-bold text-black mb-4">Legal</h3>
                             <ul className="space-y-2 text-center sm:text-left">
                                 <li>
-                                    <a href="#" className="text-black text-sm hover:underline">
+                                    <a href="https://voicebot.everailabs.com/demo/telecom/m1" className="text-black text-sm hover:underline">
                                         Terms of Service
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-black text-sm hover:underline">
+                                    <a href="https://voicebot.everailabs.com/demo/telecom/m1" className="text-black text-sm hover:underline">
                                         Privacy Policy
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-black text-sm hover:underline">
+                                    <a href="https://voicebot.everailabs.com/demo/telecom/m1" className="text-black text-sm hover:underline">
                                         Cookie Policy
                                     </a>
                                 </li>
