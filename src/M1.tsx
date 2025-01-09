@@ -65,7 +65,7 @@ export default function Component() {
         // Add chatbot script
         const addChatbotScript = () => {
             const script = document.createElement('script')
-            const projectId = "669833f4ca2c7886e6638f93";
+            const projectId = "678056572812e20e7c68a0f1";
             script.type = 'text/javascript'
             script.innerHTML = `
             (function(d, t) {
@@ -127,7 +127,7 @@ export default function Component() {
         }
         const addChatbotScript = () => {
             const script = document.createElement('script')
-            const projectId = "669833f4ca2c7886e6638f93";
+            const projectId = "678056572812e20e7c68a0f1";
             script.type = 'text/javascript'
             script.innerHTML = `
         (function(d, t) {
@@ -144,8 +144,8 @@ export default function Component() {
                         customer_name: "${userDetails.name}",
                         accountNumber: "${userDetails.accountNumber}",
                         address: "${userDetails.address}",
-                        selectedAgent: "${userDetails.selectedAgent}",                  
-                      }
+                        selectedAgent: "${userDetails.selectedAgent}"
+                    }
                 }
               },
             });
