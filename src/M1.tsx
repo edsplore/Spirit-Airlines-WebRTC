@@ -14,6 +14,7 @@ interface UserDetails {
     name: string
     accountNumber: string
     address: string
+    selectedAgent: string
 }
 
 const webClient = new RetellWebClient()
@@ -31,7 +32,9 @@ export default function Component() {
     const [userDetails, setUserDetails] = useState<UserDetails>({
         name: '',
         accountNumber: '',
-        address: ''
+        address: '',
+        selectedAgent: 'Mindy', // Default agent
+
     })
     const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
     const [callInProgress, setCallInProgress] = useState(false)
@@ -73,7 +76,9 @@ export default function Component() {
         setUserDetails({
             name: formData.get('name') as string,
             accountNumber: formData.get('accountNumber') as string,
-            address: formData.get('address') as string
+            address: formData.get('address') as string,
+            selectedAgent: formData.get('selectedAgent') as string,
+
         })
         setShowVerificationForm(false)
     }
@@ -104,8 +109,12 @@ export default function Component() {
         }
     }
 
+
     const initiateConversation = async () => {
-        const agentId = "agent_a6075c48f5a298374c1c314357"
+        const agentId = userDetails.selectedAgent === 'Mindy'
+            ? 'agent_a6075c48f5a298374c1c314357'
+            : 'agent_a6075c48f5a298374c1c314357'
+
         try {
             const registerCallResponse = await registerCall(agentId)
             if (registerCallResponse.callId) {
@@ -205,7 +214,21 @@ export default function Component() {
                                     readOnly
                                     className="p-2 rounded bg-[#BFBFBF] text-gray-700 w-full font-bold"
                                 />
+                                <label htmlFor="selectedAgent" className="text-white text-base sm:text-lg font-bold sm:text-right">
+                                    Select Agent
+                                </label>
+                                <select
+                                    id="selectedAgent"
+                                    name="selectedAgent"
+                                    required
+                                    defaultValue="Mindy"
+                                    className="p-2 rounded bg-[#fff2e3] text-black w-full font-bold"
+                                >
+                                    <option value="Mindy">Mindy</option>
+                                    <option value="Kevin">Kevin</option>
+                                </select>
                             </div>
+
                             <div className="flex justify-center mt-4 sm:mt-6">
                                 <button
                                     type="submit"
