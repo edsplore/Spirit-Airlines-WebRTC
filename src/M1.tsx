@@ -408,7 +408,9 @@ export default function Component() {
                     </div>
 
                     <div className="text-center">
-                        <button className="relative bg-[#ff9e1b] rounded-full p-6 sm:p-8 transition-all duration-300 hover:scale-105">
+                        <button 
+                            onClick={() => (window as any).voiceflow?.chat?.open()}
+                            className="relative bg-[#ff9e1b] rounded-full p-6 sm:p-8 transition-all duration-300 hover:scale-105">
                             <User className="w-8 h-8 sm:w-12 sm:h-12 text-white" />
                         </button>
                         <p className="mt-4 text-base sm:text-lg text-[#ff9e1b]">
