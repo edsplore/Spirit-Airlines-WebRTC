@@ -187,7 +187,7 @@ export default function Component() {
 
     const initiateConversation = async () => {
         const agentId = userDetails.selectedAgent === 'Mindy'
-            ? 'agent_a6075c48f5a298374c1c314357'
+            ? 'agent_5af48d3a44ac25dd5c949db973'
             : 'agent_a6075c48f5a298374c1c314357'
 
         try {
