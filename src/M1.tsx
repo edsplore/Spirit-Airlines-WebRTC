@@ -62,13 +62,51 @@ export default function Component() {
             console.log("Update received", update)
         })
 
+        // Add chatbot script
+        const addChatbotScript = () => {
+            const script = document.createElement('script')
+            const projectId = "669833f4ca2c7886e6638f93";
+            script.type = 'text/javascript'
+            script.innerHTML = `
+            (function(d, t) {
+              var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+              v.onload = function() {
+                window.voiceflow.chat.load({
+                  verify: { projectID: '${projectId}' },
+                  url: 'https://general-runtime.voiceflow.com',
+                  versionID: 'production',
+                  launch: {
+                    event: {
+                      type: "launch",
+                      payload: {
+                        customer_name: "${userDetails.name}",
+                        accountNumber: "${userDetails.accountNumber}",
+                        address: "${userDetails.address}",
+                        selectedAgent: "${userDetails.selectedAgent}",                  
+                      }
+                    }
+                  },
+                });
+              }
+              v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+            })(document, 'script');
+          `
+            document.body.appendChild(script)
+            return script;
+        }
+
+        const chatbotScript = addChatbotScript();
+
         return () => {
             webClient.off("conversationStarted")
             webClient.off("conversationEnded")
             webClient.off("error")
             webClient.off("update")
+            if (chatbotScript && chatbotScript.parentNode) {
+                chatbotScript.parentNode.removeChild(chatbotScript)
+            }
         }
-    }, [])
+    }, [userDetails])
 
     const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -81,6 +119,43 @@ export default function Component() {
 
         })
         setShowVerificationForm(false)
+
+        // Reload the chatbot script with new user details
+        const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]');
+        if (existingScript && existingScript.parentNode) {
+            existingScript.parentNode.removeChild(existingScript);
+        }
+        const addChatbotScript = () => {
+            const script = document.createElement('script')
+            const projectId = "669833f4ca2c7886e6638f93";
+            script.type = 'text/javascript'
+            script.innerHTML = `
+        (function(d, t) {
+          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+          v.onload = function() {
+            window.voiceflow.chat.load({
+              verify: { projectID: '${projectId}' },
+              url: 'https://general-runtime.voiceflow.com',
+              versionID: 'production',
+              launch: {
+                event: {
+                  type: "launch",
+                   payload: {
+                        customer_name: "${userDetails.name}",
+                        accountNumber: "${userDetails.accountNumber}",
+                        address: "${userDetails.address}",
+                        selectedAgent: "${userDetails.selectedAgent}",                  
+                      }
+                }
+              },
+            });
+          }
+          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+      `
+            document.body.appendChild(script)
+        }
+        addChatbotScript();
     }
 
     const toggleConversation = async () => {
