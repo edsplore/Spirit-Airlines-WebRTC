@@ -191,8 +191,8 @@ export default function SpiritAirlinesDemo() {
 
   const initiateConversation = async () => {
     const agentId = userDetails.language === 'Spanish'
-    ? "agent_c53c273bda8beda64317da5bc9"
-    : "agent_c53c273bda8beda64317da5bc9";
+      ? "agent_c53c273bda8beda64317da5bc9"
+      : "agent_c53c273bda8beda64317da5bc9";
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -408,7 +408,7 @@ export default function SpiritAirlinesDemo() {
       )}
 
       <nav className="bg-[#EEF6F7] mb-4">
-        <div className="container mx-auto px-4 py-2" style={{zIndex: 12}}>
+        <div className="container mx-auto px-4 py-2" style={{ zIndex: 12 }}>
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <img src="/aon-logo.svg" alt="Aon" className="h-8 mb-2 sm:mb-0" />
             {userDetails.name && (
@@ -455,35 +455,46 @@ export default function SpiritAirlinesDemo() {
 
       <div className="bg-white pt-8 px-4">
         <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
+          {/* Button 1 */}
           <button
             onClick={toggleConversation}
             className="flex flex-col items-center group"
           >
-            <div className={`p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-              callStatus === "active" ? "ring-4 ring-[#EEF6F7] animate-pulse" : ""
-            }`}>
-              <Mic className={`w-12 h-12 md:w-16 md:h-16 text-[#EEF6F7] ${
-                callStatus === "active" ? "animate-bounce" : ""
-              }`} />
+            <div
+              className={`p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent ${callStatus === "active"
+                  ? "bg-red-500 group-hover:bg-red-500"
+                  : "bg-transparent group-hover:bg-red-500"
+                }`}
+            >
+              <Mic
+                className={`w-12 h-12 md:w-16 md:h-16 ${callStatus === "active"
+                    ? "text-white group-hover:text-white"
+                    : "text-[#EB0017] group-hover:text-white"
+                  }`}
+              />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">
-              {callStatus === "active" 
-                ? "Click to Disconnect"
-                : "Let's Talk"
-              }
+            <span
+              className={`mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]`}
+            >
+              {callStatus === "active" ? "Click to Disconnect" : "Let's Talk"}
             </span>
           </button>
 
-          <button 
+          {/* Button 2 */}
+          <button
             onClick={() => (window as any).voiceflow?.chat?.open()}
-            className="flex flex-col items-center group">
-            <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-              <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#EEF6F7]" />
+            className="flex flex-col items-center group"
+          >
+            <div className="p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent group-hover:bg-red-500">
+              <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#EB0017] group-hover:text-white" />
             </div>
-            <span className="mt-4 text-lg md:text-xl font-medium">Let's Chat</span>
+            <span className="mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]">
+              Let's Chat
+            </span>
           </button>
         </div>
       </div>
+
     </div>
   )
 }
