@@ -268,7 +268,7 @@ export default function Centene() {
         `}
             </style>
 
-            <div
+            {/* <div
                 className="absolute decorative-triangle"
                 style={{
                     bottom: 0,
@@ -311,7 +311,7 @@ export default function Centene() {
                     borderTop: '0 solid transparent',
                     zIndex: 10,
                 }}
-            ></div>
+            ></div> */}
 
             {showVerificationForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -428,19 +428,20 @@ export default function Centene() {
 
 
 
-            <nav className="bg-[#1e81b0] mb-4">
+            <nav className="bg-[#1e81b0] ">
                 <div className="container mx-auto px-4 py-2" style={{ zIndex: 12 }}>
                     <div className="flex flex-col sm:flex-row items-center justify-between">
                         <img src="/centene_logo.png" alt="Spirit" className="h-12 mb-3 sm:mb-0" />
-                        {userDetails.name && (
-                            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-white">
-                                <span className="font-bold">DOB#:</span>
-                                <span>{userDetails.dob}</span> {/* Displaying Date of Birth */}
 
-                                <span className="font-bold">Address:</span>
-                                <span>{userDetails.address}</span> {/* Displaying Address */}
-                            </div>
-                        )}
+                        {/* Right-side links */}
+                        <div className="flex flex-col sm:flex-row items-center gap-12 text-white text-lg font-bold">
+                            <span className="cursor-pointer">Who are we</span>
+                            <span className="cursor-pointer">Why we are different</span>
+                            <span className="cursor-pointer">Products and Services</span>
+                            <span className="cursor-pointer">Careers</span>
+                            <span className="cursor-pointer">Investors</span>
+                            <span className="cursor-pointer">News</span>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -448,84 +449,129 @@ export default function Centene() {
 
 
             <div className="relative w-full">
-                <div className="flex flex-col md:flex-row">
+                {/* Full-width Image */}
+                <img
+                    src="/centene_Hero.png"
+                    alt="Spirit Airlines beach scene"
+                    className="w-full h-auto object-cover rounded-lg shadow-md"
+                />
 
-                    <div className="w-full md:w-2/3 relative p-4">
-                        <img
-                            src="/centene_Hero.png"
-                            alt="Spirit Airlines beach scene"
-                            className="w-full h-auto md:h-[350px] object-contain md:object-cover rounded-lg shadow-md"
-                        />
+                {/* "Who we are" heading outside the white background */}
+                <div className="absolute bottom-36 left-4 text-white text-4xl md:text-6xl font-bold z-10">
+                    Who we are
+                </div>
+
+                {/* Text Container with white transparent background */}
+                <div className="absolute bottom-4 left-4 bg-white bg-opacity-70 text-black p-6 rounded-lg shadow-md w-auto">
+                    <p className="text-base md:text-lg font-bold text-black mb-2">
+                        Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
+                    </p>
+                    <p className="text-base md:text-lg font-bold text-black mb-2">
+                        innovative programs and health solutions that help families and individuals get well, stay well and be well.
+                    </p>
+
+                </div>
+            </div>
+
+
+
+
+
+
+            <div className="flex justify-center gap-12 mt-8">
+                <div className="w-full md:w-1/3 bg-white pt-8 pl-8 pr-8 pb-8 rounded-lg">
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 text-sm border border-gray-300">
+                            <div className="font-semibold bg-[#1e81b0] text-white p-2 border-r border-b border-gray-300">Medical ID #</div>
+                            <div className="bg-[#1e81b0] text-white p-2 border-b border-gray-300">{userDetails.medicalCode}</div>
+
+                            <div className="font-semibold p-2 border-r border-b border-gray-300">Member Name</div>
+                            <div className="p-2 border-b border-gray-300">{userDetails.name}</div>
+
+                            <div className="font-semibold p-2 border-r border-b border-gray-300">Email ID</div>
+                            <div className="p-2 border-b border-gray-300">{userDetails.email}</div>
+
+                            <div className="font-semibold p-2 border-r border-b border-gray-300">Status</div>
+                            <div className="p-2 border-b border-gray-300">Enrolled</div>
+
+                            <div className="font-semibold p-2 border-r border-b border-gray-300">DOB</div>
+                            <div className="p-2 border-b border-gray-300">{userDetails.dob}</div>
+
+                            <div className="font-semibold p-2 border-r border-b border-gray-300">Address</div>
+                            <div className="p-2 border-b border-gray-300">{userDetails.address}</div>
+
+                            <div className="font-semibold p-2 border-r border-b border-gray-300">Policy Active Date</div>
+                            <div className="p-2 border-b border-gray-300">{format(addDays(new Date(), 15), 'dd MMM yyyy')}</div>
+                        </div>
                     </div>
+                </div>
 
-
-                    <div className="w-full md:w-1/3 bg-white pt-8 pl-8 pr-8 pb-8 rounded-lg mt-8">
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 text-sm border border-gray-300">
-                                <div className="font-semibold bg-[#1e81b0] text-white p-2 border-r border-b border-gray-300">Medical ID #</div>
-                                <div className="bg-[#1e81b0] text-white p-2 border-b border-gray-300">{userDetails.medicalCode}</div>
-
-                                <div className="font-semibold p-2 border-r border-b border-gray-300">Member Name</div>
-                                <div className="p-2 border-b border-gray-300">{userDetails.name}</div>
-
-                                <div className="font-semibold p-2 border-r border-b border-gray-300">Email ID</div>
-                                <div className="p-2 border-b border-gray-300">{userDetails.email}</div>
-
-                                <div className="font-semibold p-2 border-r border-b border-gray-300">Status</div>
-                                <div className="p-2 border-b border-gray-300">Enrolled</div>
-
-                                <div className="font-semibold p-2 border-r border-b border-gray-300">Policy Active Date</div>
-                                <div className="p-2 border-b border-gray-300">{format(addDays(new Date(), 15), 'dd MMM yyyy')}</div>
+                <div className="bg-white pt-2 px-2 w-full md:w-1/2 mt-4">
+                    <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
+                        <button
+                            onClick={toggleConversation}
+                            className="flex flex-col items-center group"
+                        >
+                            <div className={`p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                                }`}>
+                                <Mic className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
+                                    }`} />
                             </div>
-                        </div>
+                            <span className="mt-4 text-[#1e81b0] md:text-xl font-medium">
+                                {callStatus === "active"
+                                    ? <span className="text-[#1e81b0]">Click to Disconnect</span>
+                                    : "Let's Talk"
+                                }
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={() => (window as any).voiceflow?.chat?.open()}
+                            className="flex flex-col items-center group">
+                            <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
+                                <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#1e81b0]" />
+                            </div>
+                            <span className="mt-4 text-[#1e81b0] md:text-xl font-medium">Let's Chat</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
+            <div className="bg-[#2E5388] text-white py-8">
+                <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8">
 
+                    <div className="flex flex-col items-start gap-2">
+                        <img src="/centene_logo.png" alt="Centene" className="h-12 mb-3 sm:mb-0" />
+                        <p className="text-sm sm:text-lg font-normal">
+                            Transform the health of the communities, <br />
+                            we serve  one person at a time.
+                        </p>
+                    </div>
 
-            <div className="text-center pt-2 bg-white md:w-2/3">
-                <p className="text-base md:text-lg text-[#1e81b0] font-bold mb-2">
-                    Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
-                </p>
-                <p className="text-base md:text-lg text-[#1e81b0] font-bold mb-2">
-                innovative programs and health solutions that help families and individuals get well, stay well and be well.
-                </p>
-            </div>
+                    <div className="flex flex-col items-center gap-4">
+                        <h2 className="text-2xl sm:text-3xl font-bold uppercase">
+                            Healthcare IS BEST DELIVERED LOCALLY
+                        </h2>
+                        <p className="text-sm sm:text-lg font-normal text-center">
+                            Our unique local approach allows us to help members helpers take out you from there, <br />
+                            access hifg-quality, cultarally sesitive healtcare services
+                        </p>
+                    </div>
 
+                    <div className="flex flex-col items-start gap-4">
+                        <ul className="text-sm sm:text-lg font-normal">
+                            <li>Contact</li>
+                            <li>Equal Oppurtunity Employer</li>
+                            <li>Privacy Policy</li>
+                            <li>Terms & Conditions</li>
+                            <li>Purchase Order Terms & Conditions</li>
 
-
-            <div className="bg-white pt-2 px-2">
-                <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
-                    <button
-                        onClick={toggleConversation}
-                        className="flex flex-col items-center group"
-                    >
-                        <div className={`p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                            }`}>
-                            <Mic className={`w-12 h-12 md:w-16 md:h-16  text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
-                                }`} />
-                        </div>
-                        <span className="mt-4 text-lg md:text-xl font-medium">
-                            {callStatus === "active"
-                                ? <span className="text-brown-500">Click to Disconnect</span>
-                                : "Let's Talk"
-                            }
-                        </span>
-                    </button>
-
-                    <button
-                        onClick={() => (window as any).voiceflow?.chat?.open()}
-                        className="flex flex-col items-center group">
-                        <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-                            <MessageCircle className="w-12 h-12 md:w-16 md:h-16  text-[#1e81b0]" />
-                        </div>
-                        <span className="mt-4 text-lg md:text-xl font-medium">Let's Chat</span>
-                    </button>
-
+                        </ul>
+                    </div>
 
                 </div>
             </div>
+
 
         </div>
     )

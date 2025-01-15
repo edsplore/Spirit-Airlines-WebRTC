@@ -267,7 +267,7 @@ export default function SpiritAirlinesDemo() {
         `}
       </style>
 
-      <div
+      {/* <div
         className="absolute decorative-triangle"
         style={{
           bottom: 0,
@@ -310,7 +310,7 @@ export default function SpiritAirlinesDemo() {
           borderTop: '0 solid transparent',
           zIndex: 10,
         }}
-      ></div>
+      ></div> */}
 
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -410,90 +410,195 @@ export default function SpiritAirlinesDemo() {
       <nav className="bg-[#EEF6F7] mb-4">
         <div className="container mx-auto px-4 py-2" style={{ zIndex: 12 }}>
           <div className="flex flex-col sm:flex-row items-center justify-between">
-            <img src="/aon-logo.svg" alt="Aon" className="h-8 mb-2 sm:mb-0" />
-            {userDetails.name && (
-              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-sm text-black">
-                <div className="flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  <span>{userDetails.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-5 h-5" />
-                  <span>{userDetails.email}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Home className="w-5 h-5" />
-                  <span>{userDetails.address}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  <span>{userDetails.zipCode}</span>
-                </div>
+            {/* Left Section: Logo and Navigation Links */}
+            <div className="flex items-center gap-6">
+              <img src="/aon-logo.svg" alt="Aon" className="h-8" />
+              <div className="flex gap-6 text-lg font-medium text-black">
+                <a href="#" className="hover:underline">Capabilities</a>
+                <a href="#" className="hover:underline">Industries</a>
+                <a href="#" className="hover:underline">Insights</a>
+                <a href="#" className="hover:underline">About</a>
               </div>
-            )}
+            </div>
+
+            {/* Right Section: Careers and Investors */}
+            <div className="flex gap-6 text-lg">
+              <a href="#" className="font-bold text-gray-400 hover:underline">Careers</a>
+              <a href="#" className="font-bold text-gray-400 hover:underline">Investors</a>
+              <a href="#" className="font-bold text-gray-400 hover:underline">News</a>
+
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="container mx-auto pl-20">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="w-full md:w-1/2">
-            <h1 className="text-3xl font-bold mb-6">ABOUT AON</h1>
-            <p className="text-lg mb-4">
-              At Aon, we exist to shape decisions for the better — to protect and enrich the lives of people around the world.
-            </p>
+
+      <div className="container mx-auto px-5 relative w-full">
+        <div className="flex flex-col md:flex-row items-stretch gap-0 w-full relative">
+          {/* Left Side */}
+          <div className="w-full md:w-1/2 flex flex-col md:flex-row items-stretch relative">
+            {/* Transparent Background */}
+            <div className="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-30 z-0"></div>
+
+            {/* Stacked Rectangles */}
+            <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
+              Better <br /> Informed
+            </div>
+            <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
+              Better <br /> Advised
+            </div>
+            <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
+              Better <br /> Decisions
+            </div>
           </div>
-          <div className="w-full md:w-1/2">
+
+          {/* Right Side */}
+          <div className="w-full md:w-1/2 relative">
             <img
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src="/AON_left_hero.png"
               alt="Aon office collage"
-              className="w-full max-h-[50vh] object-cover rounded-lg shadow-lg"
+              className="w-full h-full object-cover rounded-sm shadow-lg"
             />
           </div>
         </div>
-      </div>
 
-      <div className="bg-white pt-8 px-4">
-        <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-24">
-          {/* Button 1 */}
-          <button
-            onClick={toggleConversation}
-            className="flex flex-col items-center group"
-          >
-            <div
-              className={`p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent ${callStatus === "active"
-                  ? "bg-red-500 group-hover:bg-red-500"
-                  : "bg-transparent group-hover:bg-red-500"
-                }`}
-            >
-              <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 ${callStatus === "active"
-                    ? "text-white group-hover:text-white"
-                    : "text-[#EB0017] group-hover:text-white"
-                  }`}
-              />
-            </div>
-            <span
-              className={`mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]`}
-            >
-              {callStatus === "active" ? "Click to Disconnect" : "Let's Talk"}
-            </span>
-          </button>
+        {/* Overlay Text */}
+        <div className="absolute top-4 left-4 md:left-10 z-10 flex items-start gap-4 w-full">
+          {/* Vertical Red Line */}
+          <div className="w-2 h-[100px] bg-red-500"></div>
 
-          {/* Button 2 */}
-          <button
-            onClick={() => (window as any).voiceflow?.chat?.open()}
-            className="flex flex-col items-center group"
-          >
-            <div className="p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent group-hover:bg-red-500">
-              <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#EB0017] group-hover:text-white" />
-            </div>
-            <span className="mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]">
-              Let's Chat
-            </span>
-          </button>
+          {/* Text Content */}
+          <div className="text-black text-lg md:text-4xl font-bold whitespace-pre-line">
+            At Aon, we exist to shape decisions for the better — to<br />
+            protect and enrich the lives of people around the world.
+          </div>
         </div>
       </div>
+
+
+
+
+      <div className="bg-white pt-8 px-4">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-20 px-4 py-8">
+          {/* User Details Table */}
+          {userDetails && (
+            <div className="overflow-hidden border border-gray-300 rounded-lg shadow-md w-full sm:w-1/2 p-6">
+              <table className="table-auto w-full text-left text-sm text-gray-700">
+                <tbody>
+                  <tr className="bg-black text-white">
+                    <td className="px-4 py-2 font-medium border-r border-red">Member Name</td>
+                    <td className="px-4 py-2">{userDetails.name || "N/A"}</td>
+                  </tr>
+                  <tr className="border-t">
+                    <td className="px-4 py-2 font-medium border-r border-red">Email ID</td>
+                    <td className="px-4 py-2">{userDetails.email || "N/A"}</td>
+                  </tr>
+                  <tr className="border-t">
+                    <td className="px-4 py-2 font-medium border-r border-red">Address</td>
+                    <td className="px-4 py-2">{userDetails.address || "N/A"}</td>
+                  </tr>
+                  <tr className="border-t">
+                    <td className="px-4 py-2 font-medium border-r border-red">Zip Code</td>
+                    <td className="px-4 py-2">{userDetails.zipCode || "N/A"}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Buttons Section */}
+          <div className="flex flex-col sm:flex-row justify-center gap-8 sm:gap-16 mt-8">
+            {/* Button 1 */}
+            <button
+              onClick={toggleConversation}
+              className="flex flex-col items-center group"
+            >
+              <div
+                className={`p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent ${callStatus === "active"
+                  ? "bg-red-500 group-hover:bg-red-500"
+                  : "bg-transparent group-hover:bg-red-500"
+                  }`}
+              >
+                <Mic
+                  className={`w-12 h-12 md:w-16 md:h-16 ${callStatus === "active"
+                    ? "text-white group-hover:text-white"
+                    : "text-[#EB0017] group-hover:text-white"
+                    }`}
+                />
+              </div>
+              <span
+                className={`mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]`}
+              >
+                {callStatus === "active" ? "Click to Disconnect" : "Let's Talk"}
+              </span>
+            </button>
+
+            {/* Button 2 */}
+            <button
+              onClick={() => (window as any).voiceflow?.chat?.open()}
+              className="flex flex-col items-center group"
+            >
+              <div className="p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent group-hover:bg-red-500">
+                <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#EB0017] group-hover:text-white" />
+              </div>
+              <span className="mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]">
+                Let's Chat
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div className="bg-[#262836] py-5 text-white">
+        <div className="container mx-auto flex flex-col md:flex-row justify-between items-start gap-10">
+          {/* Left Section */}
+          <div className="flex flex-col items-start gap-4">
+            <img src="/aon-logo.svg" alt="Aon" className="h-8" />
+            <p className="text-white">Aon is in the Business of Better Decisions</p>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex flex-col gap-32 md:flex-row">
+            {/* First Column */}
+            <div className="flex flex-col gap-3">
+              <h3 className="text-gray-400">About Aon</h3>
+              <ul className="space-y-2">
+                <li className="text-white">Our Story</li>
+                <li className="text-white">Careers</li>
+                <li className="text-white">Investors</li>
+                <li className="text-white">News</li>
+              </ul>
+            </div>
+
+            {/* Second Column */}
+            <div className="flex flex-col gap-3">
+              <h3 className="text-gray-400">Explore</h3>
+              <ul className="space-y-2">
+                <li className="text-white">Capabilities</li>
+                <li className="text-white">Industries</li>
+                <li className="text-white">Insights</li>
+              </ul>
+            </div>
+
+            {/* Third Column */}
+            <div className="flex flex-col gap-3">
+              <h3 className="text-gray-400">Learn</h3>
+              <ul className="space-y-2">
+                <li className="text-white">Trade</li>
+                <li className="text-white">Technology</li>
+                <li className="text-white">Weather</li>
+                <li className="text-white">Workforce</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
 
     </div>
   )
