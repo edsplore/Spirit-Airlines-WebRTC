@@ -407,13 +407,13 @@ export default function SpiritAirlinesDemo() {
         </div>
       )}
 
-      <nav className="bg-[#EEF6F7] mb-4">
-        <div className="container mx-auto px-4 py-2" style={{ zIndex: 12 }}>
+      <nav className="bg-white mb-4">
+        <div className="container mx-auto px-4 py-3" style={{ zIndex: 12 }}>
           <div className="flex flex-col sm:flex-row items-center justify-between">
             {/* Left Section: Logo and Navigation Links */}
-            <div className="flex items-center gap-6">
-              <img src="/aon-logo.svg" alt="Aon" className="h-8" />
-              <div className="flex gap-6 text-lg font-medium text-black">
+            <div className="flex items-center gap-8">
+              <img src="/aon-logo.svg" alt="Aon" className="h-12" /> {/* Logo size increased */}
+              <div className="flex gap-8 text-xl font-semibold text-black">
                 <a href="#" className="hover:underline">Capabilities</a>
                 <a href="#" className="hover:underline">Industries</a>
                 <a href="#" className="hover:underline">Insights</a>
@@ -422,15 +422,15 @@ export default function SpiritAirlinesDemo() {
             </div>
 
             {/* Right Section: Careers and Investors */}
-            <div className="flex gap-6 text-lg">
-              <a href="#" className="font-bold text-gray-400 hover:underline">Careers</a>
-              <a href="#" className="font-bold text-gray-400 hover:underline">Investors</a>
-              <a href="#" className="font-bold text-gray-400 hover:underline">News</a>
-
+            <div className="flex gap-8 text-xl font-semibold">
+              <a href="#" className="text-gray-500 hover:underline">Careers</a>
+              <a href="#" className="text-gray-500 hover:underline">Investors</a>
+              <a href="#" className="text-gray-500 hover:underline">News</a>
             </div>
           </div>
         </div>
       </nav>
+
 
 
       <div className="container mx-auto px-5 relative w-full">
@@ -441,14 +441,25 @@ export default function SpiritAirlinesDemo() {
             <div className="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-30 z-0"></div>
 
             {/* Stacked Rectangles */}
-            <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
-              Better <br /> Informed
+            <div className="flex-1 bg-[#F2F8F9] flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
             </div>
-            <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
-              Better <br /> Advised
+            <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-4">
+              <div className="flex flex-col items-center">
+                <span className="text-center">Better</span>
+                <span className="mt-2 self-end w-[80%] text-left">Informed</span>
+              </div>
             </div>
-            <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70">
-              Better <br /> Decisions
+            <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-4">
+              <div className="flex flex-col items-center">
+                <span className="text-center">Better</span>
+                <span className="mt-2 self-end w-[70%] text-left">Advised</span>
+              </div>
+            </div>
+            <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-4">
+              <div className="flex flex-col items-center">
+                <span className="text-center">Better</span>
+                <span className="mt-2 self-end w-[80%] text-left">Decisions</span>
+              </div>
             </div>
           </div>
 
@@ -479,26 +490,26 @@ export default function SpiritAirlinesDemo() {
 
 
       <div className="bg-white pt-8 px-4">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-20 px-4 py-8">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-space-between gap-12 sm:gap-20 px-4 py-8">
           {/* User Details Table */}
           {userDetails && (
-            <div className="overflow-hidden border border-gray-300 rounded-lg shadow-md w-full sm:w-1/2 p-6">
-              <table className="table-auto w-full text-left text-sm text-gray-700">
+            <div className="overflow-hidden  rounded-lg w-full sm:w-1/2 p-6">
+              <table className="table-auto w-full text-left border border-gray-300 text-sm text-gray-700">
                 <tbody>
-                  <tr className="bg-black text-white">
-                    <td className="px-4 py-2 font-medium border-r border-red">Member Name</td>
+                  <tr className="bg-[#262836] text-white">
+                    <td className="px-4 py-2 font-medium border-r border-gray-300">Member Name</td>
                     <td className="px-4 py-2">{userDetails.name || "N/A"}</td>
                   </tr>
                   <tr className="border-t">
-                    <td className="px-4 py-2 font-medium border-r border-red">Email ID</td>
+                    <td className="px-4 py-2 font-medium border-r border-gray-300">Email ID</td>
                     <td className="px-4 py-2">{userDetails.email || "N/A"}</td>
                   </tr>
                   <tr className="border-t">
-                    <td className="px-4 py-2 font-medium border-r border-red">Address</td>
+                    <td className="px-4 py-2 font-medium border-r border-gray-300">Address</td>
                     <td className="px-4 py-2">{userDetails.address || "N/A"}</td>
                   </tr>
                   <tr className="border-t">
-                    <td className="px-4 py-2 font-medium border-r border-red">Zip Code</td>
+                    <td className="px-4 py-2 font-medium border-r border-gray-300">Zip Code</td>
                     <td className="px-4 py-2">{userDetails.zipCode || "N/A"}</td>
                   </tr>
                 </tbody>
@@ -514,20 +525,23 @@ export default function SpiritAirlinesDemo() {
               className="flex flex-col items-center group"
             >
               <div
-                className={`p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent ${callStatus === "active"
-                  ? "bg-red-500 group-hover:bg-red-500"
+                className={`p-8 md:p-12 border-8 border-black rounded-full transition-all duration-300 group-hover:border-transparent ${callStatus === "active"
+                  ? "bg-red-500"
                   : "bg-transparent group-hover:bg-red-500"
                   }`}
               >
                 <Mic
                   className={`w-12 h-12 md:w-16 md:h-16 ${callStatus === "active"
-                    ? "text-white group-hover:text-white"
+                    ? "text-white"
                     : "text-[#EB0017] group-hover:text-white"
                     }`}
                 />
               </div>
               <span
-                className={`mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]`}
+                className={`mt-4 text-2xl md:text-3xl font-bold ${callStatus === "active"
+                  ? "text-white group-hover:text-white"
+                  : "text-[#EB0017] group-hover:text-[#EB0017]"
+                  }`}
               >
                 {callStatus === "active" ? "Click to Disconnect" : "Let's Talk"}
               </span>
@@ -538,16 +552,20 @@ export default function SpiritAirlinesDemo() {
               onClick={() => (window as any).voiceflow?.chat?.open()}
               className="flex flex-col items-center group"
             >
-              <div className="p-8 md:p-12 border-4 border-black rounded-full transition-all duration-300 group-hover:border-transparent group-hover:bg-red-500">
+              <div className="p-8 md:p-12 border-8 border-black rounded-full transition-all duration-300 group-hover:border-transparent group-hover:bg-red-500">
                 <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#EB0017] group-hover:text-white" />
               </div>
-              <span className="mt-4 text-lg md:text-xl font-medium text-[#EB0017] group-hover:text-[#EB0017]">
+              <span
+                className="mt-4 text-2xl md:text-3xl font-bold text-[#EB0017] group-hover:text-[#EB0017]"
+              >
                 Let's Chat
               </span>
             </button>
           </div>
+
         </div>
       </div>
+
 
 
       <div className="bg-[#262836] py-5 text-white">
@@ -555,7 +573,9 @@ export default function SpiritAirlinesDemo() {
           {/* Left Section */}
           <div className="flex flex-col items-start gap-4">
             <img src="/aon-logo.svg" alt="Aon" className="h-8" />
-            <p className="text-white">Aon is in the Business of Better Decisions</p>
+            <p className="text-white" style={{ fontStyle: "italic" }}>
+              Aon is in the Business of Better Decisions
+            </p>
           </div>
 
           {/* Right Section */}
@@ -563,7 +583,7 @@ export default function SpiritAirlinesDemo() {
             {/* First Column */}
             <div className="flex flex-col gap-3">
               <h3 className="text-gray-400">About Aon</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 <li className="text-white">Our Story</li>
                 <li className="text-white">Careers</li>
                 <li className="text-white">Investors</li>
@@ -574,7 +594,7 @@ export default function SpiritAirlinesDemo() {
             {/* Second Column */}
             <div className="flex flex-col gap-3">
               <h3 className="text-gray-400">Explore</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 <li className="text-white">Capabilities</li>
                 <li className="text-white">Industries</li>
                 <li className="text-white">Insights</li>
@@ -584,7 +604,7 @@ export default function SpiritAirlinesDemo() {
             {/* Third Column */}
             <div className="flex flex-col gap-3">
               <h3 className="text-gray-400">Learn</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 <li className="text-white">Trade</li>
                 <li className="text-white">Technology</li>
                 <li className="text-white">Weather</li>
