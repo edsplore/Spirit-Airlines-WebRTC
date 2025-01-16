@@ -446,25 +446,25 @@ export default function SpiritAirlinesDemo() {
             <div className="flex">
               {/* First Rectangle */}
               <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-12">
-                <div className="flex flex-col items-center">
-                  <span className="text-center">Better</span>
-                  <span className="mt-2 self-end w-[80%] text-left">Informed</span>
+                <div className="flex flex-col items-start">
+                  <span className="text-left">Better</span>
+                  <span className="mt-2 self-end w-[67%] text-left">Informed</span>
                 </div>
               </div>
 
               {/* Second Rectangle */}
               <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-12">
-                <div className="flex flex-col items-center" style={{ marginTop: 'calc(7rem + 1rem)' }}>
-                  <span className="text-center">Better</span>
-                  <span className="mt-2 self-end w-[70%] text-left">Advised</span>
+                <div className="flex flex-col items-start" style={{ marginTop: 'calc(7rem + 1rem)' }}>
+                  <span className="text-left">Better</span>
+                  <span className="mt-2 self-end w-[67%] text-left">Advised</span>
                 </div>
               </div>
 
               {/* Third Rectangle */}
               <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-12">
-                <div className="flex flex-col items-center" style={{ marginTop: 'calc(15rem + 2rem)' }}>
-                  <span className="text-center">Better</span>
-                  <span className="mt-2 self-end w-[80%] text-left">Decisions</span>
+                <div className="flex flex-col items-start" style={{ marginTop: 'calc(15rem + 2rem)' }}>
+                  <span className="text-left">Better</span>
+                  <span className="mt-2 self-end w-[67%] text-left">Decisions</span>
                 </div>
               </div>
             </div>
