@@ -438,14 +438,14 @@ export default function SpiritAirlinesDemo() {
           {/* Left Side */}
           <div className="w-full md:w-1/2 flex flex-col md:flex-row items-stretch relative">
             {/* Transparent Background */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-30 z-0"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-60 z-0"></div>
 
             {/* Stacked Rectangles */}
             <div className="flex-1 bg-[#F2F8F9] flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-1">
             </div>
             <div className="flex">
               {/* First Rectangle */}
-              <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-12">
+              <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-bold bg-opacity-70 p-12">
                 <div className="flex flex-col items-start">
                   <span className="text-left">Better</span>
                   <span className="mt-2 self-end w-[67%] text-left">Informed</span>
@@ -453,7 +453,7 @@ export default function SpiritAirlinesDemo() {
               </div>
 
               {/* Second Rectangle */}
-              <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-12">
+              <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-bold bg-opacity-70 p-12">
                 <div className="flex flex-col items-start" style={{ marginTop: 'calc(7rem + 1rem)' }}>
                   <span className="text-left">Better</span>
                   <span className="mt-2 self-end w-[67%] text-left">Advised</span>
@@ -461,7 +461,7 @@ export default function SpiritAirlinesDemo() {
               </div>
 
               {/* Third Rectangle */}
-              <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-medium bg-opacity-70 p-12">
+              <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-bold bg-opacity-70 p-12">
                 <div className="flex flex-col items-start" style={{ marginTop: 'calc(15rem + 2rem)' }}>
                   <span className="text-left">Better</span>
                   <span className="mt-2 self-end w-[67%] text-left">Decisions</span>
