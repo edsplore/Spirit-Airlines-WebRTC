@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import "./App.css";
-import { Mic, MessageCircle, User, Mail, Home, MapPin } from 'lucide-react'
+import { Mic, MessageCircle} from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface UserDetails {
@@ -414,18 +414,18 @@ export default function SpiritAirlinesDemo() {
             <div className="flex items-center gap-8">
               <img src="/aon-logo.svg" alt="Aon" className="h-12" /> {/* Logo size increased */}
               <div className="flex gap-8 text-xl font-semibold text-black">
-                <a href="#" className="hover:underline">Capabilities</a>
-                <a href="#" className="hover:underline">Industries</a>
-                <a href="#" className="hover:underline">Insights</a>
-                <a href="#" className="hover:underline">About</a>
+                <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="hover:underline">Capabilities</a>
+                <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="hover:underline">Industries</a>
+                <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="hover:underline">Insights</a>
+                <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="hover:underline">About</a>
               </div>
             </div>
 
             {/* Right Section: Careers and Investors */}
             <div className="flex gap-8 text-xl font-semibold">
-              <a href="#" className="text-gray-500 hover:underline">Careers</a>
-              <a href="#" className="text-gray-500 hover:underline">Investors</a>
-              <a href="#" className="text-gray-500 hover:underline">News</a>
+              <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="text-gray-500 hover:underline">Careers</a>
+              <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="text-gray-500 hover:underline">Investors</a>
+              <a href="https://voicebot.everailabs.com/demo/riskmanagement/aon" className="text-gray-500 hover:underline">News</a>
             </div>
           </div>
         </div>
