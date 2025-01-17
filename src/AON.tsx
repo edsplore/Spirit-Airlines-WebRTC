@@ -407,8 +407,8 @@ export default function SpiritAirlinesDemo() {
         </div>
       )}
 
-      <nav className="bg-white mb-4">
-        <div className="container mx-auto px-4 py-3" style={{ zIndex: 12 }}>
+      <nav className="bg-white mb-1">
+        <div className="container mx-auto px-4 py-1" style={{ zIndex: 12 }}>
           <div className="flex flex-col sm:flex-row items-center justify-between">
             {/* Left Section: Logo and Navigation Links */}
             <div className="flex items-center gap-8">
@@ -433,7 +433,7 @@ export default function SpiritAirlinesDemo() {
 
 
 
-      <div className="container mx-auto px-5 relative w-full">
+      <div className="container mx-auto relative w-full">
         <div className="flex flex-col md:flex-row items-stretch gap-0 w-full relative">
           {/* Left Side */}
           <div className="w-full md:w-1/2 flex flex-col md:flex-row items-stretch relative">
@@ -445,7 +445,7 @@ export default function SpiritAirlinesDemo() {
             </div>
             <div className="flex">
               {/* First Rectangle */}
-              <div className="flex-1 bg-blue-500 flex items-center justify-center text-white text-3xl font-bold bg-opacity-70 p-12">
+              <div className="flex-1 bg-[#B5D7DC] flex items-center justify-center text-white text-3xl font-bold p-12">
                 <div className="flex flex-col items-start">
                   <span className="text-left">Better</span>
                   <span className="mt-2 self-end w-[67%] text-left">Informed</span>
@@ -453,7 +453,7 @@ export default function SpiritAirlinesDemo() {
               </div>
 
               {/* Second Rectangle */}
-              <div className="flex-1 bg-violet-500 flex items-center justify-center text-white text-3xl font-bold bg-opacity-70 p-12">
+              <div className="flex-1 bg-[#BEC5C9] flex items-center justify-center text-white text-3xl font-bold p-12">
                 <div className="flex flex-col items-start" style={{ marginTop: 'calc(7rem + 1rem)' }}>
                   <span className="text-left">Better</span>
                   <span className="mt-2 self-end w-[67%] text-left">Advised</span>
@@ -461,7 +461,7 @@ export default function SpiritAirlinesDemo() {
               </div>
 
               {/* Third Rectangle */}
-              <div className="flex-1 bg-red-500 flex items-center justify-center text-white text-3xl font-bold bg-opacity-70 p-12">
+              <div className="flex-1 bg-[#F2BBBC] flex items-center justify-center text-white text-3xl font-bold p-12">
                 <div className="flex flex-col items-start" style={{ marginTop: 'calc(15rem + 2rem)' }}>
                   <span className="text-left">Better</span>
                   <span className="mt-2 self-end w-[67%] text-left">Decisions</span>
@@ -496,8 +496,8 @@ export default function SpiritAirlinesDemo() {
 
 
 
-      <div className="bg-white pt-8 px-4">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-space-between gap-12 sm:gap-20 px-4 py-8">
+      <div className="bg-white px-4">
+        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-space-between gap-12 sm:gap-20 px-4">
           {/* User Details Table */}
           {userDetails && (
             <div className="overflow-hidden  rounded-lg w-full sm:w-1/2 p-6">
