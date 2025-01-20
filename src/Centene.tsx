@@ -447,31 +447,36 @@ export default function Centene() {
             </nav>
 
             <div className="relative w-full">
-                {/* Full-width Image */}
-                <img
-                    src="/centene_Hero.png"
-                    alt="Spirit Airlines beach scene"
-                    className="w-full h-auto object-cover rounded-lg shadow-md"
-                />
+  {/* Full-width Image */}
+  <img
+    src="/centene_Hero.png"
+    alt="Spirit Airlines beach scene"
+    className="w-full h-auto object-cover rounded-lg shadow-md"
+  />
 
-                {/* "Who we are" heading positioned just above the text container and left-aligned with text container */}
-                <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 flex flex-col justify-start items-start text-white text-6xl md:text-8xl font-extrabold z-10">
-                    <span>Who we are</span>
-                </div>
+  {/* Wrapper div to stack the elements one below the other */}
+  <div className="absolute bottom-5 left-0 w-full flex flex-col items-left justify-center p-6">
 
-                {/* Full-width Text Container with white transparent background, padding, margin, and width set to 60% */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-11/12 md:w-4/5 bg-white bg-opacity-70 text-black p-6 rounded-lg shadow-md mt-6 mb-6 mx-2">
-                    <p className="text-lg md:text-3xl font-bold text-black ">
-                        Centene is committed to helping people live healthier lives. We provide access to
-                    </p>
-                    <p className="text-lg md:text-3xl font-bold text-black ">
-                        high-quality healthcare, innovative programs and health solutions that help
-                    </p>
-                    <p className="text-lg md:text-3xl font-bold text-black ">
-                        families and individuals get well, stay well and be well.
-                    </p>
-                </div>
-            </div>
+    {/* "Who we are" heading aligned to the left */}
+    <div className="text-white text-6xl md:text-8xl font-extrabold mb-2">
+      <span>Who we are</span>
+    </div>
+
+    {/* Full-width Text Container with white transparent background, padding, margin, and width set to 60% */}
+    <div className="w-full md:w-4/5 bg-white bg-opacity-70 text-black p-6 rounded-lg shadow-md">
+      <p className="text-lg md:text-3xl font-bold text-black">
+        Centene is committed to helping people live healthier lives. We provide access to
+      </p>
+      <p className="text-lg md:text-3xl font-bold text-black">
+        high-quality healthcare, innovative programs and health solutions that help
+      </p>
+      <p className="text-lg md:text-3xl font-bold text-black">
+        families and individuals get well, stay well and be well.
+      </p>
+    </div>
+  </div>
+</div>
+
 
 
 
