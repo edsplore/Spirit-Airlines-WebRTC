@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import "./App.css";
-import { Mic, MessageCircle} from 'lucide-react'
+import { Mic, MessageCircle } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface UserDetails {
@@ -9,6 +9,8 @@ interface UserDetails {
   address: string
   zipCode: string
   language: string
+  bookingId: string
+  claimReferenceNumber: string
 }
 
 const webClient = new RetellWebClient()
@@ -27,7 +29,9 @@ export default function SpiritAirlinesDemo() {
     email: '',
     address: '1234 Elm Street Springfield',
     zipCode: '62704',
-    language: 'English'
+    language: 'English',
+    bookingId: 'P4B7V9',
+    claimReferenceNumber: '20257'
   })
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
@@ -54,7 +58,9 @@ export default function SpiritAirlinesDemo() {
                     email: "${userDetails.email}",
                     address: "${userDetails.address}",
                     zipcode: "${userDetails.zipCode}",
-                    language: "${userDetails.language}"
+                    language: "${userDetails.language}",
+                     bookingId: "${userDetails.bookingId}",
+                    claimReferenceNumber: "${userDetails.claimReferenceNumber}"
                   }
                 }
               },
@@ -119,6 +125,9 @@ export default function SpiritAirlinesDemo() {
       email: formData.get('email') as string,
       address: formData.get('address') as string,
       zipCode: formData.get('zipCode') as string,
+      bookingId: formData.get('bookingId') as string,
+      claimReferenceNumber: formData.get('claimReferenceNumber') as string,
+
       language: 'English'
     }
     setUserDetails(newUserDetails)
@@ -149,7 +158,9 @@ export default function SpiritAirlinesDemo() {
                     email: "${newUserDetails.email}",
                     address: "${newUserDetails.address}",
                     zipcode: "${newUserDetails.zipCode}",
-                    language: "${newUserDetails.language}"
+                    language: "${newUserDetails.language}",
+                   bookingId: "${userDetails.bookingId}",
+                    claimReferenceNumber: "${userDetails.claimReferenceNumber}"
                   }
                 }
               },
@@ -229,6 +240,8 @@ export default function SpiritAirlinesDemo() {
             email: userDetails.email,
             address: userDetails.address,
             zip_code: userDetails.zipCode,
+            bookingId: userDetails.bookingId,
+            claimReferenceNumber: userDetails.claimReferenceNumber,
           },
         }),
       })
@@ -370,6 +383,34 @@ export default function SpiritAirlinesDemo() {
                       id="zipCode"
                       name="zipCode"
                       defaultValue="62704"
+                      readOnly
+                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="bookingId" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                      Booking ID
+                    </label>
+                    <input
+                      type="text"
+                      id="bookingId"
+                      name="bookingId"
+                      defaultValue="P4B7V9"
+                      required
+                      readOnly
+                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label htmlFor="claimReferenceNumber" className="w-full sm:w-40 text-black text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3">
+                      Claim Reference no.
+                    </label>
+                    <input
+                      type="text"
+                      id="claimReferenceNumber"
+                      name="claimReferenceNumber"
+                      defaultValue="20257"
+                      required
                       readOnly
                       className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
@@ -518,6 +559,14 @@ export default function SpiritAirlinesDemo() {
                   <tr className="border-t">
                     <td className="px-4 py-2 font-medium border-r border-gray-300">Zip Code</td>
                     <td className="px-4 py-2">{userDetails.zipCode || "N/A"}</td>
+                  </tr>
+                  <tr className="border-t">
+                    <td className="px-4 py-2 font-medium border-r border-gray-300">Booking Id</td>
+                    <td className="px-4 py-2">{userDetails.bookingId || "N/A"}</td>
+                  </tr>
+                  <tr className="border-t">
+                    <td className="px-4 py-2 font-medium border-r border-gray-300">Claim Reference Number</td>
+                    <td className="px-4 py-2">{userDetails.claimReferenceNumber || "N/A"}</td>
                   </tr>
                 </tbody>
               </table>

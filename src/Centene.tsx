@@ -428,13 +428,13 @@ export default function Centene() {
 
 
 
-            <nav className="bg-[#1e81b0] ">
+            <nav className="bg-[#2E5388]">
                 <div className="container mx-auto px-4 py-2" style={{ zIndex: 12 }}>
                     <div className="flex flex-col sm:flex-row items-center justify-between">
-                        <img src="/centene_logo.png" alt="Spirit" className="h-12 mb-3 sm:mb-0" />
+                        <img src="/centene_logo.png" alt="Spirit" className="h-16 sm:h-18 mb-3 sm:mb-0 bg-transparent" />
 
                         {/* Right-side links */}
-                        <div className="flex flex-col sm:flex-row items-center gap-12 text-white text-lg font-bold">
+                        <div className="flex flex-col sm:flex-row items-center gap-12 text-white text-xl font-bold">
                             <span className="cursor-pointer">Who are we</span>
                             <span className="cursor-pointer">Why we are different</span>
                             <span className="cursor-pointer">Products and Services</span>
@@ -446,8 +446,6 @@ export default function Centene() {
                 </div>
             </nav>
 
-
-
             <div className="relative w-full">
                 {/* Full-width Image */}
                 <img
@@ -456,22 +454,30 @@ export default function Centene() {
                     className="w-full h-auto object-cover rounded-lg shadow-md"
                 />
 
-                {/* "Who we are" heading outside the white background */}
-                <div className="absolute bottom-36 left-4 text-white text-4xl md:text-6xl font-bold z-10">
-                    Who we are
+                {/* "Who we are" heading positioned just above the text container and left-aligned with text container */}
+                <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 flex flex-col justify-start items-start text-white text-6xl md:text-8xl font-extrabold z-10">
+                    <span>Who we are</span>
                 </div>
 
-                {/* Text Container with white transparent background */}
-                <div className="absolute bottom-4 left-4 bg-white bg-opacity-70 text-black p-6 rounded-lg shadow-md w-auto">
-                    <p className="text-base md:text-lg font-bold text-black mb-2">
-                        Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
+                {/* Full-width Text Container with white transparent background, padding, margin, and width set to 60% */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-11/12 md:w-4/5 bg-white bg-opacity-70 text-black p-6 rounded-lg shadow-md mt-6 mb-6 mx-2">
+                    <p className="text-lg md:text-3xl font-bold text-black ">
+                        Centene is committed to helping people live healthier lives. We provide access to
                     </p>
-                    <p className="text-base md:text-lg font-bold text-black mb-2">
-                        innovative programs and health solutions that help families and individuals get well, stay well and be well.
+                    <p className="text-lg md:text-3xl font-bold text-black ">
+                        high-quality healthcare, innovative programs and health solutions that help
                     </p>
-
+                    <p className="text-lg md:text-3xl font-bold text-black ">
+                        families and individuals get well, stay well and be well.
+                    </p>
                 </div>
             </div>
+
+
+
+
+
+
 
 
 
@@ -482,8 +488,8 @@ export default function Centene() {
                 <div className="w-full md:w-1/3 bg-white pt-8 pl-8 pr-8 pb-8 rounded-lg">
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 text-sm border border-gray-300">
-                            <div className="font-semibold bg-[#1e81b0] text-white p-2 border-r border-b border-gray-300">Medical ID #</div>
-                            <div className="bg-[#1e81b0] text-white p-2 border-b border-gray-300">{userDetails.medicalCode}</div>
+                            <div className="font-semibold bg-[#2E5388] text-white p-2 border-r border-b border-gray-300">Medical ID #</div>
+                            <div className="bg-[#2E5388] text-white p-2 border-b border-gray-300">{userDetails.medicalCode}</div>
 
                             <div className="font-semibold p-2 border-r border-b border-gray-300">Member Name</div>
                             <div className="p-2 border-b border-gray-300">{userDetails.name}</div>
@@ -512,12 +518,12 @@ export default function Centene() {
                             onClick={toggleConversation}
                             className="flex flex-col items-center group"
                         >
-                            <div className={`p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                            <div className={`p-10 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
                                 }`}>
-                                <Mic className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
+                                <Mic className={`w-16 h-16 md:w-20 md:h-20 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
                                     }`} />
                             </div>
-                            <span className="mt-4 text-[#1e81b0] md:text-xl font-medium">
+                            <span className="mt-6 text-[#1e81b0] md:text-3xl font-bold">
                                 {callStatus === "active"
                                     ? <span className="text-[#1e81b0]">Click to Disconnect</span>
                                     : "Let's Talk"
@@ -528,23 +534,23 @@ export default function Centene() {
                         <button
                             onClick={() => (window as any).voiceflow?.chat?.open()}
                             className="flex flex-col items-center group">
-                            <div className="p-8 md:p-12 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-                                <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#1e81b0]" />
+                            <div className="p-10 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
+                                <MessageCircle className="w-16 h-16 md:w-20 md:h-20 text-[#1e81b0]" />
                             </div>
-                            <span className="mt-4 text-[#1e81b0] md:text-xl font-medium">Let's Chat</span>
+                            <span className="mt-6 text-[#1e81b0] md:text-3xl font-bold">Let's Chat</span>
                         </button>
                     </div>
                 </div>
+
             </div>
 
-            <div className="bg-[#2E5388] text-white py-8">
-                <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8">
-
+            <div className="bg-[#2E5388] text-white py-4">
+                <div className="container mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 px-1">
                     <div className="flex flex-col items-start gap-2">
-                        <img src="/centene_logo.png" alt="Centene" className="h-12 mb-3 sm:mb-0" />
+                        <img src="/centene_logo.png" alt="Centene" className="h-14 mb-3 sm:mb-0" />
                         <p className="text-sm sm:text-lg font-normal">
                             Transform the health of the communities, <br />
-                            we serve  one person at a time.
+                            we serve one person at a time.
                         </p>
                     </div>
 
@@ -554,23 +560,22 @@ export default function Centene() {
                         </h2>
                         <p className="text-sm sm:text-lg font-normal text-center">
                             Our unique local approach allows us to help members helpers take out you from there, <br />
-                            access hifg-quality, cultarally sesitive healtcare services
+                            access high-quality, culturally sensitive healthcare services
                         </p>
                     </div>
 
                     <div className="flex flex-col items-start gap-4">
                         <ul className="text-sm sm:text-lg font-normal">
                             <li>Contact</li>
-                            <li>Equal Oppurtunity Employer</li>
+                            <li>Equal Opportunity Employer</li>
                             <li>Privacy Policy</li>
                             <li>Terms & Conditions</li>
                             <li>Purchase Order Terms & Conditions</li>
-
                         </ul>
                     </div>
-
                 </div>
             </div>
+
 
 
         </div>
