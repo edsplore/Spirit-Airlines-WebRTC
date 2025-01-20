@@ -471,13 +471,13 @@ export default function Centene() {
 
                         {/* Full-width Text Container with white transparent background, padding, margin, and width set to 60% */}
                         <div className="bg-white bg-opacity-70 text-black p-4 rounded-3xl shadow-md mt-4">
-                            <p className="text-lg md:text-3xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '1rem' }}>
+                            <p className="text-lg md:text-4xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.2rem' }}>
                                 Centene is committed to helping people live healthier lives. We provide access to
                             </p>
-                            <p className="text-lg md:text-3xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '1rem' }}>
+                            <p className="text-lg md:text-4xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.3rem' }}>
                                 high-quality healthcare, innovative programs and health solutions that help
                             </p>
-                            <p className="text-lg md:text-3xl font-bold text-black" >
+                            <p className="text-lg md:text-4xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.1rem' }}>
                                 families and individuals get well, stay well and be well.
                             </p>
                         </div>
