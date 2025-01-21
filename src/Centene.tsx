@@ -213,6 +213,7 @@ export default function Centene() {
 
         const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
         const sampleRate = parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
+        const policy_date = format(addDays(new Date(), 15), 'dd MMM yyyy');
 
         try {
             const formattedConfirmationCode = userDetails.medicalCode.split('').join(' - ');
@@ -229,7 +230,8 @@ export default function Centene() {
                         email: userDetails.email,
                         confirmation_code: formattedConfirmationCode,
                         address: userDetails.address,
-                        DOB: userDetails.dob
+                        DOB: userDetails.dob,
+                        policy_date: policy_date
                     },
                 }),
             })

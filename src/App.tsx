@@ -6,6 +6,7 @@ import AON from "./AON.tsx";
 import McAfeeDemo from "./McAfee.tsx";
 import Centene from "./Centene.tsx";
 import Mone from "./M1.tsx";
+import Recruiter from "./Recruiter.tsx";
 
 export default function App() {
   return (
@@ -14,7 +15,7 @@ export default function App() {
       <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
       <Route path="/demo/healthcare/centene" element={<Centene />} />
       <Route path="/demo/telecom/M1" element={<Mone />} />
-
+      <Route path="/demo/HR/Recruiter" element={<Recruiter />} />
 
       <Route path="/demo/airline/jetblue" element={<JetBlueDemo />} />
       <Route path="/demo/security/mcafee" element={<McAfeeDemo />} />
