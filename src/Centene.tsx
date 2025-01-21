@@ -68,7 +68,7 @@ export default function Centene() {
         // Add chatbot script
         const addChatbotScript = () => {
             const script = document.createElement('script')
-            const projectId = "669833f4ca2c7886e6638f93";
+            const projectId = "67900940c6f7a86d23b3de98";
             script.type = 'text/javascript'
             script.innerHTML = `
         (function(d, t) {
@@ -84,7 +84,7 @@ export default function Centene() {
                   payload: {
                     customer_name: "${userDetails.name}",
                     email: "${userDetails.email}",
-                    confirmation_code: "${userDetails.medicalCode}",                  
+                    confirmation_code: "${userDetails.medicalCode}",                    
                   }
                 }
               },
@@ -130,7 +130,7 @@ export default function Centene() {
         }
         const addChatbotScript = () => {
             const script = document.createElement('script');
-            const projectId = "669833f4ca2c7886e6638f93";
+            const projectId = "67900940c6f7a86d23b3de98";
             script.type = 'text/javascript';
             script.innerHTML = `
             (function(d, t) {
@@ -268,51 +268,6 @@ export default function Centene() {
         `}
             </style>
 
-            {/* <div
-                className="absolute decorative-triangle"
-                style={{
-                    bottom: 0,
-                    left: 0,
-                    width: 0,
-                    height: 0,
-                    borderLeft: '50px solid #1e81b0',
-                    borderRight: '20px solid transparent',
-                    borderTop: '50vw solid transparent',
-                    borderBottom: '0 solid transparent',
-                    zIndex: 10,
-                }}
-            ></div>
-
-            <div
-                className="absolute decorative-triangle"
-                style={{
-                    bottom: 0,
-                    right: 0,
-                    width: 0,
-                    height: 0,
-                    borderRight: '50px solid #1e81b0',
-                    borderLeft: '20px solid transparent',
-                    borderTop: '50vw solid transparent',
-                    borderBottom: '0 solid transparent',
-                    zIndex: 10,
-                }}
-            ></div>
-
-            <div
-                className="absolute decorative-triangle"
-                style={{
-                    top: 63,
-                    right: 0,
-                    width: 0,
-                    height: 0,
-                    borderRight: '700px solid #1e81b0',
-                    borderLeft: '100px solid transparent',
-                    borderBottom: '4vw solid transparent',
-                    borderTop: '0 solid transparent',
-                    zIndex: 10,
-                }}
-            ></div> */}
-
             {showVerificationForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-[#1e81b0] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
@@ -429,7 +384,7 @@ export default function Centene() {
 
 
             <nav className="bg-[#2E5388]">
-                <div className="flex items-center justify-between px-4 py-2" style={{ zIndex: 12 }}>
+                <div className="flex items-center justify-between px-20 py-2 mr-16" style={{ zIndex: 12 }}>
                     {/* Logo */}
                     <img
                         src="/centene_logo.png"
@@ -438,7 +393,7 @@ export default function Centene() {
                     />
 
                     {/* Right-side links */}
-                    <div className="flex items-center gap-16 text-white text-lg font-bold">
+                    <div className="flex items-center gap-8 text-white text-lg font-bold">
                         <span className="cursor-pointer">Who are we</span>
                         <span className="cursor-pointer">Why we are different</span>
                         <span className="cursor-pointer">Products and Services</span>
@@ -453,9 +408,9 @@ export default function Centene() {
             <div className="relative w-full ">
                 {/* Full-width Image */}
                 <img
-                    src="/centene_Hero.png"
-                    alt="Spirit Airlines beach scene"
-                    className="w-full object-cover rounded-lg shadow-md h-[380px]"
+                    src="/centene-hero2.png"
+                    alt="Centene Hero Image"
+                    className="w-full object-cover rounded-lg shadow-md"
                 />
 
                 {/* Wrapper div to stack the elements one below the other */}
@@ -465,20 +420,20 @@ export default function Centene() {
                     <div className="w-full md:w-4/5 flex flex-col">
 
                         {/* "Who we are" heading aligned to the left */}
-                        <div className="text-white text-5xl md:text-7xl font-extrabold">
+                        <div className="text-white text-5xl md:text-5xl font-extrabold">
                             <span>Who we are</span>
                         </div>
 
                         {/* Full-width Text Container with white transparent background, padding, margin, and width set to 60% */}
                         <div className="bg-white bg-opacity-70 text-black p-4 rounded-3xl shadow-md mt-4">
-                            <p className="text-lg md:text-4xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.2rem' }}>
-                                Centene is committed to helping people live healthier lives. We provide access to
+                            <p className="text-lg md:text-2xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.2rem' }}>
+                                Centene is committed to helping people live healthier lives. We provide access to high-quality 
                             </p>
-                            <p className="text-lg md:text-4xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.3rem' }}>
-                                high-quality healthcare, innovative programs and health solutions that help
+                            <p className="text-lg md:text-2xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.3rem' }}>
+                                healthcare, innovative programs and health solutions that help families and individuals
                             </p>
-                            <p className="text-lg md:text-4xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.1rem' }}>
-                                families and individuals get well, stay well and be well.
+                            <p className="text-lg md:text-2xl font-bold text-black" style={{ display: 'inline-block', width: '100%', wordSpacing: '0.1rem' }}>
+                                 get well, stay well and be well.
                             </p>
                         </div>
 
