@@ -411,7 +411,7 @@ export default function Centene() {
                 {/* Full-width Image */}
                 <img
                     src="/centene-hero2.png"
-                    alt="Centene Hero Image"
+                    alt="Centene Hero"
                     className="w-full object-cover rounded-lg shadow-md"
                 />
 
