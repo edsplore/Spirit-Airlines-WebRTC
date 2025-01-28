@@ -82,8 +82,9 @@ export default function Centene() {
                   payload: {
                     customer_name: "${userDetails.name}",
                     email: "${userDetails.email}",
-                    confirmation_code: "${userDetails.medicalCode}",                    
-                  }
+                    confirmation_code: "${userDetails.medicalCode}",
+                    DOB: "${userDetails.dob}",
+                    address: "${userDetails.address}"                  }
                 }
               },
             });
@@ -145,7 +146,9 @@ export default function Centene() {
                         email: "${newUserDetails.email}",
                         confirmation_code: "${newUserDetails.medicalCode}",
                         address: "${newUserDetails.address}",
-                        medical_code: "${newUserDetails.medicalCode}"
+                        DOB: "${newUserDetails.dob}"
+                      }
+                    }
                       }
                     }
                   },
