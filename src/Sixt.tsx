@@ -285,7 +285,7 @@ export default function SixtHomepage() {
                 <div className="md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;</label>
                   <Button variant="primary" className="w-full">
-                    Show cars
+                    >
                   </Button>
                 </div>
               </div>
