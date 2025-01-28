@@ -165,12 +165,12 @@ export default function SixtHomepage() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#" className="text-white hover:text-[#FF6B00]">Rent</a>
-              <a href="#" className="text-white hover:text-[#FF6B00]">Share</a>
-              <a href="#" className="text-white hover:text-[#FF6B00]">Ride</a>
-              <a href="#" className="text-white hover:text-[#FF6B00]">Subscribe</a>
-              <a href="#" className="text-white hover:text-[#FF6B00]">Locations</a>
-              <a href="#" className="text-white hover:text-[#FF6B00]">Deals</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="text-white hover:text-[#FF6B00]">Rent</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="text-white hover:text-[#FF6B00]">Share</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="text-white hover:text-[#FF6B00]">Ride</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="text-white hover:text-[#FF6B00]">Subscribe</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="text-white hover:text-[#FF6B00]">Locations</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="text-white hover:text-[#FF6B00]">Deals</a>
             </div>
 
             {/* Mobile menu button */}
@@ -189,12 +189,12 @@ export default function SixtHomepage() {
         {isMenuOpen && (
           <div className="md:hidden bg-black/90 border-t border-gray-800">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Rent</a>
-              <a href="#" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Share</a>
-              <a href="#" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Ride</a>
-              <a href="#" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Subscribe</a>
-              <a href="#" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Locations</a>
-              <a href="#" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Deals</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Rent</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Share</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Ride</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Subscribe</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Locations</a>
+              <a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="block px-3 py-2 text-white hover:text-[#FF6B00]">Deals</a>
             </div>
           </div>
         )}
@@ -285,7 +285,7 @@ export default function SixtHomepage() {
                 <div className="md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;</label>
                   <Button variant="primary" className="w-full">
-                    >
+                    <Search className="w-4 h-4 mr-2 text-white" />                    
                   </Button>
                 </div>
               </div>
@@ -355,25 +355,25 @@ export default function SixtHomepage() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Rental</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Car Rental</a></li>
-                <li><a href="#" className="hover:text-white">Van Rental</a></li>
-                <li><a href="#" className="hover:text-white">Luxury Cars</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Car Rental</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Van Rental</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Luxury Cars</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">About Us</a></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
-                <li><a href="#" className="hover:text-white">Press</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">About Us</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Careers</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Press</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white">Cookie Policy</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Privacy Policy</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Terms of Service</a></li>
+                <li><a href="https://voicebot.everailabs.com/demo/carrental/sixt" className="hover:text-white">Cookie Policy</a></li>
               </ul>
             </div>
           </div>
