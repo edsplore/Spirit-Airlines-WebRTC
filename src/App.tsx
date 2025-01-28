@@ -7,6 +7,7 @@ import McAfeeDemo from "./McAfee.tsx";
 import Centene from "./Centene.tsx";
 import Mone from "./M1.tsx";
 import Recruiter from "./Recruiter.tsx";
+import SixtHomepage from "./Sixt.tsx";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/demo/airline/jetblue" element={<JetBlueDemo />} />
       <Route path="/demo/security/mcafee" element={<McAfeeDemo />} />
       <Route path="/demo/riskmanagement/aon" element={<AON />} />
+      <Route path="/demo/carrental/sixt" element={<SixtHomepage />} />
       <Route path="*" element={<div>Coming Soon</div>} />
     </Routes>
   );
