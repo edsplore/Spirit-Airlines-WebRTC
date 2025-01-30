@@ -619,7 +619,7 @@ export default function SpiritAirlinesDemo() {
               <span
                 className={`mt-4 text-2xl md:text-3xl font-bold ${
                   callStatus === "active"
-                    ? "text-white group-hover:text-white"
+                    ? "text-[#EB0017] group-hover:text-[#EB0017]"
                     : "text-[#EB0017] group-hover:text-[#EB0017]"
                 }`}
               >
