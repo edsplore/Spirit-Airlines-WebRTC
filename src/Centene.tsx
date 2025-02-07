@@ -17,6 +17,7 @@ interface UserDetails {
   email: string
   address: string
   medicalCode: string
+  status: string
 }
 
 const webClient = new RetellWebClient()
@@ -36,6 +37,7 @@ export default function Centene() {
     email: "",
     address: "",
     medicalCode: "",
+    status: ""
   })
 
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
@@ -84,9 +86,11 @@ export default function Centene() {
                     email: "${userDetails.email}",
                     confirmation_code: "${userDetails.medicalCode}",
                     DOB: "${userDetails.dob}",
-                    address: "${userDetails.address}"                  }
+                    address: "${userDetails.address}",
+                    status: "${userDetails.status}"
+                    }
                 }
-              },
+              }
             });
           }
           v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
@@ -118,6 +122,7 @@ export default function Centene() {
       email: formData.get("email") as string,
       address: formData.get("address") as string,
       medicalCode: formData.get("confirmationCode") as string,
+      status: formData.get("status") as string,
     }
     setUserDetails(newUserDetails)
     setShowVerificationForm(false)
@@ -146,9 +151,8 @@ export default function Centene() {
                         email: "${newUserDetails.email}",
                         confirmation_code: "${newUserDetails.medicalCode}",
                         address: "${newUserDetails.address}",
-                        DOB: "${newUserDetails.dob}"
-                      }
-                    }
+                        DOB: "${newUserDetails.dob}",
+                        status: "${newUserDetails.status}"
                       }
                     }
                   },
@@ -230,6 +234,7 @@ export default function Centene() {
             address: userDetails.address,
             DOB: userDetails.dob,
             policy_date: policy_date,
+            status: userDetails.status,
           },
         }),
       })
@@ -354,6 +359,24 @@ export default function Centene() {
                       className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
+                  {/* Added dropdown for Status */}
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="status"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
+                      Status
+                    </label>
+                    <select
+                      id="status"
+                      name="status"
+                      required
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                    >
+                      <option value="Enrolled">Enrolled</option>
+                      <option value="Disenrolled">Disenrolled</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-center mt-6">
@@ -445,7 +468,7 @@ export default function Centene() {
               <div className="font-semibold p-2 border-r border-b border-gray-300">Email ID</div>
               <div className="p-2 border-b border-gray-300">{userDetails.email}</div>
               <div className="font-semibold p-2 border-r border-b border-gray-300">Status</div>
-              <div className="p-2 border-b border-gray-300">Enrolled</div>
+              <div className="p-2 border-b border-gray-300">{userDetails.status}</div>
               <div className="font-semibold p-2 border-r border-b border-gray-300">DOB</div>
               <div className="p-2 border-b border-gray-300">{userDetails.dob}</div>
               <div className="font-semibold p-2 border-r border-b border-gray-300">Address</div>
@@ -522,4 +545,3 @@ export default function Centene() {
     </div>
   )
 }
-
