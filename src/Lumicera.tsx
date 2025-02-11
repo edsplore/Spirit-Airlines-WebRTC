@@ -189,7 +189,7 @@ export default function Lumicera() {
     }
 
     const initiateConversation = async () => {
-        const agentId = "agent_3ad7f48e10b9c6a45ffaf0cfac"
+        const agentId = "agent_1ecd510a6f5bd6f164e23adf10"
         try {
             const registerCallResponse = await registerCall(agentId)
             if (registerCallResponse.callId) {
