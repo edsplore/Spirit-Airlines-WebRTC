@@ -525,7 +525,7 @@ export default function Lumicera() {
 
                     {/* Right Side: Additional Image */}
                     <div>
-                        <img src="/Lumicera_Footer_Right.png" alt="Additional Image" className="h-18 sm:h-26" />
+                        <img src="/Lumicera_Footer_Right.png" alt="Additional Lumicera" className="h-18 sm:h-26" />
                     </div>
                 </div>
             </div>
