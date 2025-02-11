@@ -8,11 +8,14 @@ import Centene from "./Centene.tsx";
 import Mone from "./M1.tsx";
 import Recruiter from "./Recruiter.tsx";
 import SixtHomepage from "./Sixt.tsx";
+import Lumicera from "./Lumicera.tsx";
 
 export default function App() {
   return (
     <Routes>
       {/* Add more routes as needed */}
+      <Route path="/demo/healthcare/lumicera" element={<Lumicera />} />
+
       <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
       <Route path="/demo/healthcare/centene" element={<Centene />} />
       <Route path="/demo/telecom/M1" element={<Mone />} />
