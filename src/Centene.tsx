@@ -217,7 +217,7 @@ export default function Centene() {
     const sampleRate = Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
     // Compute policy_date based on status:
     const policy_date =
-      userDetails.status === "Disenrolled"
+      userDetails.status === "Recently Disenrolled"
         ? format(addDays(new Date(), -7), "dd MMM yyyy")
         : format(addDays(new Date(), 15), "dd MMM yyyy")
 
@@ -374,8 +374,8 @@ export default function Centene() {
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     >
-                      <option value="Enrolled">Future Disenrollment</option>
-                      <option value="Disenrolled">Recently Disenrolled</option>
+                      <option value="Future Disenrollment">Future Disenrollment</option>
+                      <option value="Recently Disenrolled">Recently Disenrolled</option>
                     </select>
                   </div>
                 </div>
@@ -476,7 +476,7 @@ export default function Centene() {
               <div className="p-2 border-b border-gray-300">{userDetails.address}</div>
               <div className="font-semibold p-2 border-r border-b border-gray-300">Policy Active Date</div>
               <div className="p-2 border-b border-gray-300">
-                {userDetails.status === "Disenrolled"
+                {userDetails.status === "Recently Disenrolled"
                   ? format(addDays(new Date(), -7), "dd MMM yyyy")
                   : format(addDays(new Date(), 15), "dd MMM yyyy")}
               </div>
