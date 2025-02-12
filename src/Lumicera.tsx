@@ -3,7 +3,6 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Mic, MessageCircle, ChevronDown, Linkedin, Facebook, Youtube } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
-import { addDays, format } from "date-fns"
 import { } from "lucide-react";
 
 interface RegisterCallResponse {
