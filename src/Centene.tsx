@@ -295,7 +295,6 @@ export default function Centene() {
                       name="name"
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                      defaultValue="John Smith"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -311,7 +310,6 @@ export default function Centene() {
                       name="dob"
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                      defaultValue="1990-12-12"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -344,7 +342,6 @@ export default function Centene() {
                       name="email"
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                      defaultValue="Kevingrant@gmail.com"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -377,8 +374,8 @@ export default function Centene() {
                       required
                       className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     >
-                      <option value="Enrolled">Enrolled</option>
-                      <option value="Disenrolled">Disenrolled</option>
+                      <option value="Enrolled">Future Disenrollment</option>
+                      <option value="Disenrolled">Recently Disenrolled</option>
                     </select>
                   </div>
                 </div>
