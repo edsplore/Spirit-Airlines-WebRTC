@@ -1,5 +1,3 @@
-"use client"
-
 import "./App.css"
 import type React from "react"
 import { useEffect, useState } from "react"
@@ -573,7 +571,7 @@ export default function Lumicera() {
 
           {/* Right Side: Additional Image */}
           <div>
-            <img src="/Lumicera_Footer_Right.png" alt="Additional Image" className="h-18 sm:h-26" />
+            <img src="/Lumicera_Footer_Right.png" alt="Additional footer" className="h-18 sm:h-26" />
           </div>
         </div>
       </div>
