@@ -98,7 +98,7 @@ export default function Lumicera() {
 
     const addChatbotScript = () => {
       const script = document.createElement("script")
-      const projectId = "67900940c6f7a86d23b3de98"
+      const projectId = "67bc5dd5212c6b4fcbef5765"
       script.type = "text/javascript"
       script.innerHTML = `
         (function(d, t) {
@@ -163,7 +163,7 @@ export default function Lumicera() {
     }
     const addChatbotScript = () => {
       const script = document.createElement("script")
-      const projectId = "67900940c6f7a86d23b3de98"
+      const projectId = "67bc5dd5212c6b4fcbef5765"
       script.type = "text/javascript"
       script.innerHTML = `
             (function(d, t) {
