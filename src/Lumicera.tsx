@@ -244,14 +244,8 @@ export default function Lumicera() {
 
     const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
     const sampleRate = Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
-    // Compute policy_date based on status:
-    const policy_date =
-      userDetails.status === "Disenrolled"
-        ? format(addDays(new Date(), -7), "dd MMM yyyy")
-        : format(addDays(new Date(), 15), "dd MMM yyyy")
 
     try {
-      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ")
       const response = await fetch("https://api.retellai.com/v2/create-web-call", {
         method: "POST",
         headers: {
@@ -263,10 +257,8 @@ export default function Lumicera() {
           retell_llm_dynamic_variables: {
             member_name: userDetails.name,
             email: userDetails.email,
-            confirmation_code: formattedConfirmationCode,
             shippingAddress: userDetails.shippingAddress,
             DOB: userDetails.dob,
-            policy_date: policy_date,
             pharmacy: userDetails.pharmacy,
           },
         }),
