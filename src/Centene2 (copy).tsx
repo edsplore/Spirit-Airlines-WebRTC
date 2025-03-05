@@ -97,8 +97,6 @@ export default function Centene2() {
       console.log("Update received", update)
     })
 
-    /* 
-    // Voiceflow chatbot script injection disabled
     const addChatbotScript = () => {
       const script = document.createElement("script")
       const projectId = "67900940c6f7a86d23b3de98"
@@ -134,18 +132,15 @@ export default function Centene2() {
     }
 
     const chatbotScript = addChatbotScript()
-    */
 
     return () => {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
       webClient.off("error")
       webClient.off("update")
-      /*
       if (chatbotScript && chatbotScript.parentNode) {
         chatbotScript.parentNode.removeChild(chatbotScript)
       }
-      */
     }
   }, [userDetails])
 
@@ -183,8 +178,6 @@ export default function Centene2() {
     setFormSubmitted(true)
     setIsEditable(false)
 
-    /*
-    // Disable re-loading of the Voiceflow chatbot on form submit
     const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]')
     if (existingScript && existingScript.parentNode) {
       existingScript.parentNode.removeChild(existingScript)
@@ -223,7 +216,6 @@ export default function Centene2() {
       document.body.appendChild(script)
     }
     addChatbotScript()
-    */
   }
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -358,6 +350,9 @@ export default function Centene2() {
           />
         </div>
       </nav>
+
+
+
 
       {/* <div className="relative w-full">
         <img src="/centene-hero2.png" alt="Centene Hero" className="w-full object-cover rounded-lg shadow-md" />
@@ -668,14 +663,12 @@ export default function Centene2() {
           <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-24">
             <button onClick={toggleConversation} className="flex flex-col items-center group">
               <div
-                className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                  callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                }`}
+                className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                  }`}
               >
                 <Mic
-                  className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
-                    callStatus === "active" ? "animate-bounce" : ""
-                  }`}
+                  className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
+                    }`}
                 />
               </div>
               <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
@@ -684,10 +677,7 @@ export default function Centene2() {
             </button>
 
             <button
-              onClick={() => {
-                // Voiceflow chatbot open function disabled
-                // (window as any).voiceflow?.chat?.open();
-              }}
+              onClick={() => (window as any).voiceflow?.chat?.open()}
               className="flex flex-col items-center group"
             >
               <div className="p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
@@ -740,3 +730,4 @@ export default function Centene2() {
     </div>
   )
 }
+
