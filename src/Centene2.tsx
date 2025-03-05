@@ -255,7 +255,7 @@ export default function Centene2() {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_3ad7f48e10b9c6a45ffaf0cfac"
+    const agentId = "agent_d3ca92c1776826ef142c084251"
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -275,7 +275,7 @@ export default function Centene2() {
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
     console.log("Registering call for agent:", agentId)
 
-    const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
+    const apiKey = "key_98fef97480c54d6bf0698564addb"
     const sampleRate = Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
     const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy")
 
