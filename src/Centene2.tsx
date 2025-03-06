@@ -1,10 +1,12 @@
 "use client";
 
 import "./App.css";
-import { useEffect, useState } from "react";
-import { Mic, Edit2 } from "lucide-react";
-import { RetellWebClient } from "retell-client-js-sdk";
-import { addDays, format } from "date-fns";
+
+import React from "react";
+import { useEffect, useState } from "react"
+import { Mic, Edit2 } from "lucide-react"
+import { RetellWebClient } from "retell-client-js-sdk"
+import { addDays, format } from "date-fns"
 
 interface RegisterCallResponse {
   access_token?: string;
@@ -40,19 +42,12 @@ const notes = [
   "Phone# and Email id is required to send instant messages and confirmation",
 ];
 
-export default function Centene2() {
-  const [isEditable, setIsEditable] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "Jacob Williams",
-    dob: "1990-12-12",
-    email: "jacobwilliam@gmail.com",
-    address: "123 Maple Street, Nashville, Tennessee, 37201",
-  });
-  const [remainingTrials, setRemainingTrials] = useState(3);
+export default function Centene2(): React.ReactElement {
+  const [remainingTrials, setRemainingTrials] = useState(3)
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jacob Williams",
-    dob: "1990-12-12",
+    dob: "Dec-12-1990",
     email: "jacobwilliam@gmail.com",
     address: "123 Maple Street, Nashville, Tennessee, 37201",
     medicalCode: "U900312752",
@@ -71,6 +66,10 @@ export default function Centene2() {
   const [callInProgress, setCallInProgress] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [showVerificationForm, setShowVerificationForm] = useState(true);
+
+  const [dobMonth, setDobMonth] = useState("")
+  const [dobDay, setDobDay] = useState("")
+  const [dobYear, setDobYear] = useState("")
 
   // Clear form submitted state on page refresh/load
   useEffect(() => {
@@ -100,79 +99,45 @@ export default function Centene2() {
       console.log("Update received", update);
     });
 
-    /*
-    // Voiceflow chatbot script injection disabled
-    const addChatbotScript = () => {
-      const script = document.createElement("script");
-      const projectId = "67900940c6f7a86d23b3de98";
-      script.type = "text/javascript";
-      script.innerHTML = `
-        (function(d, t) {
-          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-          v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: '${projectId}' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production',
-              launch: {
-                event: {
-                  type: "launch",
-                  payload: {
-                    customer_name: "${userDetails.name}",
-                    email: "${userDetails.email}",
-                    confirmation_code: "${userDetails.medicalCode}",
-                    DOB: "${userDetails.dob}",
-                    address: "${userDetails.address}",
-                    phone: "${userDetails.phone}"
-                  }
-                }
-              },
-            });
-          }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-        })(document, 'script');
-      `;
-      document.body.appendChild(script);
-      return script;
-    };
-
-    const chatbotScript = addChatbotScript();
-    */
-
     return () => {
-      webClient.off("conversationStarted");
-      webClient.off("conversationEnded");
-      webClient.off("error");
-      webClient.off("update");
-      /*
-      if (chatbotScript && chatbotScript.parentNode) {
-        chatbotScript.parentNode.removeChild(chatbotScript);
-      }
-      */
-    };
-  }, [userDetails]);
+      webClient.off("conversationStarted")
+      webClient.off("conversationEnded")
+      webClient.off("error")
+      webClient.off("update")
+    }
+  }, [userDetails])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (remainingTrials <= 0) {
       return; // Don't allow submission if no trials are left
     }
-    const newFormData = new FormData(e.currentTarget);
-    const newName = newFormData.get("name") as string;
-    const newDob = newFormData.get("dob") as string;
-    const newEmail = newFormData.get("email") as string;
-    const newAddress = newFormData.get("address") as string;
+    const newFormData = new FormData(e.currentTarget)
+    const newName = newFormData.get("name") as string
+    const month = dobMonth
+    const day = dobDay
+    const year = dobYear
+
+    // Convert month number to month name
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const monthName = monthNames[Number.parseInt(month) - 1]
+
+    // Format as MMM-DD-YYYY
+    const newDob = `${monthName}-${day}-${year}`
+
+    const newEmail = newFormData.get("email") as string
+    const newAddress = newFormData.get("address") as string
 
     // Validate inputs against expected values
     const validation = {
       name: newName.trim().toLowerCase() === "jacob williams" ? "valid" : "invalid",
-      dob: newDob === "1990-12-12" ? "valid" : "invalid",
+      dob: newDob === "Dec-12-1990" ? "valid" : "invalid",
       email: newEmail.trim().toLowerCase() === "jacobwilliam@gmail.com" ? "valid" : "invalid",
       address:
         newAddress.trim().toLowerCase() === "123 maple street, nashville, tennessee, 37201" ? "valid" : "invalid",
       phone: userDetails.phone === "6152314412" ? "valid" : "invalid",
       medicalCode: userDetails.medicalCode === "U900312752" ? "valid" : "invalid",
-    };
+    } as UserDetails["validation"]
 
     // Update userDetails with form data
     const newUserDetails = {
@@ -193,14 +158,6 @@ export default function Centene2() {
 
     // Close the form after each submission
     setShowVerificationForm(false);
-  };
-
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isEditable) return;
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
   };
 
   const toggleConversation = async () => {
@@ -233,7 +190,7 @@ export default function Centene2() {
       const registerCallResponse = await registerCall(agentId);
       if (registerCallResponse.callId) {
         await webClient.startCall({
-          accessToken: registerCallResponse.access_token,
+          accessToken: registerCallResponse.access_token || "",
           callId: registerCallResponse.callId,
           sampleRate: registerCallResponse.sampleRate,
           enableUpdate: true,
@@ -294,18 +251,6 @@ export default function Centene2() {
     }
   }
 
-  const toggleEditable = () => {
-    if (!isEditable) {
-      setFormData({
-        name: userDetails.name,
-        dob: userDetails.dob,
-        email: userDetails.email,
-        address: userDetails.address,
-      });
-    }
-    setIsEditable(!isEditable);
-  };
-
   const reopenVerificationForm = () => {
     if (remainingTrials > 0) {
       setShowVerificationForm(true);
@@ -313,6 +258,32 @@ export default function Centene2() {
       alert("No more trials left. Please contact support for assistance.");
     }
   };
+
+  const generateMonthOptions = () => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    return months.map((month, index) => (
+      <option key={month} value={String(index + 1).padStart(2, "0")}>
+        {month}
+      </option>
+    ))
+  }
+
+  const generateDayOptions = () => {
+    return Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+      <option key={day} value={String(day).padStart(2, "0")}>
+        {day}
+      </option>
+    ))
+  }
+
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear()
+    return Array.from({ length: 100 }, (_, i) => currentYear - i).map((year) => (
+      <option key={year} value={year}>
+        {year}
+      </option>
+    ))
+  }
 
   return (
     <div className="min-h-screen bg-white relative flex flex-col">
@@ -384,7 +355,7 @@ export default function Centene2() {
                   </tr>
                   <tr className="bg-[#E6F3FF]">
                     <td className="border p-2">Date of Birth</td>
-                    <td className="border p-2 font-bold">1990-12-12</td>
+                    <td className="border p-2 font-bold">Dec-12-1990</td>
                     <td className="border p-2">{formSubmitted ? userDetails.dob : ""}</td>
                     <td className="border p-2">
                       {formSubmitted && (
@@ -439,14 +410,12 @@ export default function Centene2() {
         <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
           <button onClick={toggleConversation} className="flex flex-col items-center group">
             <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-              }`}
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                }`}
             >
               <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
-                  callStatus === "active" ? "animate-bounce" : ""
-                }`}
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
+                  }`}
               />
             </div>
             <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
@@ -472,7 +441,7 @@ export default function Centene2() {
 
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1e81b0] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
+          <div className="bg-[#2E5388] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
             <h2 className="text-base sm:text-xl font-medium text-white mb-4 sm:mb-6">
               Customer details required for verification and authentication
               <span className="ml-2 text-yellow-300 text-sm block sm:inline">
@@ -504,13 +473,41 @@ export default function Centene2() {
                     >
                       Choose DOB
                     </label>
-                    <input
-                      type="date"
-                      id="dob"
-                      name="dob"
-                      required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                    />
+                    <div className="flex-1 flex gap-2">
+                      <select
+                        id="dobMonth"
+                        name="dobMonth"
+                        required
+                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                        value={dobMonth}
+                        onChange={(e) => setDobMonth(e.target.value)}
+                      >
+                        <option value="">Month</option>
+                        {generateMonthOptions()}
+                      </select>
+                      <select
+                        id="dobDay"
+                        name="dobDay"
+                        required
+                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                        value={dobDay}
+                        onChange={(e) => setDobDay(e.target.value)}
+                      >
+                        <option value="">Day</option>
+                        {generateDayOptions()}
+                      </select>
+                      <select
+                        id="dobYear"
+                        name="dobYear"
+                        required
+                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                        value={dobYear}
+                        onChange={(e) => setDobYear(e.target.value)}
+                      >
+                        <option value="">Year</option>
+                        {generateYearOptions()}
+                      </select>
+                    </div>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
@@ -578,6 +575,18 @@ export default function Centene2() {
                   </div>
                 </div>
               </div>
+              <div className="flex justify-center mt-6">
+                <button
+                  type="submit"
+                  className={`px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold ${remainingTrials > 0 ? "hover:bg-gray-800" : "opacity-50 cursor-not-allowed"
+                    }`}
+                  disabled={remainingTrials <= 0}
+                >
+                  {remainingTrials > 0
+                    ? `Submit (${remainingTrials} ${remainingTrials === 1 ? "trial" : "trials"} left)`
+                    : "No trials left"}
+                </button>
+              </div>
               <div className="mt-4 bg-white p-3 rounded-lg">
                 <p className="font-medium text-[#8B0000] mb-1">Note</p>
                 <ul className="space-y-1 text-black text-sm">
@@ -595,19 +604,6 @@ export default function Centene2() {
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="flex justify-center mt-6">
-                <button
-                  type="submit"
-                  className={`px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold ${
-                    remainingTrials > 0 ? "hover:bg-gray-800" : "opacity-50 cursor-not-allowed"
-                  }`}
-                  disabled={remainingTrials <= 0}
-                >
-                  {remainingTrials > 0
-                    ? `Submit (${remainingTrials} ${remainingTrials === 1 ? "trial" : "trials"} left)`
-                    : "No trials left"}
-                </button>
               </div>
             </form>
           </div>
