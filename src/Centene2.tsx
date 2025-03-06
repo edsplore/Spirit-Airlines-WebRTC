@@ -3,7 +3,7 @@
 import "./App.css"
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Mic, MessageCircle, Edit2, X } from "lucide-react"
+import { Mic, Edit2 } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
@@ -47,6 +47,7 @@ export default function Centene2() {
     email: "jacobwilliam@gmail.com",
     address: "123 Maple Street, Nashville, Tennessee, 37201",
   })
+  const [remainingTrials, setRemainingTrials] = useState(3)
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jacob Williams",
@@ -68,6 +69,7 @@ export default function Centene2() {
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [showVerificationForm, setShowVerificationForm] = useState(true)
 
   // Clear form submitted state on page refresh/load
   useEffect(() => {
@@ -151,6 +153,9 @@ export default function Centene2() {
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (remainingTrials <= 0) {
+      return // Don't allow submission if no trials are left
+    }
     const newFormData = new FormData(e.currentTarget)
     const newName = newFormData.get("name") as string
     const newDob = newFormData.get("dob") as string
@@ -159,16 +164,16 @@ export default function Centene2() {
 
     // Validate inputs against expected values
     const validation = {
-      name: newName === "Jacob Williams" ? "valid" : "invalid",
+      name: newName.trim().toLowerCase() === "jacob williams" ? "valid" : "invalid",
       dob: newDob === "1990-12-12" ? "valid" : "invalid",
-      email: newEmail === "jacobwilliam@gmail.com" ? "valid" : "invalid",
-      address: newAddress === "123 Maple Street, Nashville, Tennessee, 37201" ? "valid" : "invalid",
-      // Adding validation for phone and medicalCode
+      email: newEmail.trim().toLowerCase() === "jacobwilliam@gmail.com" ? "valid" : "invalid",
+      address:
+        newAddress.trim().toLowerCase() === "123 maple street, nashville, tennessee, 37201" ? "valid" : "invalid",
       phone: userDetails.phone === "6152314412" ? "valid" : "invalid",
       medicalCode: userDetails.medicalCode === "U900312752" ? "valid" : "invalid",
     }
 
-    // Update userDetails with form data only after submit
+    // Update userDetails with form data
     const newUserDetails = {
       name: newName,
       dob: newDob,
@@ -179,51 +184,15 @@ export default function Centene2() {
       validation: validation,
     }
 
+    // Always submit the form and update user details
     setUserDetails(newUserDetails)
     setFormSubmitted(true)
-    setIsEditable(false)
 
-    /*
-    // Disable re-loading of the Voiceflow chatbot on form submit
-    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]')
-    if (existingScript && existingScript.parentNode) {
-      existingScript.parentNode.removeChild(existingScript)
-    }
+    // Decrement trials on each submission, but not below 0
+    setRemainingTrials((prev) => Math.max(0, prev - 1))
 
-    const addChatbotScript = () => {
-      const script = document.createElement("script")
-      const projectId = "67900940c6f7a86d23b3de98"
-      script.type = "text/javascript"
-      script.innerHTML = `
-        (function(d, t) {
-          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-          v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: '${projectId}' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production',
-              launch: {
-                event: {
-                  type: "launch",
-                  payload: {
-                    customer_name: "${newUserDetails.name}",
-                    email: "${newUserDetails.email}",
-                    confirmation_code: "${newUserDetails.medicalCode}",
-                    address: "${newUserDetails.address}",
-                    DOB: "${newUserDetails.dob}",
-                    phone: "${newUserDetails.phone}"
-                  }
-                }
-              },
-            });
-          }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-        })(document, 'script');
-      `
-      document.body.appendChild(script)
-    }
-    addChatbotScript()
-    */
+    // Close the form after each submission
+    setShowVerificationForm(false)
   }
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -340,206 +309,186 @@ export default function Centene2() {
     setIsEditable(!isEditable)
   }
 
+  const reopenVerificationForm = () => {
+    if (remainingTrials > 0) {
+      setShowVerificationForm(true)
+    } else {
+      alert("No more trials left. Please contact support for assistance.")
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-white relative">
-      <nav
-        className="w-full h-48 md:h-64 bg-cover bg-center relative"
-        style={{
-          backgroundImage: "url('/Centene_Header.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="px-4 md:px-20 py-6">
-          <img
-            src="/centene_logo.png"
-            alt="Centene"
-            className="h-12 md:h-14 absolute top-2 left-2"
-          />
+    <div className="min-h-screen bg-white relative flex flex-col">
+      <nav className="bg-[#2E5388] w-full">
+        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-2">
+          <img src="/centene_logo.png" alt="Centene" className="h-12 bg-transparent mb-4 md:mb-0" />
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-white text-sm md:text-lg font-bold">
+            <span className="cursor-pointer whitespace-nowrap">Who are we</span>
+            <span className="cursor-pointer whitespace-nowrap">Why we are different</span>
+            <span className="cursor-pointer whitespace-nowrap">Products and Services</span>
+            <span className="cursor-pointer whitespace-nowrap">Careers</span>
+            <span className="cursor-pointer whitespace-nowrap">Investors</span>
+            <span className="cursor-pointer whitespace-nowrap">News</span>
+          </div>
         </div>
       </nav>
 
-      {/* <div className="relative w-full">
-        <img src="/centene-hero2.png" alt="Centene Hero" className="w-full object-cover rounded-lg shadow-md" />
-        <div className="absolute bottom-1 left-0 w-full flex flex-col items-center justify-center p-3">
-          <div className="w-full md:w-4/5 flex flex-col">
-            <div className="text-white text-3xl md:text-5xl font-extrabold">
-              <span>Who we are</span>
-            </div>
-            <div className="bg-white bg-opacity-70 text-black p-4 rounded-3xl shadow-md mt-4 hidden md:block">
-              <p
-                className="text-sm md:text-2xl font-bold text-black"
-                style={{ display: "inline-block", width: "100%", wordSpacing: "0.2rem" }}
-              >
-                Centene is committed to helping people live healthier lives. We provide access to high-quality
-              </p>
-              <p
-                className="text-sm md:text-2xl font-bold text-black"
-                style={{ display: "inline-block", width: "100%", wordSpacing: "0.3rem" }}
-              >
-                healthcare, innovative programs and health solutions that help families and individuals
-              </p>
-              <p
-                className="text-sm md:text-2xl font-bold text-black"
-                style={{ display: "inline-block", width: "100%", wordSpacing: "0.1rem" }}
-              >
-                get well, stay well and be well.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
-      <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8">
-        <div className="w-full lg:w-1/2">
-          {/* Always show the table, but only show data after form submission */}
+      <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
+        <div className="w-full lg:w-3/4">
           <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="grid grid-cols-2 text-xs md:text-sm border border-gray-300">
-              <div className="font-semibold bg-[#2E5388] text-white p-2 border-r border-b border-gray-300">
-                Medical ID #
-              </div>
-              <div className="bg-[#2E5388] text-white p-2 border-b border-gray-300 flex justify-between items-center">
-                {formSubmitted ? userDetails.medicalCode : ""}
-                {formSubmitted && (
-                  <span className="text-white text-xs font-medium">
-                    {userDetails.validation.medicalCode === "valid" ? "Valid" : "Invalid"}
-                  </span>
-                )}
-              </div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">Phone Number</div>
-              <div className="p-2 border-b border-gray-300 flex justify-between items-center">
-                {formSubmitted ? userDetails.phone : ""}
-                {formSubmitted && (
-                  <span
-                    className={
-                      userDetails.validation.phone === "valid"
-                        ? "text-green-500 text-xs font-medium"
-                        : "text-red-500 text-xs font-medium"
-                    }
-                  >
-                    {userDetails.validation.phone === "valid" ? "Valid" : "Invalid"}
-                  </span>
-                )}
-              </div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">Member Name</div>
-              <div className="p-2 border-b border-gray-300 flex justify-between items-center">
-                {formSubmitted ? userDetails.name : ""}
-                {formSubmitted && (
-                  <span
-                    className={
-                      userDetails.validation.name === "valid"
-                        ? "text-green-500 text-xs font-medium"
-                        : "text-red-500 text-xs font-medium"
-                    }
-                  >
-                    {userDetails.validation.name === "valid" ? "Valid" : "Invalid"}
-                  </span>
-                )}
-              </div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">Email ID</div>
-              <div className="p-2 border-b border-gray-300 flex justify-between items-center">
-                {formSubmitted ? userDetails.email : ""}
-                {formSubmitted && (
-                  <span
-                    className={
-                      userDetails.validation.email === "valid"
-                        ? "text-green-500 text-xs font-medium"
-                        : "text-red-500 text-xs font-medium"
-                    }
-                  >
-                    {userDetails.validation.email === "valid" ? "Valid" : "Invalid"}
-                  </span>
-                )}
-              </div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">Status</div>
-              <div className="p-2 border-b border-gray-300">{formSubmitted ? "Enrolled" : ""}</div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">DOB</div>
-              <div className="p-2 border-b border-gray-300 flex justify-between items-center">
-                {formSubmitted ? userDetails.dob : ""}
-                {formSubmitted && (
-                  <span
-                    className={
-                      userDetails.validation.dob === "valid"
-                        ? "text-green-500 text-xs font-medium"
-                        : "text-red-500 text-xs font-medium"
-                    }
-                  >
-                    {userDetails.validation.dob === "valid" ? "Valid" : "Invalid"}
-                  </span>
-                )}
-              </div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">Address</div>
-              <div className="p-2 border-b border-gray-300 flex justify-between items-center">
-                <div className="truncate pr-2">{formSubmitted ? userDetails.address : ""}</div>
-                {formSubmitted && (
-                  <span
-                    className={
-                      userDetails.validation.address === "valid"
-                        ? "text-green-500 text-xs font-medium"
-                        : "text-red-500 text-xs font-medium"
-                    }
-                  >
-                    {userDetails.validation.address === "valid" ? "Valid" : "Invalid"}
-                  </span>
-                )}
-              </div>
-
-              <div className="font-semibold p-2 border-r border-b border-gray-300">Policy Active Date</div>
-              <div className="p-2 border-b border-gray-300">
-                {formSubmitted ? format(addDays(new Date(), 15), "dd MMM yyyy") : ""}
-              </div>
-            </div>
-          </div>
-
-          {/* Always show the note section */}
-          <div className="mt-4 bg-white p-3 rounded-lg border shadow">
-            <p className="font-medium text-[#8B0000] mb-1">Note</p>
-            <ul className="space-y-1 text-black text-sm">
-              {notes.map((note, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-black">➤</span>
-                  {index === 1 ? (
-                    <span>
-                      <span className="text-red-500">*</span>
-                      {note}
-                    </span>
-                  ) : (
-                    <span>{note}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div className="w-full lg:w-1/2">
-          <div className="bg-[#1e81b0] rounded-lg p-4 shadow border">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-base sm:text-xl font-medium text-white">
-                Customer details required for verification
+              <h2 className="text-xl font-bold">
+                Customer Identity Verification (CIV) Status
+                {remainingTrials < 3 && (
+                  <span className="ml-2 text-red-500 text-sm">
+                    ({remainingTrials} {remainingTrials === 1 ? "trial" : "trials"} remaining)
+                  </span>
+                )}
               </h2>
               <button
-                onClick={toggleEditable}
-                className="flex items-center gap-1 bg-black text-white px-3 py-1 rounded-full text-sm"
+                onClick={reopenVerificationForm}
+                className="flex items-center text-[#2E5388] hover:text-[#1e81b0]"
               >
-                {isEditable ? (
-                  <>
-                    <X size={14} /> Lock Form
-                  </>
-                ) : (
-                  <>
-                    <Edit2 size={14} /> Edit Form
-                  </>
-                )}
+                <Edit2 className="w-5 h-5 mr-1" />
+                Edit
               </button>
             </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-[#2E5388] text-white">
+                    <th className="border p-2 text-left">CIV Parameter</th>
+                    <th className="border p-2 text-left">Customer Details</th>
+                    <th className="border p-2 text-left">Input Provided</th>
+                    <th className="border p-2 text-left">Authentication Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="bg-[#E6F3FF]">
+                    <td className="border p-2">Medical ID</td>
+                    <td className="border p-2 font-bold">U900312752</td>
+                    <td className="border p-2">{formSubmitted ? userDetails.medicalCode : ""}</td>
+                    <td className="border p-2">
+                      {formSubmitted && (
+                        <span
+                          className={userDetails.validation.medicalCode === "valid" ? "text-green-500" : "text-red-500"}
+                        >
+                          {userDetails.validation.medicalCode === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td className="border p-2">Member Name</td>
+                    <td className="border p-2 font-bold">Jacob Williams</td>
+                    <td className="border p-2">{formSubmitted ? userDetails.name : ""}</td>
+                    <td className="border p-2">
+                      {formSubmitted && (
+                        <span className={userDetails.validation.name === "valid" ? "text-green-500" : "text-red-500"}>
+                          {userDetails.validation.name === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr className="bg-[#E6F3FF]">
+                    <td className="border p-2">Date of Birth</td>
+                    <td className="border p-2 font-bold">1990-12-12</td>
+                    <td className="border p-2">{formSubmitted ? userDetails.dob : ""}</td>
+                    <td className="border p-2">
+                      {formSubmitted && (
+                        <span className={userDetails.validation.dob === "valid" ? "text-green-500" : "text-red-500"}>
+                          {userDetails.validation.dob === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td className="border p-2">Address</td>
+                    <td className="border p-2 font-bold">123 Maple Street, Nashville, Tennessee, 37201</td>
+                    <td className="border p-2">{formSubmitted ? userDetails.address : ""}</td>
+                    <td className="border p-2">
+                      {formSubmitted && (
+                        <span
+                          className={userDetails.validation.address === "valid" ? "text-green-500" : "text-red-500"}
+                        >
+                          {userDetails.validation.address === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr className="bg-[#E6F3FF]">
+                    <td className="border p-2">Phone Number</td>
+                    <td className="border p-2 font-bold">6152314412</td>
+                    <td className="border p-2">{formSubmitted ? userDetails.phone : ""}</td>
+                    <td className="border p-2">
+                      {formSubmitted && (
+                        <span className={userDetails.validation.phone === "valid" ? "text-green-500" : "text-red-500"}>
+                          {userDetails.validation.phone === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td className="border p-2">Email ID</td>
+                    <td className="border p-2 font-bold">jacobwilliam@gmail.com</td>
+                    <td className="border p-2">{formSubmitted ? userDetails.email : ""}</td>
+                    <td className="border p-2">
+                      {formSubmitted && (
+                        <span className={userDetails.validation.email === "valid" ? "text-green-500" : "text-red-500"}>
+                          {userDetails.validation.email === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
+        <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
+          <button onClick={toggleConversation} className="flex flex-col items-center group">
+            <div
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+              }`}
+            >
+              <Mic
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
+                  callStatus === "active" ? "animate-bounce" : ""
+                }`}
+              />
+            </div>
+            <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
+              {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="bg-fit bg-center text-white py-8 mt-8"
+        style={{
+          backgroundImage: "url('/Centene_Footer.png')",
+          marginTop: "auto",
+        }}
+      >
+        <div className="container mx-auto px-4 text-right">
+          <p className="text-[#2E5388] font-bold text-sm md:text-base">Centene Headquarters:</p>
+          <p className="text-[#2E5388] text-sm md:text-base">Centene Corporation, Centene Plaza,</p>
+          <p className="text-[#2E5388] text-sm md:text-base">7700 Forsyth Boulevard St. Louis, MO 63105</p>
+        </div>
+      </div>
+
+      {showVerificationForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1e81b0] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
+            <h2 className="text-base sm:text-xl font-medium text-white mb-4 sm:mb-6">
+              Customer details required for verification and authentication
+              <span className="ml-2 text-yellow-300 text-sm block sm:inline">
+                ({remainingTrials} {remainingTrials === 1 ? "trial" : "trials"} remaining)
+              </span>
+            </h2>
             <form onSubmit={handleSubmitDetails} className="space-y-4">
               <div className="grid gap-4 max-w-lg mx-auto">
                 <div className="grid gap-4">
@@ -555,16 +504,13 @@ export default function Centene2() {
                       id="name"
                       name="name"
                       required
-                      className={`flex-1 p-1.5 rounded ${isEditable ? "bg-white" : "bg-gray-100"} text-black border border-gray-300 font-bold text-sm`}
-                      value={isEditable ? formData.name : userDetails.name}
-                      onChange={handleFormChange}
-                      readOnly={!isEditable}
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Choose DOB
                     </label>
@@ -573,10 +519,22 @@ export default function Centene2() {
                       id="dob"
                       name="dob"
                       required
-                      className={`flex-1 p-1.5 rounded ${isEditable ? "bg-white" : "bg-gray-100"} text-black border border-gray-300 font-bold text-sm`}
-                      value={isEditable ? formData.dob : userDetails.dob}
-                      onChange={handleFormChange}
-                      readOnly={!isEditable}
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="email"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
+                      Email id
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -592,27 +550,8 @@ export default function Centene2() {
                       name="address"
                       required
                       className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
-                      value={isEditable ? formData.address : userDetails.address}
-                      onChange={handleFormChange}
+                      defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
                       readOnly
-                    />
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="email"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Email id
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      className={`flex-1 p-1.5 rounded ${isEditable ? "bg-white" : "bg-gray-100"} text-black border border-gray-300 font-bold text-sm`}
-                      value={isEditable ? formData.email : userDetails.email}
-                      onChange={handleFormChange}
-                      readOnly={!isEditable}
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -620,13 +559,13 @@ export default function Centene2() {
                       htmlFor="medicalCode"
                       className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
-                      Medical Code#
+                      Medical ID
                     </label>
                     <input
                       type="text"
                       id="medicalCode"
                       name="medicalCode"
-                      value={userDetails.medicalCode}
+                      defaultValue="U900312752"
                       readOnly
                       className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
@@ -642,101 +581,49 @@ export default function Centene2() {
                       type="text"
                       id="phone"
                       name="phone"
-                      value={userDetails.phone}
+                      defaultValue="6152314412"
                       readOnly
                       className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                 </div>
               </div>
+              <div className="mt-4 bg-white p-3 rounded-lg">
+                <p className="font-medium text-[#8B0000] mb-1">Note</p>
+                <ul className="space-y-1 text-black text-sm">
+                  {notes.map((note, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-black">➤</span>
+                      {index === 1 ? (
+                        <span>
+                          <span className="text-red-500">*</span>
+                          {note}
+                        </span>
+                      ) : (
+                        <span>{note}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full hover:bg-gray-800 transition-colors font-bold"
-                  disabled={!isEditable}
+                  className={`px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold ${
+                    remainingTrials > 0 ? "hover:bg-gray-800" : "opacity-50 cursor-not-allowed"
+                  }`}
+                  disabled={remainingTrials <= 0}
                 >
-                  Submit
+                  {remainingTrials > 0
+                    ? `Submit (${remainingTrials} ${remainingTrials === 1 ? "trial" : "trials"} left)`
+                    : "No trials left"}
                 </button>
               </div>
             </form>
           </div>
         </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-center mt-8 px-4">
-        <div className="bg-white pt-2 px-2 w-full max-w-4xl">
-          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-24">
-            <button onClick={toggleConversation} className="flex flex-col items-center group">
-              <div
-                className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                  callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                }`}
-              >
-                <Mic
-                  className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
-                    callStatus === "active" ? "animate-bounce" : ""
-                  }`}
-                />
-              </div>
-              <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
-                {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
-              </span>
-            </button>
-
-            <button
-              onClick={() => {
-                // Voiceflow chatbot open function disabled
-                // (window as any).voiceflow?.chat?.open();
-              }}
-              className="flex flex-col items-center group"
-            >
-              <div className="p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105">
-                <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-[#1e81b0]" />
-              </div>
-              <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">Let's Chat</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="bg-cover bg-center text-white py-2.5 mt-8 relative"
-        style={{ backgroundImage: "url('/Centene_Footer.png')" }}
-      >
-        {/* Overlay for better readability */}
-        <div className="absolute "></div>
-
-        <div className="container mx-auto px-4 sm:px-8 max-w-full flex flex-col sm:flex-row justify-between items-center sm:items-start relative z-10">
-          <div className="flex flex-col items-start gap-2 mb-4 sm:mb-0">
-            <img src="/centene_logo.png" alt="Centene" className="h-12 sm:h-16 mb-2 sm:mb-0" />
-            <p className="text-sm text-[#2E5388] sm:text-lg font-normal italic text-center sm:text-left">
-              Transform the health of the communities, <br />
-              we serve one person at a time.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center sm:items-start gap-1 mt-4 sm:mt-8 mb-4 sm:mb-0">
-            <h2 className="text-xl  text-[#2E5388] sm:text-2xl font-bold uppercase text-center sm:text-left">
-              Healthcare IS BEST DELIVERED LOCALLY
-            </h2>
-            <p className="text-sm sm:text-lg text-[#2E5388]  font-normal text-center sm:text-left">
-              Our unique local approach allows us to help members helpers take out you from there, <br />
-              access high-quality, culturally sensitive healthcare services
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center sm:items-start gap-2">
-            <ul className="text-sm  text-[#2E5388] sm:text-lg font-normal text-center sm:text-left">
-              <li>Contact</li>
-              <li>Equal Opportunity Employer</li>
-              <li>Privacy Policy</li>
-              <li>Terms & Conditions</li>
-              <li>Purchase Order Terms & Conditions</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
+      )}
     </div>
   )
 }
+
