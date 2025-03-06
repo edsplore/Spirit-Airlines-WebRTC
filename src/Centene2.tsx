@@ -1,46 +1,44 @@
-"use client";
+"use client"
 
-import "./App.css";
+import "./App.css"
 
-import React from "react";
+import  React from "react"
 import { useEffect, useState } from "react"
 import { Mic, Edit2 } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
 interface RegisterCallResponse {
-  access_token?: string;
-  callId?: string;
-  sampleRate: number;
+  access_token?: string
+  callId?: string
+  sampleRate: number
 }
 
 interface UserDetails {
-  name: string;
-  dob: string;
-  email: string;
-  address: string;
-  medicalCode: string;
-  phone: string;
+  name: string
+  dob: string
+  email: string
+  address: string
+  medicalCode: string
+  phone: string
   validation: {
-    name: "valid" | "invalid" | "";
-    dob: "valid" | "invalid" | "";
-    email: "valid" | "invalid" | "";
-    address: "valid" | "invalid" | "";
-    medicalCode: "valid" | "invalid" | "";
-    phone: "valid" | "invalid" | "";
-  };
+    name: "valid" | "invalid" | ""
+    dob: "valid" | "invalid" | ""
+    email: "valid" | "invalid" | ""
+    address: "valid" | "invalid" | ""
+    medicalCode: "valid" | "invalid" | ""
+    phone: "valid" | "invalid" | ""
+  }
 }
 
-const webClient = new RetellWebClient();
+const webClient = new RetellWebClient()
 
 const notes = [
   "The platform is not integrated into the company systems, therefore asking for specific details for authentication and verification",
-  <span key="1">
-    Please enter the name that the Virtual Assistant wants to address you as.
-  </span>,
+  <span key="1">Please enter the name that the Virtual Assistant wants to address you as.</span>,
   "Upon authentication request by Virtual Assistant please mention confirmation code # and full name as shown on the top right side of the bar for reference upon this form submission.",
   "Phone# and Email id is required to send instant messages and confirmation",
-];
+]
 
 export default function Centene2(): React.ReactElement {
   const [remainingTrials, setRemainingTrials] = useState(3)
@@ -60,12 +58,12 @@ export default function Centene2(): React.ReactElement {
       medicalCode: "",
       phone: "",
     },
-  });
+  })
 
-  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started");
-  const [callInProgress, setCallInProgress] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [showVerificationForm, setShowVerificationForm] = useState(true);
+  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
+  const [callInProgress, setCallInProgress] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [showVerificationForm, setShowVerificationForm] = useState(true)
 
   const [dobMonth, setDobMonth] = useState("")
   const [dobDay, setDobDay] = useState("")
@@ -73,31 +71,31 @@ export default function Centene2(): React.ReactElement {
 
   // Clear form submitted state on page refresh/load
   useEffect(() => {
-    setFormSubmitted(false);
-  }, []);
+    setFormSubmitted(false)
+  }, [])
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
-      console.log("Conversation started successfully");
-      setCallStatus("active");
-      setCallInProgress(false);
-    });
+      console.log("Conversation started successfully")
+      setCallStatus("active")
+      setCallInProgress(false)
+    })
 
     webClient.on("conversationEnded", ({ code, reason }) => {
-      console.log("Conversation ended with code:", code, "reason:", reason);
-      setCallStatus("inactive");
-      setCallInProgress(false);
-    });
+      console.log("Conversation ended with code:", code, "reason:", reason)
+      setCallStatus("inactive")
+      setCallInProgress(false)
+    })
 
     webClient.on("error", (error) => {
-      console.error("An error occurred:", error);
-      setCallStatus("inactive");
-      setCallInProgress(false);
-    });
+      console.error("An error occurred:", error)
+      setCallStatus("inactive")
+      setCallInProgress(false)
+    })
 
     webClient.on("update", (update) => {
-      console.log("Update received", update);
-    });
+      console.log("Update received", update)
+    })
 
     return () => {
       webClient.off("conversationStarted")
@@ -108,9 +106,9 @@ export default function Centene2(): React.ReactElement {
   }, [userDetails])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault()
     if (remainingTrials <= 0) {
-      return; // Don't allow submission if no trials are left
+      return // Don't allow submission if no trials are left
     }
     const newFormData = new FormData(e.currentTarget)
     const newName = newFormData.get("name") as string
@@ -148,71 +146,68 @@ export default function Centene2(): React.ReactElement {
       medicalCode: userDetails.medicalCode,
       phone: userDetails.phone,
       validation: validation,
-    };
+    }
 
-    setUserDetails(newUserDetails);
-    setFormSubmitted(true);
+    setUserDetails(newUserDetails)
+    setFormSubmitted(true)
 
     // Decrement trials on each submission, but not below 0
-    setRemainingTrials((prev) => Math.max(0, prev - 1));
+    setRemainingTrials((prev) => Math.max(0, prev - 1))
 
     // Close the form after each submission
-    setShowVerificationForm(false);
-  };
+    setShowVerificationForm(false)
+  }
 
   const toggleConversation = async () => {
-    if (callInProgress) return;
-    setCallInProgress(true);
+    if (callInProgress) return
+    setCallInProgress(true)
     if (callStatus === "active") {
       try {
-        await webClient.stopCall();
-        setCallStatus("inactive");
+        await webClient.stopCall()
+        setCallStatus("inactive")
       } catch (error) {
-        console.error("Error stopping the call:", error);
+        console.error("Error stopping the call:", error)
       } finally {
-        setCallInProgress(false);
+        setCallInProgress(false)
       }
     } else {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        await initiateConversation();
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+        await initiateConversation()
       } catch (error) {
-        console.error("Microphone permission denied or error occurred:", error);
+        console.error("Microphone permission denied or error occurred:", error)
       } finally {
-        setCallInProgress(false);
+        setCallInProgress(false)
       }
     }
-  };
+  }
 
   const initiateConversation = async () => {
-    const agentId = "agent_d3ca92c1776826ef142c084251";
+    const agentId = "agent_d3ca92c1776826ef142c084251"
     try {
-      const registerCallResponse = await registerCall(agentId);
+      const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
         await webClient.startCall({
           accessToken: registerCallResponse.access_token || "",
           callId: registerCallResponse.callId,
           sampleRate: registerCallResponse.sampleRate,
           enableUpdate: true,
-        });
-        setCallStatus("active");
+        })
+        setCallStatus("active")
       }
     } catch (error) {
-      console.error("Error in registering or starting the call:", error);
+      console.error("Error in registering or starting the call:", error)
     }
-  };
+  }
 
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
-    console.log("Registering call for agent:", agentId);
-    const apiKey = "key_98fef97480c54d6bf0698564addb";
-    const sampleRate = Number.parseInt(
-      process.env.NEXT_PUBLIC_RETELL_SAMPLE_RATE || "16000",
-      10
-    );
-    const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy");
+    console.log("Registering call for agent:", agentId)
+    const apiKey = "key_98fef97480c54d6bf0698564addb"
+    const sampleRate = Number.parseInt(process.env.NEXT_PUBLIC_RETELL_SAMPLE_RATE || "16000", 10)
+    const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy")
 
     try {
-      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ");
+      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ")
       const response = await fetch("https://api.retellai.com/v2/create-web-call", {
         method: "POST",
         headers: {
@@ -229,35 +224,36 @@ export default function Centene2(): React.ReactElement {
             DOB: userDetails.dob,
             policy_date: policy_date,
             phone: userDetails.phone,
+            member_id: userDetails.medicalCode, // Add this line to pass medical ID as member_id
           },
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error: ${response.status}`)
       }
 
-      const data = await response.json();
-      console.log("Call registered successfully:", data);
+      const data = await response.json()
+      console.log("Call registered successfully:", data)
 
       return {
         access_token: data.access_token,
         callId: data.call_id,
         sampleRate: sampleRate,
-      };
+      }
     } catch (err) {
-      console.error("Error registering call:", err);
-      throw err;
+      console.error("Error registering call:", err)
+      throw err
     }
   }
 
   const reopenVerificationForm = () => {
     if (remainingTrials > 0) {
-      setShowVerificationForm(true);
+      setShowVerificationForm(true)
     } else {
-      alert("No more trials left. Please contact support for assistance.");
+      alert("No more trials left. Please contact support for assistance.")
     }
-  };
+  }
 
   const generateMonthOptions = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -313,7 +309,10 @@ export default function Centene2(): React.ReactElement {
                   </span>
                 )}
               </h2>
-              <button onClick={reopenVerificationForm} className="flex items-center text-[#2E5388] hover:text-[#1e81b0]">
+              <button
+                onClick={reopenVerificationForm}
+                className="flex items-center text-[#2E5388] hover:text-[#1e81b0]"
+              >
                 <Edit2 className="w-5 h-5 mr-1" />
                 Edit
               </button>
@@ -335,7 +334,9 @@ export default function Centene2(): React.ReactElement {
                     <td className="border p-2">{formSubmitted ? userDetails.medicalCode : ""}</td>
                     <td className="border p-2">
                       {formSubmitted && (
-                        <span className={userDetails.validation.medicalCode === "valid" ? "text-green-500" : "text-red-500"}>
+                        <span
+                          className={userDetails.validation.medicalCode === "valid" ? "text-green-500" : "text-red-500"}
+                        >
                           {userDetails.validation.medicalCode === "valid" ? "Valid" : "Invalid"}
                         </span>
                       )}
@@ -371,7 +372,9 @@ export default function Centene2(): React.ReactElement {
                     <td className="border p-2">{formSubmitted ? userDetails.address : ""}</td>
                     <td className="border p-2">
                       {formSubmitted && (
-                        <span className={userDetails.validation.address === "valid" ? "text-green-500" : "text-red-500"}>
+                        <span
+                          className={userDetails.validation.address === "valid" ? "text-green-500" : "text-red-500"}
+                        >
                           {userDetails.validation.address === "valid" ? "Valid" : "Invalid"}
                         </span>
                       )}
@@ -410,12 +413,14 @@ export default function Centene2(): React.ReactElement {
         <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
           <button onClick={toggleConversation} className="flex flex-col items-center group">
             <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                }`}
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+              }`}
             >
               <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
-                  }`}
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
+                  callStatus === "active" ? "animate-bounce" : ""
+                }`}
               />
             </div>
             <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
@@ -578,8 +583,9 @@ export default function Centene2(): React.ReactElement {
               <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className={`px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold ${remainingTrials > 0 ? "hover:bg-gray-800" : "opacity-50 cursor-not-allowed"
-                    }`}
+                  className={`px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold ${
+                    remainingTrials > 0 ? "hover:bg-gray-800" : "opacity-50 cursor-not-allowed"
+                  }`}
                   disabled={remainingTrials <= 0}
                 >
                   {remainingTrials > 0
@@ -610,5 +616,6 @@ export default function Centene2(): React.ReactElement {
         </div>
       )}
     </div>
-  );
+  )
 }
+
