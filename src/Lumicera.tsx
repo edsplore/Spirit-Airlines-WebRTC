@@ -1,3 +1,5 @@
+"use client"
+
 import "./App.css"
 import type React from "react"
 import { useEffect, useState } from "react"
@@ -111,7 +113,7 @@ export default function Lumicera() {
                 event: {
                   type: "launch",
                   payload: {
-                    customer_name: "${userDetails.name}",
+                    member_name: "${userDetails.name}",
                     email: "${userDetails.email}",
                     DOB: "${userDetails.dob}",
                     shippingAddress: "${userDetails.shippingAddress}",
@@ -176,7 +178,7 @@ export default function Lumicera() {
                     event: {
                       type: "launch",
                       payload: {
-                        customer_name: "${newUserDetails.name}",
+                        member_name: "${newUserDetails.name}",
                         email: "${newUserDetails.email}",
                         shippingAddress: "${newUserDetails.shippingAddress}",
                         DOB: "${newUserDetails.dob}",

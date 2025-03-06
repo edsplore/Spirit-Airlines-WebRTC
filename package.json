@@ -16,6 +16,7 @@
     "lucide-react": "^0.451.0",
     "node-fetch": "^2.6.7",
     "react": "^18.2.0",
+    "react-datepicker": "^8.1.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.3.0",
     "react-router-dom": "^7.0.2",
