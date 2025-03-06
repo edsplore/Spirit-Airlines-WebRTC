@@ -1,53 +1,54 @@
-"use client"
+"use client";
 
-import "./App.css"
-import type React from "react"
-import { useEffect, useState } from "react"
-import { Mic, Edit2 } from "lucide-react"
-import { RetellWebClient } from "retell-client-js-sdk"
-import { addDays, format } from "date-fns"
+import "./App.css";
+import { useEffect, useState } from "react";
+import { Mic, Edit2 } from "lucide-react";
+import { RetellWebClient } from "retell-client-js-sdk";
+import { addDays, format } from "date-fns";
 
 interface RegisterCallResponse {
-  access_token?: string
-  callId?: string
-  sampleRate: number
+  access_token?: string;
+  callId?: string;
+  sampleRate: number;
 }
 
 interface UserDetails {
-  name: string
-  dob: string
-  email: string
-  address: string
-  medicalCode: string
-  phone: string
+  name: string;
+  dob: string;
+  email: string;
+  address: string;
+  medicalCode: string;
+  phone: string;
   validation: {
-    name: "valid" | "invalid" | ""
-    dob: "valid" | "invalid" | ""
-    email: "valid" | "invalid" | ""
-    address: "valid" | "invalid" | ""
-    medicalCode: "valid" | "invalid" | ""
-    phone: "valid" | "invalid" | ""
-  }
+    name: "valid" | "invalid" | "";
+    dob: "valid" | "invalid" | "";
+    email: "valid" | "invalid" | "";
+    address: "valid" | "invalid" | "";
+    medicalCode: "valid" | "invalid" | "";
+    phone: "valid" | "invalid" | "";
+  };
 }
 
-const webClient = new RetellWebClient()
+const webClient = new RetellWebClient();
 
 const notes = [
   "The platform is not integrated into the company systems, therefore asking for specific details for authentication and verification",
-  <span key="1">Please enter the name that the Virtual Assistant want to address you as.</span>,
+  <span key="1">
+    Please enter the name that the Virtual Assistant wants to address you as.
+  </span>,
   "Upon authentication request by Virtual Assistant please mention confirmation code # and full name as shown on the top right side of the bar for reference upon this form submission.",
   "Phone# and Email id is required to send instant messages and confirmation",
-]
+];
 
 export default function Centene2() {
-  const [isEditable, setIsEditable] = useState(false)
+  const [isEditable, setIsEditable] = useState(false);
   const [formData, setFormData] = useState({
     name: "Jacob Williams",
     dob: "1990-12-12",
     email: "jacobwilliam@gmail.com",
     address: "123 Maple Street, Nashville, Tennessee, 37201",
-  })
-  const [remainingTrials, setRemainingTrials] = useState(3)
+  });
+  const [remainingTrials, setRemainingTrials] = useState(3);
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jacob Williams",
@@ -64,47 +65,47 @@ export default function Centene2() {
       medicalCode: "",
       phone: "",
     },
-  })
+  });
 
-  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
-  const [callInProgress, setCallInProgress] = useState(false)
-  const [formSubmitted, setFormSubmitted] = useState(false)
-  const [showVerificationForm, setShowVerificationForm] = useState(true)
+  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started");
+  const [callInProgress, setCallInProgress] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [showVerificationForm, setShowVerificationForm] = useState(true);
 
   // Clear form submitted state on page refresh/load
   useEffect(() => {
-    setFormSubmitted(false)
-  }, [])
+    setFormSubmitted(false);
+  }, []);
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
-      console.log("Conversation started successfully")
-      setCallStatus("active")
-      setCallInProgress(false)
-    })
+      console.log("Conversation started successfully");
+      setCallStatus("active");
+      setCallInProgress(false);
+    });
 
     webClient.on("conversationEnded", ({ code, reason }) => {
-      console.log("Conversation ended with code:", code, "reason:", reason)
-      setCallStatus("inactive")
-      setCallInProgress(false)
-    })
+      console.log("Conversation ended with code:", code, "reason:", reason);
+      setCallStatus("inactive");
+      setCallInProgress(false);
+    });
 
     webClient.on("error", (error) => {
-      console.error("An error occurred:", error)
-      setCallStatus("inactive")
-      setCallInProgress(false)
-    })
+      console.error("An error occurred:", error);
+      setCallStatus("inactive");
+      setCallInProgress(false);
+    });
 
     webClient.on("update", (update) => {
-      console.log("Update received", update)
-    })
+      console.log("Update received", update);
+    });
 
-    /* 
+    /*
     // Voiceflow chatbot script injection disabled
     const addChatbotScript = () => {
-      const script = document.createElement("script")
-      const projectId = "67900940c6f7a86d23b3de98"
-      script.type = "text/javascript"
+      const script = document.createElement("script");
+      const projectId = "67900940c6f7a86d23b3de98";
+      script.type = "text/javascript";
       script.innerHTML = `
         (function(d, t) {
           var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
@@ -130,37 +131,37 @@ export default function Centene2() {
           }
           v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
         })(document, 'script');
-      `
-      document.body.appendChild(script)
-      return script
-    }
+      `;
+      document.body.appendChild(script);
+      return script;
+    };
 
-    const chatbotScript = addChatbotScript()
+    const chatbotScript = addChatbotScript();
     */
 
     return () => {
-      webClient.off("conversationStarted")
-      webClient.off("conversationEnded")
-      webClient.off("error")
-      webClient.off("update")
+      webClient.off("conversationStarted");
+      webClient.off("conversationEnded");
+      webClient.off("error");
+      webClient.off("update");
       /*
       if (chatbotScript && chatbotScript.parentNode) {
-        chatbotScript.parentNode.removeChild(chatbotScript)
+        chatbotScript.parentNode.removeChild(chatbotScript);
       }
       */
-    }
-  }, [userDetails])
+    };
+  }, [userDetails]);
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     if (remainingTrials <= 0) {
-      return // Don't allow submission if no trials are left
+      return; // Don't allow submission if no trials are left
     }
-    const newFormData = new FormData(e.currentTarget)
-    const newName = newFormData.get("name") as string
-    const newDob = newFormData.get("dob") as string
-    const newEmail = newFormData.get("email") as string
-    const newAddress = newFormData.get("address") as string
+    const newFormData = new FormData(e.currentTarget);
+    const newName = newFormData.get("name") as string;
+    const newDob = newFormData.get("dob") as string;
+    const newEmail = newFormData.get("email") as string;
+    const newAddress = newFormData.get("address") as string;
 
     // Validate inputs against expected values
     const validation = {
@@ -171,7 +172,7 @@ export default function Centene2() {
         newAddress.trim().toLowerCase() === "123 maple street, nashville, tennessee, 37201" ? "valid" : "invalid",
       phone: userDetails.phone === "6152314412" ? "valid" : "invalid",
       medicalCode: userDetails.medicalCode === "U900312752" ? "valid" : "invalid",
-    }
+    };
 
     // Update userDetails with form data
     const newUserDetails = {
@@ -182,82 +183,79 @@ export default function Centene2() {
       medicalCode: userDetails.medicalCode,
       phone: userDetails.phone,
       validation: validation,
-    }
+    };
 
-    // Always submit the form and update user details
-    setUserDetails(newUserDetails)
-    setFormSubmitted(true)
+    setUserDetails(newUserDetails);
+    setFormSubmitted(true);
 
     // Decrement trials on each submission, but not below 0
-    setRemainingTrials((prev) => Math.max(0, prev - 1))
+    setRemainingTrials((prev) => Math.max(0, prev - 1));
 
     // Close the form after each submission
-    setShowVerificationForm(false)
-  }
+    setShowVerificationForm(false);
+  };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isEditable) return
-
-    // Only update the formData state, not the userDetails yet
+    if (!isEditable) return;
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const toggleConversation = async () => {
-    if (callInProgress) return
-
-    setCallInProgress(true)
-
+    if (callInProgress) return;
+    setCallInProgress(true);
     if (callStatus === "active") {
       try {
-        await webClient.stopCall()
-        setCallStatus("inactive")
+        await webClient.stopCall();
+        setCallStatus("inactive");
       } catch (error) {
-        console.error("Error stopping the call:", error)
+        console.error("Error stopping the call:", error);
       } finally {
-        setCallInProgress(false)
+        setCallInProgress(false);
       }
     } else {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true })
-        await initiateConversation()
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        await initiateConversation();
       } catch (error) {
-        console.error("Microphone permission denied or error occurred:", error)
+        console.error("Microphone permission denied or error occurred:", error);
       } finally {
-        setCallInProgress(false)
+        setCallInProgress(false);
       }
     }
-  }
+  };
 
   const initiateConversation = async () => {
-    const agentId = "agent_d3ca92c1776826ef142c084251"
+    const agentId = "agent_d3ca92c1776826ef142c084251";
     try {
-      const registerCallResponse = await registerCall(agentId)
+      const registerCallResponse = await registerCall(agentId);
       if (registerCallResponse.callId) {
         await webClient.startCall({
           accessToken: registerCallResponse.access_token,
           callId: registerCallResponse.callId,
           sampleRate: registerCallResponse.sampleRate,
           enableUpdate: true,
-        })
-        setCallStatus("active")
+        });
+        setCallStatus("active");
       }
     } catch (error) {
-      console.error("Error in registering or starting the call:", error)
+      console.error("Error in registering or starting the call:", error);
     }
-  }
+  };
 
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
-    console.log("Registering call for agent:", agentId)
-
-    const apiKey = "key_98fef97480c54d6bf0698564addb"
-    const sampleRate = Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
-    const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy")
+    console.log("Registering call for agent:", agentId);
+    const apiKey = "key_98fef97480c54d6bf0698564addb";
+    const sampleRate = Number.parseInt(
+      process.env.NEXT_PUBLIC_RETELL_SAMPLE_RATE || "16000",
+      10
+    );
+    const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy");
 
     try {
-      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ")
+      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ");
       const response = await fetch("https://api.retellai.com/v2/create-web-call", {
         method: "POST",
         headers: {
@@ -276,46 +274,45 @@ export default function Centene2() {
             phone: userDetails.phone,
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
+        throw new Error(`Error: ${response.status}`);
       }
 
-      const data = await response.json()
-      console.log("Call registered successfully:", data)
+      const data = await response.json();
+      console.log("Call registered successfully:", data);
 
       return {
         access_token: data.access_token,
         callId: data.call_id,
         sampleRate: sampleRate,
-      }
+      };
     } catch (err) {
-      console.error("Error registering call:", err)
-      throw err
+      console.error("Error registering call:", err);
+      throw err;
     }
   }
 
   const toggleEditable = () => {
     if (!isEditable) {
-      // When enabling edit mode, sync formData with userDetails
       setFormData({
         name: userDetails.name,
         dob: userDetails.dob,
         email: userDetails.email,
         address: userDetails.address,
-      })
+      });
     }
-    setIsEditable(!isEditable)
-  }
+    setIsEditable(!isEditable);
+  };
 
   const reopenVerificationForm = () => {
     if (remainingTrials > 0) {
-      setShowVerificationForm(true)
+      setShowVerificationForm(true);
     } else {
-      alert("No more trials left. Please contact support for assistance.")
+      alert("No more trials left. Please contact support for assistance.");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-white relative flex flex-col">
@@ -345,10 +342,7 @@ export default function Centene2() {
                   </span>
                 )}
               </h2>
-              <button
-                onClick={reopenVerificationForm}
-                className="flex items-center text-[#2E5388] hover:text-[#1e81b0]"
-              >
+              <button onClick={reopenVerificationForm} className="flex items-center text-[#2E5388] hover:text-[#1e81b0]">
                 <Edit2 className="w-5 h-5 mr-1" />
                 Edit
               </button>
@@ -370,9 +364,7 @@ export default function Centene2() {
                     <td className="border p-2">{formSubmitted ? userDetails.medicalCode : ""}</td>
                     <td className="border p-2">
                       {formSubmitted && (
-                        <span
-                          className={userDetails.validation.medicalCode === "valid" ? "text-green-500" : "text-red-500"}
-                        >
+                        <span className={userDetails.validation.medicalCode === "valid" ? "text-green-500" : "text-red-500"}>
                           {userDetails.validation.medicalCode === "valid" ? "Valid" : "Invalid"}
                         </span>
                       )}
@@ -408,9 +400,7 @@ export default function Centene2() {
                     <td className="border p-2">{formSubmitted ? userDetails.address : ""}</td>
                     <td className="border p-2">
                       {formSubmitted && (
-                        <span
-                          className={userDetails.validation.address === "valid" ? "text-green-500" : "text-red-500"}
-                        >
+                        <span className={userDetails.validation.address === "valid" ? "text-green-500" : "text-red-500"}>
                           {userDetails.validation.address === "valid" ? "Valid" : "Invalid"}
                         </span>
                       )}
@@ -510,7 +500,7 @@ export default function Centene2() {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Choose DOB
                     </label>
@@ -525,7 +515,7 @@ export default function Centene2() {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="email"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Email id
                     </label>
@@ -540,7 +530,7 @@ export default function Centene2() {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="address"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Address
                     </label>
@@ -557,7 +547,7 @@ export default function Centene2() {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="medicalCode"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Medical ID
                     </label>
@@ -573,7 +563,7 @@ export default function Centene2() {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="phone"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Phone Number
                     </label>
@@ -624,6 +614,5 @@ export default function Centene2() {
         </div>
       )}
     </div>
-  )
+  );
 }
-
