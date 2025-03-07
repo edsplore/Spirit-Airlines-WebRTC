@@ -1,58 +1,56 @@
-"use client"
+"use client";
 
-import React from "react"
-
-import "./App.css"
-import { useEffect, useState, useRef, useCallback } from "react"
-import { Mic, RefreshCcw } from "lucide-react"
-import { RetellWebClient } from "retell-client-js-sdk"
-import { addDays, format } from "date-fns"
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import "./App.css";
+import { Mic, RefreshCcw } from "lucide-react";
+import { RetellWebClient } from "retell-client-js-sdk";
+import { addDays, format } from "date-fns";
 
 interface RegisterCallResponse {
-  access_token?: string
-  callId?: string
-  sampleRate: number
+  access_token?: string;
+  callId?: string;
+  sampleRate: number;
 }
 
 interface UserDetails {
-  name: string
-  dob: string
-  email: string
-  address: string
-  medicalCode: string
-  phone: string
+  name: string;
+  dob: string;
+  email: string;
+  address: string;
+  medicalCode: string;
+  phone: string;
   validation: {
-    name: "valid" | "invalid" | ""
-    dob: "valid" | "invalid" | ""
-    email: "valid" | "invalid" | ""
-    address: "valid" | "invalid" | ""
-    medicalCode: "valid" | "invalid" | ""
-    phone: "valid" | "invalid" | ""
-  }
+    name: "valid" | "invalid" | "";
+    dob: "valid" | "invalid" | "";
+    email: "valid" | "invalid" | "";
+    address: "valid" | "invalid" | "";
+    medicalCode: "valid" | "invalid" | "";
+    phone: "valid" | "invalid" | "";
+  };
 }
 
 interface ApiData {
-  name: string
-  dob: string
-  email: string
-  address: string
-  medicalCode: string
-  phone: string
+  name: string;
+  dob: string;
+  email: string;
+  address: string;
+  medicalCode: string;
+  phone: string;
 }
 
-const webClient = new RetellWebClient()
+const webClient = new RetellWebClient();
 
 const notes = [
   "The platform is not integrated into the company systems, therefore asking for specific details for authentication and verification",
   <span key="1">Please enter the name that the Virtual Assistant wants to address you as.</span>,
   "Upon authentication request by Virtual Assistant please mention confirmation code # and full name as shown on the top right side of the bar for reference upon this form submission.",
   "Phone# and Email id is required to send instant messages and confirmation",
-]
+];
 
-const apiKey = "key_98fef97480c54d6bf0698564addb"
+const apiKey = "key_98fef97480c54d6bf0698564addb";
 
 export default function Centene2(): React.ReactElement {
-  const [allTrialsUsed, setAllTrialsUsed] = useState(false)
+  const [allTrialsUsed, setAllTrialsUsed] = useState(false);
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "",
@@ -69,16 +67,15 @@ export default function Centene2(): React.ReactElement {
       medicalCode: "",
       phone: "",
     },
-  })
+  });
 
-  // Replace the existing apiCallData state with this:
   const [apiCallData, setApiCallData] = useState<{
-    member_id: string[]
-    shipping_address: string[]
-    member_name: string[]
-    _d_o_b: string[]
-    phone: string[]
-    email: string[]
+    member_id: string[];
+    shipping_address: string[];
+    member_name: string[];
+    _d_o_b: string[];
+    phone: string[];
+    email: string[];
   }>({
     member_id: [],
     shipping_address: [],
@@ -86,16 +83,15 @@ export default function Centene2(): React.ReactElement {
     _d_o_b: [],
     phone: [],
     email: [],
-  })
+  });
 
-  // Replace the existing apiData state with this:
   const [apiData, setApiData] = useState<{
-    name: string[]
-    dob: string[]
-    email: string[]
-    address: string[]
-    medicalCode: string[]
-    phone: string[]
+    name: string[];
+    dob: string[];
+    email: string[];
+    address: string[];
+    medicalCode: string[];
+    phone: string[];
   }>({
     name: [],
     dob: [],
@@ -103,37 +99,39 @@ export default function Centene2(): React.ReactElement {
     address: [],
     medicalCode: [],
     phone: [],
-  })
+  });
 
-  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
-  const [callInProgress, setCallInProgress] = useState(false)
-  const [formSubmitted, setFormSubmitted] = useState(false)
-  const [showVerificationForm, setShowVerificationForm] = useState(true)
+  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started");
+  const [callInProgress, setCallInProgress] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [showVerificationForm, setShowVerificationForm] = useState(true);
 
-  const [dobMonth, setDobMonth] = useState("")
-  const [dobDay, setDobDay] = useState("")
-  const [dobYear, setDobYear] = useState("")
+  const [dobMonth, setDobMonth] = useState("");
+  const [dobDay, setDobDay] = useState("");
+  const [dobYear, setDobYear] = useState("");
 
-  const [currentCallId, setCurrentCallId] = useState<string>("")
-  const callEndedRef = useRef(false)
-  const [callEnded, setCallEnded] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [currentCallId, setCurrentCallId] = useState<string>("");
+  const callEndedRef = useRef(false);
+  const [callEnded, setCallEnded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // State to track which agent ID to use
+  const [useAlternateAgent, setUseAlternateAgent] = useState(false);
 
   useEffect(() => {
-    setFormSubmitted(false)
-    setAllTrialsUsed(false)
-  }, [])
+    setFormSubmitted(false);
+    setAllTrialsUsed(false);
+  }, []);
 
-  // Modify the fetchCallData function to update the new state
   const fetchCallData = useCallback(async (callId: string) => {
-    setIsLoading(true)
-    setError(null)
-    console.log(`Attempting to fetch call data for ID: ${callId}`)
+    setIsLoading(true);
+    setError(null);
+    console.log(`Attempting to fetch call data for ID: ${callId}`);
 
     try {
-      const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
-      console.log(`Making API request to: ${apiUrl}`)
+      const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`;
+      console.log(`Making API request to: ${apiUrl}`);
 
       const response = await fetch(apiUrl, {
         method: "GET",
@@ -141,21 +139,20 @@ export default function Centene2(): React.ReactElement {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-      })
+      });
 
-      console.log(`API response status: ${response.status}`)
+      console.log(`API response status: ${response.status}`);
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
-        throw new Error(`API Error: ${response.status}, ${errorText}`)
+        const errorText = await response.text();
+        console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`);
+        throw new Error(`API Error: ${response.status}, ${errorText}`);
       }
 
-      const data = await response.json()
-      console.log("Call data retrieved successfully:", JSON.stringify(data))
+      const data = await response.json();
+      console.log("Call data retrieved successfully:", JSON.stringify(data));
 
-      // Extract the custom analysis data
-      const customData = data.call_analysis.custom_analysis_data
+      const customData = data.call_analysis.custom_analysis_data;
       setApiCallData((prev) => ({
         member_id: [...prev.member_id, customData.member_id || ""],
         shipping_address: [...prev.shipping_address, customData.shipping_address || ""],
@@ -163,109 +160,101 @@ export default function Centene2(): React.ReactElement {
         _d_o_b: [...prev._d_o_b, customData._d_o_b || ""],
         phone: [...prev.phone, customData.phone_number || customData.phone || ""],
         email: [...prev.email, customData.email || ""],
-      }))
+      }));
 
-      setIsLoading(false)
-      return data
+      setIsLoading(false);
+      return data;
     } catch (err) {
-      console.error("Error in fetchCallData:", err)
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
-      setIsLoading(false)
-      throw err
+      console.error("Error in fetchCallData:", err);
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setIsLoading(false);
+      throw err;
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
-      console.log("Conversation started successfully")
-      setCallStatus("active")
-      setCallInProgress(false)
-      callEndedRef.current = false
-      // Explicitly ensure callEnded is false when conversation starts
-      setCallEnded(false)
-    })
+      console.log("Conversation started successfully");
+      setCallStatus("active");
+      setCallInProgress(false);
+      callEndedRef.current = false;
+      setCallEnded(false);
+    });
 
     webClient.on("conversationEnded", ({ code, reason }) => {
-      console.log("Conversation ended event triggered with code:", code, "reason:", reason)
-      setCallStatus("inactive")
-      setCallInProgress(false)
-      callEndedRef.current = true
+      console.log("Conversation ended event triggered with code:", code, "reason:", reason);
+      setCallStatus("inactive");
+      setCallInProgress(false);
+      callEndedRef.current = true;
 
-      // Add a small delay before setting callEnded to true to ensure all other state updates have completed
       setTimeout(() => {
-        setCallEnded(true)
-        console.log("Call ended, callEnded state set to true")
-        console.log("Current call ID:", currentCallId)
-      }, 500)
-    })
+        setCallEnded(true);
+        console.log("Call ended, callEnded state set to true");
+        console.log("Current call ID:", currentCallId);
+      }, 500);
+    });
 
     webClient.on("error", (error) => {
-      console.error("An error occurred:", error)
-      setCallStatus("inactive")
-      setCallInProgress(false)
-    })
+      console.error("An error occurred:", error);
+      setCallStatus("inactive");
+      setCallInProgress(false);
+    });
 
     webClient.on("update", (update) => {
-      console.log("Update received", update)
-    })
+      console.log("Update received", update);
+    });
 
     return () => {
-      webClient.off("conversationStarted")
-      webClient.off("conversationEnded")
-      webClient.off("error")
-      webClient.off("update")
-    }
-  }, [currentCallId])
+      webClient.off("conversationStarted");
+      webClient.off("conversationEnded");
+      webClient.off("error");
+      webClient.off("update");
+    };
+  }, [currentCallId]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    let timeoutId: NodeJS.Timeout;
 
-    // Only run this effect when callEnded changes from false to true
     if (callEnded && currentCallId) {
-      console.log("Call ended detected, preparing to fetch call data...")
-      console.log("Current call ID:", currentCallId)
+      console.log("Call ended detected, preparing to fetch call data...");
+      console.log("Current call ID:", currentCallId);
 
-      // Increase the timeout to give the API more time to process the call data
       timeoutId = setTimeout(() => {
-        console.log("Timeout completed, now fetching call data...")
+        console.log("Timeout completed, now fetching call data...");
         fetchCallData(currentCallId)
           .then((data) => {
-            console.log("Call data fetched successfully:", data)
-            return processCallData(data)
+            console.log("Call data fetched successfully:", data);
+            return processCallData(data);
           })
           .then(() => {
-            console.log("Call data processed successfully")
-            // Reset callEnded after processing to prevent repeated API calls
-            setCallEnded(false)
+            console.log("Call data processed successfully");
+            setCallEnded(false);
           })
-          .catch((error) => console.error("Error fetching or processing call data:", error))
-      }, 5000) // Increased from 1000ms to 3000ms to ensure the API has time to process
+          .catch((error) => console.error("Error fetching or processing call data:", error));
+      }, 5000);
     }
 
     return () => {
       if (timeoutId) {
-        console.log("Clearing timeout for API call")
-        clearTimeout(timeoutId)
+        console.log("Clearing timeout for API call");
+        clearTimeout(timeoutId);
       }
-    }
-  }, [callEnded, currentCallId, fetchCallData])
+    };
+  }, [callEnded, currentCallId, fetchCallData]);
 
-  // Replace the processCallData function with this updated version
-  // Replace the processCallData function with this improved version
   const processCallData = useCallback(
     (callData: any) => {
       try {
-        console.log("Processing call data:", JSON.stringify(callData))
+        console.log("Processing call data:", JSON.stringify(callData));
 
-        const userInfo = callData.transcript?.user_info
-        const customData = callData.call_analysis?.custom_analysis_data || {}
+        const userInfo = callData.transcript?.user_info;
+        const customData = callData.call_analysis?.custom_analysis_data || {};
 
         if (!userInfo && !customData) {
-          console.error("User info not found in call data")
-          return
+          console.error("User info not found in call data");
+          return;
         }
 
-        // Prefer data from custom_analysis_data if available, fall back to user_info
         const extractedData = {
           name: customData.member_name || userInfo?.name || "",
           dob: customData._d_o_b || userInfo?.dob || "",
@@ -273,10 +262,10 @@ export default function Centene2(): React.ReactElement {
           address: customData.shipping_address || userInfo?.address || "",
           medicalCode: customData.member_id || userInfo?.medical_id || userInfo?.member_id || "",
           phone: customData.phone_number || customData.phone || userInfo?.phone || "",
-        }
+        };
 
-        console.log("Extracted data from API:", extractedData)
-        console.log("User details:", userDetails)
+        console.log("Extracted data from API:", extractedData);
+        console.log("User details:", userDetails);
 
         setApiData((prev) => ({
           name: [...prev.name, extractedData.name],
@@ -285,18 +274,16 @@ export default function Centene2(): React.ReactElement {
           address: [...prev.address, extractedData.address],
           medicalCode: [...prev.medicalCode, extractedData.medicalCode],
           phone: [...prev.phone, extractedData.phone],
-        }))
+        }));
 
-        // Improved normalization functions
         const normalizeString = (str: string) => {
           if (!str) return "";
           return str.toLowerCase().replace(/[^a-z0-9]/g, "");
-        }
+        };
 
         const normalizeDOB = (dob: string) => {
           if (!dob) return "";
 
-          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
           const dashPattern = /([a-z]+)-(\d+)-(\d+)/i;
           const dashMatch = dob.match(dashPattern);
 
@@ -309,7 +296,6 @@ export default function Centene2(): React.ReactElement {
             }
           }
 
-          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
           const slashPattern = /(\d+)\/(\d+)\/(\d+)/;
           const slashMatch = dob.match(slashPattern);
 
@@ -318,17 +304,14 @@ export default function Centene2(): React.ReactElement {
             return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`;
           }
 
-          // If no pattern matches, just normalize the string
           return normalizeString(dob);
-        }
+        };
 
-        // Normalize phone number (remove all non-digits)
         const normalizePhone = (phone: string) => {
           if (!phone) return "";
           return phone.replace(/\D/g, "");
-        }
+        };
 
-        // Perform validations
         const userDOB = normalizeDOB(userDetails.dob);
         const extractedDOB = normalizeDOB(extractedData.dob);
 
@@ -340,17 +323,25 @@ export default function Centene2(): React.ReactElement {
           email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
           address: normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
           phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
-          medicalCode: normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode) ? "valid" : "invalid",
-        }
+          medicalCode:
+            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
+              ? "valid"
+              : "invalid",
+        };
 
-        console.log("Validation results:", validation)
-        console.log("Normalized comparisons:")
-        console.log("Name:", normalizeString(extractedData.name), "vs", normalizeString(userDetails.name))
-        console.log("DOB:", userDOB, "vs", extractedDOB)
-        console.log("Email:", normalizeString(extractedData.email), "vs", normalizeString(userDetails.email))
-        console.log("Address:", normalizeString(extractedData.address), "vs", normalizeString(userDetails.address))
-        console.log("Phone:", normalizePhone(extractedData.phone), "vs", normalizePhone(userDetails.phone))
-        console.log("Medical ID:", normalizeString(extractedData.medicalCode), "vs", normalizeString(userDetails.medicalCode))
+        console.log("Validation results:", validation);
+        console.log("Normalized comparisons:");
+        console.log("Name:", normalizeString(extractedData.name), "vs", normalizeString(userDetails.name));
+        console.log("DOB:", userDOB, "vs", extractedDOB);
+        console.log("Email:", normalizeString(extractedData.email), "vs", normalizeString(userDetails.email));
+        console.log("Address:", normalizeString(extractedData.address), "vs", normalizeString(userDetails.address));
+        console.log("Phone:", normalizePhone(extractedData.phone), "vs", normalizePhone(userDetails.phone));
+        console.log(
+          "Medical ID:",
+          normalizeString(extractedData.medicalCode),
+          "vs",
+          normalizeString(userDetails.medicalCode)
+        );
 
         setApiCallData((prev) => ({
           member_id: [...prev.member_id, extractedData.medicalCode],
@@ -359,114 +350,118 @@ export default function Centene2(): React.ReactElement {
           _d_o_b: [...prev._d_o_b, extractedData.dob],
           phone: [...prev.phone, extractedData.phone],
           email: [...prev.email, extractedData.email],
-        }))
+        }));
 
         setUserDetails((prev) => ({
           ...prev,
           validation,
-        }))
+        }));
       } catch (error) {
-        console.error("Error processing call data:", error)
+        console.error("Error processing call data:", error);
       }
     },
-    [userDetails],
-  )
+    [userDetails]
+  );
 
-  // Add this new state to track if all columns are filled
-  const [allColumnsFilled, setAllColumnsFilled] = useState(false)
+  const [allColumnsFilled, setAllColumnsFilled] = useState(false);
 
-  // Add this useEffect to check if all columns are filled
   useEffect(() => {
-    const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
-    setAllColumnsFilled(columnCount >= 3)
-  }, [apiCallData])
+    const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0);
+    const allFilled = columnCount >= 3;
+    setAllColumnsFilled(allFilled);
+
+    if (allFilled) {
+      setUseAlternateAgent(true);
+      console.log("Switching to alternate agent ID: agent_032768381114b7bf21281a9790");
+    }
+  }, [apiCallData]);
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const newFormData = new FormData(e.currentTarget)
-    const newName = newFormData.get("name") as string
-    const month = dobMonth
-    const day = dobDay
-    const year = dobYear
+    e.preventDefault();
+    const newFormData = new FormData(e.currentTarget);
+    const newName = newFormData.get("name") as string;
+    const month = dobMonth;
+    const day = dobDay;
+    const year = dobYear;
 
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    const monthName = monthNames[Number.parseInt(month) - 1]
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthName = monthNames[Number.parseInt(month) - 1];
 
-    const newDob = `${monthName}-${day.padStart(2, "0")}-${year}`
+    const newDob = `${monthName}-${day.padStart(2, "0")}-${year}`;
 
-    const newEmail = newFormData.get("email") as string
+    const newEmail = newFormData.get("email") as string;
 
     const newUserDetails = {
       ...userDetails,
       name: newName,
       dob: newDob,
       email: newEmail,
-    }
+    };
 
-    setUserDetails(newUserDetails)
-    setFormSubmitted(true)
-    setShowVerificationForm(false)
-    console.log("Form submitted with details:", newUserDetails)
-  }
+    setUserDetails(newUserDetails);
+    setFormSubmitted(true);
+    setShowVerificationForm(false);
+    console.log("Form submitted with details:", newUserDetails);
+  };
 
   const toggleConversation = async () => {
-    if (callInProgress) return
-    setCallInProgress(true)
+    if (callInProgress) return;
+    setCallInProgress(true);
 
     if (callStatus === "active") {
       try {
-        console.log("Stopping the call...")
-        await webClient.stopCall()
-        setCallStatus("inactive")
-        setCallEnded(true)
-        console.log("Call stopped, callEnded state set to true")
+        console.log("Stopping the call...");
+        await webClient.stopCall();
+        setCallStatus("inactive");
+        setCallEnded(true);
+        console.log("Call stopped, callEnded state set to true");
       } catch (error) {
-        console.error("Error stopping the call:", error)
+        console.error("Error stopping the call:", error);
       } finally {
-        setCallInProgress(false)
+        setCallInProgress(false);
       }
     } else {
       try {
-        // Reset callEnded state when starting a new call
-        setCallEnded(false)
-        await navigator.mediaDevices.getUserMedia({ audio: true })
-        await initiateConversation()
+        setCallEnded(false);
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        await initiateConversation();
       } catch (error) {
-        console.error("Microphone permission denied or error occurred:", error)
+        console.error("Microphone permission denied or error occurred:", error);
       } finally {
-        setCallInProgress(false)
+        setCallInProgress(false);
       }
     }
-  }
+  };
 
   const initiateConversation = async () => {
-    const agentId = "agent_d3ca92c1776826ef142c084251"
+    const agentId = useAlternateAgent ? "agent_032768381114b7bf21281a9790" : "agent_d3ca92c1776826ef142c084251";
+
     try {
-      const registerCallResponse = await registerCall(agentId)
+      const registerCallResponse = await registerCall(agentId);
       if (registerCallResponse.callId) {
-        setCurrentCallId(registerCallResponse.callId)
-        console.log("Call ID set to:", registerCallResponse.callId)
+        setCurrentCallId(registerCallResponse.callId);
+        console.log("Call ID set to:", registerCallResponse.callId);
 
         await webClient.startCall({
           accessToken: registerCallResponse.access_token || "",
           callId: registerCallResponse.callId,
           sampleRate: registerCallResponse.sampleRate,
           enableUpdate: true,
-        })
-        setCallStatus("active")
+        });
+        setCallStatus("active");
       }
     } catch (error) {
-      console.error("Error in registering or starting the call:", error)
+      console.error("Error in registering or starting the call:", error);
     }
-  }
+  };
 
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
-    console.log("Registering call for agent:", agentId)
-    const sampleRate = Number.parseInt(process.env.NEXT_PUBLIC_RETELL_SAMPLE_RATE || "16000", 10)
-    const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy")
+    console.log("Registering call for agent:", agentId);
+    const sampleRate = Number.parseInt(process.env.NEXT_PUBLIC_RETELL_SAMPLE_RATE || "16000", 10);
+    const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy");
 
     try {
-      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ")
+      const formattedConfirmationCode = userDetails.medicalCode.split("").join(" - ");
       const response = await fetch("https://api.retellai.com/v2/create-web-call", {
         method: "POST",
         headers: {
@@ -486,30 +481,28 @@ export default function Centene2(): React.ReactElement {
             member_id: userDetails.medicalCode,
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
+        throw new Error(`Error: ${response.status}`);
       }
 
-      const data = await response.json()
-      console.log("Call registered successfully:", data)
+      const data = await response.json();
+      console.log("Call registered successfully:", data);
 
       return {
         access_token: data.access_token,
         callId: data.call_id,
         sampleRate: sampleRate,
-      }
+      };
     } catch (err) {
-      console.error("Error registering call:", err)
-      throw err
+      console.error("Error registering call:", err);
+      throw err;
     }
   }
 
-  // Update the reopenVerificationForm function
   const reopenVerificationForm = () => {
     if (allColumnsFilled) {
-      // Reset all data and show the form
       setApiCallData({
         member_id: [],
         shipping_address: [],
@@ -517,7 +510,7 @@ export default function Centene2(): React.ReactElement {
         _d_o_b: [],
         phone: [],
         email: [],
-      })
+      });
       setApiData({
         name: [],
         dob: [],
@@ -525,7 +518,7 @@ export default function Centene2(): React.ReactElement {
         address: [],
         medicalCode: [],
         phone: [],
-      })
+      });
       setUserDetails({
         name: "",
         dob: "",
@@ -541,38 +534,40 @@ export default function Centene2(): React.ReactElement {
           medicalCode: "",
           phone: "",
         },
-      })
-      setShowVerificationForm(true)
-      setFormSubmitted(false)
-      setAllColumnsFilled(false)
+      });
+      setShowVerificationForm(true);
+      setFormSubmitted(false);
+      setAllColumnsFilled(false);
+      setUseAlternateAgent(false);
+      console.log("Reverting to original agent ID: agent_d3ca92c1776826ef142c084251");
     }
-  }
+  };
 
   const generateMonthOptions = () => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return months.map((month, index) => (
       <option key={month} value={String(index + 1).padStart(2, "0")}>
         {month}
       </option>
-    ))
-  }
+    ));
+  };
 
   const generateDayOptions = () => {
     return Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
       <option key={day} value={String(day).padStart(2, "0")}>
         {day}
       </option>
-    ))
-  }
+    ));
+  };
 
   const generateYearOptions = () => {
-    const currentYear = new Date().getFullYear()
+    const currentYear = new Date().getFullYear();
     return Array.from({ length: 100 }, (_, i) => currentYear - i).map((year) => (
       <option key={year} value={year}>
         {year}
       </option>
-    ))
-  }
+    ));
+  };
 
   return (
     <div className="min-h-screen bg-white relative flex flex-col">
@@ -593,7 +588,6 @@ export default function Centene2(): React.ReactElement {
       <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
         <div className="w-full lg:w-3/4">
           <div className="bg-white p-4 rounded-lg shadow border">
-            {/* Update the JSX for the table header to include the Refresh button */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Customer Identity Verification (CIV) Status</h2>
               {allColumnsFilled && (
@@ -617,7 +611,6 @@ export default function Centene2(): React.ReactElement {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Update the table rows to show validation status for each input */}
                   {[
                     { label: "Medical ID", key: "medicalCode", apiKey: "member_id" },
                     { label: "Member Name", key: "name", apiKey: "member_name" },
@@ -670,12 +663,14 @@ export default function Centene2(): React.ReactElement {
         <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
           <button onClick={toggleConversation} className="flex flex-col items-center group">
             <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                }`}
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+              }`}
             >
               <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
-                  }`}
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
+                  callStatus === "active" ? "animate-bounce" : ""
+                }`}
               />
             </div>
             <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
@@ -867,6 +862,5 @@ export default function Centene2(): React.ReactElement {
         {error && <p className="text-red-500 font-bold">Error: {error}</p>}
       </div>
     </div>
-  )
+  );
 }
-
