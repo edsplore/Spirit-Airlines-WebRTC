@@ -608,6 +608,27 @@ export default function Centene2(): React.ReactElement {
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
+        <div className="w-full lg:w-1/3 flex flex-col items-center">
+          <img src="/centene_Hero.png" alt="Centene commitment" style={{ width: "600px", height: "220px" }} className="mb-4" />                  <p className="text-center mb-6 font-medium text-sm md:text-base">
+            Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
+            innovative programs and health solutions that help families and individuals get well, stay well and be well.
+          </p>
+          <button onClick={toggleConversation} className="flex flex-col items-center group">
+            <div
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                }`}
+            >
+              <Mic
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
+                  }`}
+              />
+            </div>
+            <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
+              {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
+            </span>
+          </button>
+        </div>
+
         <div className="w-full lg:w-3/4">
           <div className="bg-white p-4 rounded-lg shadow border">
             {/* Update the JSX for the table header to include the Refresh button */}
@@ -682,25 +703,6 @@ export default function Centene2(): React.ReactElement {
               </table>
             </div>
           </div>
-        </div>
-
-        <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
-          <button onClick={toggleConversation} className="flex flex-col items-center group">
-            <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-              }`}
-            >
-              <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
-                  callStatus === "active" ? "animate-bounce" : ""
-                }`}
-              />
-            </div>
-            <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
-              {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
-            </span>
-          </button>
         </div>
       </div>
 
