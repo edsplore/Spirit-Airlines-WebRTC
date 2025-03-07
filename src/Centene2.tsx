@@ -882,9 +882,10 @@ export default function Centene2(): React.ReactElement {
         </div>
       )}
       <div>
-        {isLoading && <p className="text-blue-500 font-bold">Loading call data...</p>}
+        {isLoading && <p className="text-blue-400 font-bold">Loading call data...</p>}
         {error && <p className="text-red-500 font-bold">Error: {error}</p>}
       </div>
     </div>
   )
 }
+
