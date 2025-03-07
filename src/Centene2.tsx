@@ -1,10 +1,11 @@
+
 "use client"
 
 import React from "react"
 
 import "./App.css"
 import { useEffect, useState, useRef, useCallback } from "react"
-import { Mic, RefreshCcw } from "lucide-react"
+import { Mic, RefreshCcw, CheckCircle, XCircle } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
@@ -592,49 +593,52 @@ export default function Centene2(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen bg-white relative flex flex-col">
-      <nav className="bg-[#2E5388] w-full">
-        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-2">
-          <img src="/centene_logo.png" alt="Centene" className="h-12 bg-transparent mb-4 md:mb-0" />
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-white text-sm md:text-lg font-bold">
-            <span className="cursor-pointer whitespace-nowrap">Who are we</span>
-            <span className="cursor-pointer whitespace-nowrap">Why we are different</span>
-            <span className="cursor-pointer whitespace-nowrap">Products and Services</span>
-            <span className="cursor-pointer whitespace-nowrap">Careers</span>
-            <span className="cursor-pointer whitespace-nowrap">Investors</span>
-            <span className="cursor-pointer whitespace-nowrap">News</span>
+    <div className="min-h-screen bg-gray-50 relative flex flex-col">
+      {/* Modern header with gradient */}
+      <nav className="bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] shadow-md w-full">
+        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-3">
+          <img src="/centene_logo.png" alt="Centene" className="h-10 bg-transparent mb-4 md:mb-0" />
+          <div className="flex flex-wrap justify-center md:justify-end items-center gap-3 md:gap-6 text-white text-sm md:text-base font-medium">
+            {["Who are we", "Why we are different", "Products and Services", "Careers", "Investors", "News"].map((item, index) => (
+              <span key={index} className="cursor-pointer whitespace-nowrap hover:text-blue-200 transition-colors px-2 py-1 rounded">
+                {item}
+              </span>
+            ))}
           </div>
         </div>
       </nav>
 
-      <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
+      <div className="flex flex-col lg:flex-row gap-6 mt-6 px-4 lg:px-8 flex-grow">
+        {/* Left column - Table */}
         <div className="w-full lg:w-3/4">
-          <div className="bg-white p-4 rounded-lg shadow border">
-            {/* Update the JSX for the table header to include the Refresh button */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Customer Identity Verification (CIV) Status</h2>
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+            {/* Table header with refresh button */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-[#1a4a7c]">Customer Identity Verification (CIV) Status</h2>
               {allColumnsFilled && (
                 <button
                   onClick={reopenVerificationForm}
-                  className="flex items-center text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
+                  className="flex items-center text-white bg-[#2E5388] hover:bg-[#1a4a7c] px-4 py-2 rounded-lg transition-colors shadow-sm"
                 >
-                  <RefreshCcw className="w-4 h-4 mr-1" />
+                  <RefreshCcw className="w-4 h-4 mr-2" />
                   Refresh
                 </button>
               )}
             </div>
+
+            {/* Modern table with hover effects */}
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-[#2E5388] text-white">
-                    <th className="border p-2 text-left">CIV Parameter</th>
-                    <th className="border p-2 text-left">Customer Details</th>
-                    <th className="border p-2 text-left">Input Provided</th>
-                    <th className="border p-2 text-left">Authentication Status</th>
+                  <tr className="bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] text-white">
+                    <th className="border border-gray-300 p-3 text-left rounded-tl-lg">CIV Parameter</th>
+                    <th className="border border-gray-300 p-3 text-left">Customer Details</th>
+                    <th className="border border-gray-300 p-3 text-left">Input Provided</th>
+                    <th className="border border-gray-300 p-3 text-left rounded-tr-lg">Authentication Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Update the table rows to show validation status for each input */}
+                  {/* Table rows with improved styling */}
                   {[
                     { label: "Medical ID", key: "medicalCode", apiKey: "member_id" },
                     { label: "Member Name", key: "name", apiKey: "member_name" },
@@ -645,33 +649,38 @@ export default function Centene2(): React.ReactElement {
                   ].map((param, index) => (
                     <React.Fragment key={param.key}>
                       {[0, 1, 2].map((row) => (
-                        <tr key={`${param.key}-${row}`} className={index % 2 === 0 ? "bg-[#E6F3FF]" : "bg-white"}>
+                        <tr 
+                          key={`${param.key}-${row}`} 
+                          className={`${index % 2 === 0 ? "bg-[#f0f7ff]" : "bg-white"} hover:bg-blue-50 transition-colors`}
+                        >
                           {row === 0 && (
                             <>
-                              <td className="border p-8" rowSpan={3}>
+                              <td className="border border-gray-200 p-4 font-semibold text-[#1a4a7c]" rowSpan={3}>
                                 {param.label}
                               </td>
-                              <td className="border p-8 font-bold" rowSpan={3}>
+                              <td className="border border-gray-200 p-4 font-bold" rowSpan={3}>
                                 {formSubmitted ? String(userDetails[param.key as keyof UserDetails]) : ""}
                               </td>
                             </>
                           )}
-                          <td className="border p-2">
+                          <td className="border border-gray-200 p-3">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] || ""}
                           </td>
-                          <td className="border p-2">
+                          <td className="border border-gray-200 p-3">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
-                              <span
-                                className={
-                                  userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
-                                    ? "text-green-500"
-                                    : "text-red-500"
-                                }
-                              >
-                                {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
-                                  ? "Valid"
-                                  : "Invalid"}
-                              </span>
+                              <div className="flex items-center">
+                                {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid" ? (
+                                  <>
+                                    <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
+                                    <span className="text-green-600 font-medium">Valid</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <XCircle className="w-5 h-5 mr-2 text-red-500" />
+                                    <span className="text-red-600 font-medium">Invalid</span>
+                                  </>
+                                )}
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -684,77 +693,105 @@ export default function Centene2(): React.ReactElement {
           </div>
         </div>
 
-        <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
+        {/* Right column - Talk button */}
+        <div className="w-full lg:w-1/4 flex flex-col items-center justify-start lg:mt-16">
           <button onClick={toggleConversation} className="flex flex-col items-center group">
             <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+              className={`p-8 bg-gradient-to-br from-[#1a4a7c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-105 ${
+                callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
               }`}
             >
               <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
+                className={`w-12 h-12 md:w-16 md:h-16 text-white ${
                   callStatus === "active" ? "animate-bounce" : ""
                 }`}
               />
             </div>
-            <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
-              {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
+            <span className="mt-6 text-[#1a4a7c] text-2xl md:text-3xl font-bold">
+              {callStatus === "active" ? (
+                <span className="text-red-500">Click to Disconnect</span>
+              ) : (
+                "Let's Talk"
+              )}
             </span>
           </button>
+          
+          {/* Customer service picture */}
+          <div className="mt-8 rounded-lg overflow-hidden shadow-md">
+            <img 
+              src="/centene-hero2.png" 
+              alt="Customer service" 
+              className="w-full h-auto max-w-xs object-cover"
+            />
+          </div>
+          
+          {/* Commitment statement */}
+          <div className="mt-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200 text-center">
+            <p className="text-[#1a4a7c] font-medium">
+              Centene is committed to helping people live healthier lives through high-quality healthcare solutions.
+            </p>
+          </div>
         </div>
       </div>
 
+      {/* Modern footer */}
       <div
-        className="bg-fit bg-center text-white py-8 mt-8"
-        style={{
-          backgroundImage: "url('/Centene_Footer.png')",
-          marginTop: "auto",
-        }}
+        className="bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] text-white py-6 mt-8"
+        style={{ marginTop: "auto" }}
       >
-        <div className="container mx-auto px-4 text-right">
-          <p className="text-[#2E5388] font-bold text-sm md:text-base">Centene Headquarters:</p>
-          <p className="text-[#2E5388] text-sm md:text-base">Centene Corporation, Centene Plaza,</p>
-          <p className="text-[#2E5388] text-sm md:text-base">7700 Forsyth Boulevard St. Louis, MO 63105</p>
+        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+          <div className="flex items-center mb-4 md:mb-0">
+            <img src="/centene_logo.png" alt="Centene" className="h-8 bg-transparent mr-4" />
+            <div className="text-sm">
+              <p className="font-bold">Transform the health of communities,</p>
+              <p>one person at a time.</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-sm">Centene Headquarters:</p>
+            <p className="text-sm">Centene Corporation, Centene Plaza,</p>
+            <p className="text-sm">7700 Forsyth Boulevard St. Louis, MO 63105</p>
+          </div>
         </div>
       </div>
 
+      {/* Verification form modal with improved styling */}
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#2E5388] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
-            <h2 className="text-base sm:text-xl font-medium text-white mb-4 sm:mb-6">
-              Customer details required for verification and authentication
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-xl mx-auto shadow-2xl overflow-y-auto max-h-[90vh] animate-fadeIn">
+            <h2 className="text-xl font-bold text-[#1a4a7c] mb-6 text-center">
+              Customer Details Verification
             </h2>
-            <form onSubmit={handleSubmitDetails} className="space-y-4">
-              <div className="grid gap-4 max-w-lg mx-auto">
+            
+            <form onSubmit={handleSubmitDetails} className="space-y-5">
+              <div className="grid gap-5 max-w-lg mx-auto">
                 <div className="grid gap-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="name"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Member Name
+                  {/* Member Name */}
+                  <div className="flex flex-col">
+                    <label htmlFor="name" className="text-[#1a4a7c] text-sm font-medium mb-1">
+                      Member Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       id="name"
                       name="name"
                       required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                      className="p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
+                      placeholder="Enter your full name"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Choose DOB
+                  
+                  {/* Date of Birth */}
+                  <div className="flex flex-col">
+                    <label htmlFor="dob" className="text-[#1a4a7c] text-sm font-medium mb-1">
+                      Date of Birth <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex-1 flex gap-2">
+                    <div className="flex gap-2">
                       <select
                         id="dobMonth"
                         name="dobMonth"
                         required
-                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                        className="flex-1 p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
                         value={dobMonth}
                         onChange={(e) => setDobMonth(e.target.value)}
                       >
@@ -765,7 +802,7 @@ export default function Centene2(): React.ReactElement {
                         id="dobDay"
                         name="dobDay"
                         required
-                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                        className="flex-1 p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
                         value={dobDay}
                         onChange={(e) => setDobDay(e.target.value)}
                       >
@@ -776,7 +813,7 @@ export default function Centene2(): React.ReactElement {
                         id="dobYear"
                         name="dobYear"
                         required
-                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                        className="flex-1 p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
                         value={dobYear}
                         onChange={(e) => setDobYear(e.target.value)}
                       >
@@ -785,26 +822,25 @@ export default function Centene2(): React.ReactElement {
                       </select>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="email"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Email id
+                  
+                  {/* Email */}
+                  <div className="flex flex-col">
+                    <label htmlFor="email" className="text-[#1a4a7c] text-sm font-medium mb-1">
+                      Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       id="email"
                       name="email"
                       required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                      className="p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
+                      placeholder="your.email@example.com"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="address"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
+                  
+                  {/* Address - Read only */}
+                  <div className="flex flex-col">
+                    <label htmlFor="address" className="text-[#1a4a7c] text-sm font-medium mb-1">
                       Address
                     </label>
                     <input
@@ -812,16 +848,15 @@ export default function Centene2(): React.ReactElement {
                       id="address"
                       name="address"
                       required
-                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
+                      className="p-2.5 rounded-lg bg-gray-100 text-black border border-gray-300 text-sm cursor-not-allowed"
                       defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
                       readOnly
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="medicalCode"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
+                  
+                  {/* Medical ID - Read only */}
+                  <div className="flex flex-col">
+                    <label htmlFor="medicalCode" className="text-[#1a4a7c] text-sm font-medium mb-1">
                       Medical ID
                     </label>
                     <input
@@ -830,14 +865,13 @@ export default function Centene2(): React.ReactElement {
                       name="medicalCode"
                       defaultValue="U900312752"
                       readOnly
-                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
+                      className="p-2.5 rounded-lg bg-gray-100 text-black border border-gray-300 text-sm cursor-not-allowed"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="phone"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
+                  
+                  {/* Phone Number - Read only */}
+                  <div className="flex flex-col">
+                    <label htmlFor="phone" className="text-[#1a4a7c] text-sm font-medium mb-1">
                       Phone Number
                     </label>
                     <input
@@ -846,25 +880,28 @@ export default function Centene2(): React.ReactElement {
                       name="phone"
                       defaultValue="6152314412"
                       readOnly
-                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
+                      className="p-2.5 rounded-lg bg-gray-100 text-black border border-gray-300 text-sm cursor-not-allowed"
                     />
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center mt-6">
+              
+              <div className="flex justify-center mt-8">
                 <button
                   type="submit"
-                  className="px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold hover:bg-gray-800"
+                  className="px-10 py-2.5 bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] text-white text-base rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 font-bold"
                 >
-                  Submit
+                  Submit Details
                 </button>
               </div>
-              <div className="mt-4 bg-white p-3 rounded-lg">
-                <p className="font-medium text-[#8B0000] mb-1">Note</p>
-                <ul className="space-y-1 text-black text-sm">
+              
+              {/* Notes section */}
+              <div className="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <p className="font-medium text-[#1a4a7c] mb-2">Important Notes:</p>
+                <ul className="space-y-2 text-gray-700 text-sm">
                   {notes.map((note, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <span className="text-black">➤</span>
+                      <span className="text-blue-500 mt-0.5">•</span>
                       {index === 1 ? (
                         <span>
                           <span className="text-red-500">*</span>
@@ -881,11 +918,20 @@ export default function Centene2(): React.ReactElement {
           </div>
         </div>
       )}
-      <div>
-        {isLoading && <p className="text-blue-400 font-bold">Loading call data...</p>}
-        {error && <p className="text-red-500 font-bold">Error: {error}</p>}
-      </div>
+      
+      {/* Loading and error states */}
+      {isLoading && (
+        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
+          <p className="flex items-center">
+            <span className="animate-spin mr-2">⟳</span> Loading call data...
+          </p>
+        </div>
+      )}
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg">
+          <p className="font-bold">Error: {error}</p>
+        </div>
+      )}
     </div>
   )
 }
-
