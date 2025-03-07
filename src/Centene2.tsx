@@ -31,14 +31,15 @@ interface UserDetails {
   }
 }
 
-interface ApiData {
-  name: string
-  dob: string
-  email: string
-  address: string
-  medicalCode: string
-  phone: string
-}
+// Removing unused interface
+// interface ApiData {
+//   name: string
+//   dob: string
+//   email: string
+//   address: string
+//   medicalCode: string
+//   phone: string
+// }
 
 const webClient = new RetellWebClient()
 
@@ -52,7 +53,8 @@ const notes = [
 const apiKey = "key_98fef97480c54d6bf0698564addb"
 
 export default function Centene2(): React.ReactElement {
-  const [allTrialsUsed, setAllTrialsUsed] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_allTrialsUsed, setAllTrialsUsed] = useState(false)
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "",
@@ -88,8 +90,8 @@ export default function Centene2(): React.ReactElement {
     email: [],
   })
 
-  // Replace the existing apiData state with this:
-  const [apiData, setApiData] = useState<{
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_apiData, setApiData] = useState<{
     name: string[]
     dob: string[]
     email: string[]
@@ -120,63 +122,204 @@ export default function Centene2(): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Add a new state to track which agent ID to use
-  const [useAlternateAgent, setUseAlternateAgent] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_useAlternateAgent, setUseAlternateAgent] = useState(false)
+
+  // Add this new state to track if all columns are filled
+  const [allColumnsFilled, setAllColumnsFilled] = useState(false)
 
   useEffect(() => {
     setFormSubmitted(false)
     setAllTrialsUsed(false)
   }, [])
 
-  // Modify the fetchCallData function to update the new state
-  const fetchCallData = useCallback(async (callId: string) => {
-    setIsLoading(true)
-    setError(null)
-    console.log(`Attempting to fetch call data for ID: ${callId}`)
+  // Replace the existing processCallData function with this updated version
+  const processCallData = useCallback(
+    (callData: any) => {
+      try {
+        console.log("Processing call data:", JSON.stringify(callData))
 
-    try {
-      const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
-      console.log(`Making API request to: ${apiUrl}`)
+        const customData = callData.call_analysis?.custom_analysis_data || {}
+        console.log("Custom data from API:", customData)
 
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-      })
+        if (!customData) {
+          console.error("Custom data not found in call data")
+          return
+        }
 
-      console.log(`API response status: ${response.status}`)
+        // Extract all the data from the custom_analysis_data object
+        // This now handles the new format with multiple fields (member_id, member_id2, etc.)
+        const extractedData = {
+          name: customData.member_name || "",
+          name2: customData.member_name2 || "",
+          name3: customData.member_name3 || "",
+          dob: customData._d_o_b || "",
+          dob2: customData._d_o_b2 || "",
+          dob3: customData._d_o_b3 || "",
+          address: customData.shipping_address || "",
+          address2: customData.shipping_address2 || "",
+          address3: customData.shipping_address3 || "",
+          medicalCode: customData.member_id || "",
+          medicalCode2: customData.member_id2 || "",
+          medicalCode3: customData.member_id3 || "",
+          phone: customData.phone_number || "",
+          phone2: customData.phone_number2 || "",
+          phone3: customData.phone_number3 || "",
+          email: customData.email || "",
+          email2: customData.email2 || "",
+          email3: customData.email3 || "",
+        }
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
-        throw new Error(`API Error: ${response.status}, ${errorText}`)
+        console.log("Extracted data from API:", extractedData)
+
+        // Update the API data state with all three sets of data at once
+        setApiData({
+          name: [extractedData.name, extractedData.name2, extractedData.name3].filter(Boolean),
+          dob: [extractedData.dob, extractedData.dob2, extractedData.dob3].filter(Boolean),
+          email: [extractedData.email, extractedData.email2, extractedData.email3].filter(Boolean),
+          address: [extractedData.address, extractedData.address2, extractedData.address3].filter(Boolean),
+          medicalCode: [extractedData.medicalCode, extractedData.medicalCode2, extractedData.medicalCode3].filter(
+            Boolean,
+          ),
+          phone: [extractedData.phone, extractedData.phone2, extractedData.phone3].filter(Boolean),
+        })
+
+        // Also update the apiCallData state with all three sets of data at once
+        setApiCallData({
+          member_id: [customData.member_id, customData.member_id2, customData.member_id3].filter(Boolean),
+          shipping_address: [
+            customData.shipping_address,
+            customData.shipping_address2,
+            customData.shipping_address3,
+          ].filter(Boolean),
+          member_name: [customData.member_name, customData.member_name2, customData.member_name3].filter(Boolean),
+          _d_o_b: [customData._d_o_b, customData._d_o_b2, customData._d_o_b3].filter(Boolean),
+          phone: [customData.phone_number, customData.phone_number2, customData.phone_number3].filter(Boolean),
+          email: [customData.email, customData.email2, customData.email3].filter(Boolean),
+        })
+
+        // Improved normalization functions
+        const normalizeString = (str: string) => {
+          if (!str) return ""
+          return str.toLowerCase().replace(/[^a-z0-9]/g, "")
+        }
+
+        const normalizeDOB = (dob: string) => {
+          if (!dob) return ""
+
+          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
+          const dashPattern = /([a-z]+)-(\d+)-(\d+)/i
+          const dashMatch = dob.match(dashPattern)
+
+          if (dashMatch) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const [_, month, day, year] = dashMatch
+            const monthNames = ["jan", "feb", ', "mar', "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
+            if (monthIndex !== -1) {
+              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
+            }
+          }
+
+          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
+          const slashPattern = /(\d+)\/(\d+)\/(\d+)/
+          const slashMatch = dob.match(slashPattern)
+
+          if (slashMatch) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const [_, month, day, year] = slashMatch
+            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
+          }
+
+          // If no pattern matches, just normalize the string
+          return normalizeString(dob)
+        }
+
+        // Normalize phone number (remove all non-digits)
+        const normalizePhone = (phone: string) => {
+          if (!phone) return ""
+          return phone.replace(/\D/g, "")
+        }
+
+        // Perform validations
+        const userDOB = normalizeDOB(userDetails.dob)
+        const extractedDOB = normalizeDOB(extractedData.dob)
+
+        console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB)
+
+        const validation: UserDetails["validation"] = {
+          name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
+          dob: userDOB === extractedDOB ? "valid" : "invalid",
+          email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
+          address:
+            normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
+          phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
+          medicalCode:
+            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
+              ? "valid"
+              : "invalid",
+        }
+
+        console.log("Validation results:", validation)
+
+        setUserDetails((prev) => ({
+          ...prev,
+          validation,
+        }))
+
+        // Set allColumnsFilled to true since we now get all data at once
+        setAllColumnsFilled(true)
+      } catch (error) {
+        console.error("Error processing call data:", error)
       }
+    },
+    [userDetails],
+  )
 
-      const data = await response.json()
-      console.log("Call data retrieved successfully:", JSON.stringify(data))
+  // Now define fetchCallData after processCallData
+  const fetchCallData = useCallback(
+    async (callId: string) => {
+      setIsLoading(true)
+      setError(null)
+      console.log(`Attempting to fetch call data for ID: ${callId}`)
 
-      // Extract the custom analysis data
-      const customData = data.call_analysis.custom_analysis_data
-      setApiCallData((prev) => ({
-        member_id: [...prev.member_id, customData.member_id || ""],
-        shipping_address: [...prev.shipping_address, customData.shipping_address || ""],
-        member_name: [...prev.member_name, customData.member_name || ""],
-        _d_o_b: [...prev._d_o_b, customData._d_o_b || ""],
-        phone: [...prev.phone, customData.phone_number || customData.phone || ""],
-        email: [...prev.email, customData.email || ""],
-      }))
+      try {
+        const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
+        console.log(`Making API request to: ${apiUrl}`)
 
-      setIsLoading(false)
-      return data
-    } catch (err) {
-      console.error("Error in fetchCallData:", err)
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
-      setIsLoading(false)
-      throw err
-    }
-  }, [])
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+        })
+
+        console.log(`API response status: ${response.status}`)
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
+          throw new Error(`API Error: ${response.status}, ${errorText}`)
+        }
+
+        const data = await response.json()
+        console.log("Call data retrieved successfully:", JSON.stringify(data))
+
+        // Process the call data directly
+        processCallData(data)
+
+        setIsLoading(false)
+        return data
+      } catch (err) {
+        console.error("Error in fetchCallData:", err)
+        setError(err instanceof Error ? err.message : "An unknown error occurred")
+        setIsLoading(false)
+        throw err
+      }
+    },
+    [processCallData],
+  )
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -220,6 +363,7 @@ export default function Centene2(): React.ReactElement {
     }
   }, [currentCallId])
 
+  // Now update the useEffect that uses fetchCallData
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
@@ -234,7 +378,8 @@ export default function Centene2(): React.ReactElement {
         fetchCallData(currentCallId)
           .then((data) => {
             console.log("Call data fetched successfully:", data)
-            return processCallData(data)
+            // No need to call processCallData again as it's already called in fetchCallData
+            return data
           })
           .then(() => {
             console.log("Call data processed successfully")
@@ -253,143 +398,20 @@ export default function Centene2(): React.ReactElement {
     }
   }, [callEnded, currentCallId, fetchCallData])
 
-  // Replace the processCallData function with this updated version
-  // Replace the processCallData function with this improved version
-  const processCallData = useCallback(
-    (callData: any) => {
-      try {
-        console.log("Processing call data:", JSON.stringify(callData))
-
-        const userInfo = callData.transcript?.user_info
-        const customData = callData.call_analysis?.custom_analysis_data || {}
-
-        if (!userInfo && !customData) {
-          console.error("User info not found in call data")
-          return
-        }
-
-        // Prefer data from custom_analysis_data if available, fall back to user_info
-        const extractedData = {
-          name: customData.member_name || userInfo?.name || "",
-          dob: customData._d_o_b || userInfo?.dob || "",
-          email: customData.email || userInfo?.email || "",
-          address: customData.shipping_address || userInfo?.address || "",
-          medicalCode: customData.member_id || userInfo?.medical_id || userInfo?.member_id || "",
-          phone: customData.phone_number || customData.phone || userInfo?.phone || "",
-        }
-
-        console.log("Extracted data from API:", extractedData)
-        console.log("User details:", userDetails)
-
-        setApiData((prev) => ({
-          name: [...prev.name, extractedData.name],
-          dob: [...prev.dob, extractedData.dob],
-          email: [...prev.email, extractedData.email],
-          address: [...prev.address, extractedData.address],
-          medicalCode: [...prev.medicalCode, extractedData.medicalCode],
-          phone: [...prev.phone, extractedData.phone],
-        }))
-
-        // Improved normalization functions
-        const normalizeString = (str: string) => {
-          if (!str) return ""
-          return str.toLowerCase().replace(/[^a-z0-9]/g, "")
-        }
-
-        const normalizeDOB = (dob: string) => {
-          if (!dob) return ""
-
-          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
-          const dashPattern = /([a-z]+)-(\d+)-(\d+)/i
-          const dashMatch = dob.match(dashPattern)
-
-          if (dashMatch) {
-            const [_, month, day, year] = dashMatch
-            const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
-            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
-            if (monthIndex !== -1) {
-              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
-            }
-          }
-
-          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
-          const slashPattern = /(\d+)\/(\d+)\/(\d+)/
-          const slashMatch = dob.match(slashPattern)
-
-          if (slashMatch) {
-            const [_, month, day, year] = slashMatch
-            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
-          }
-
-          // If no pattern matches, just normalize the string
-          return normalizeString(dob)
-        }
-
-        // Normalize phone number (remove all non-digits)
-        const normalizePhone = (phone: string) => {
-          if (!phone) return ""
-          return phone.replace(/\D/g, "")
-        }
-
-        // Perform validations
-        const userDOB = normalizeDOB(userDetails.dob)
-        const extractedDOB = normalizeDOB(extractedData.dob)
-
-        console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB)
-
-        const validation: UserDetails["validation"] = {
-          name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
-          dob: userDOB === extractedDOB ? "valid" : "invalid",
-          email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
-          address:
-            normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
-          phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
-          medicalCode:
-            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
-              ? "valid"
-              : "invalid",
-        }
-
-        console.log("Validation results:", validation)
-        console.log("Normalized comparisons:")
-        console.log("Name:", normalizeString(extractedData.name), "vs", normalizeString(userDetails.name))
-        console.log("DOB:", userDOB, "vs", extractedDOB)
-        console.log("Email:", normalizeString(extractedData.email), "vs", normalizeString(userDetails.email))
-        console.log("Address:", normalizeString(extractedData.address), "vs", normalizeString(userDetails.address))
-        console.log("Phone:", normalizePhone(extractedData.phone), "vs", normalizePhone(userDetails.phone))
-        console.log(
-          "Medical ID:",
-          normalizeString(extractedData.medicalCode),
-          "vs",
-          normalizeString(userDetails.medicalCode),
-        )
-
-        setUserDetails((prev) => ({
-          ...prev,
-          validation,
-        }))
-      } catch (error) {
-        console.error("Error processing call data:", error)
-      }
-    },
-    [userDetails],
-  )
-
-  // Add this new state to track if all columns are filled
-  const [allColumnsFilled, setAllColumnsFilled] = useState(false)
-
   // Add this useEffect to check if all columns are filled
-  useEffect(() => {
-    const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
-    const allFilled = columnCount >= 3
-    setAllColumnsFilled(allFilled)
+  /*
+useEffect(() => {
+  const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
+  const allFilled = columnCount >= 3
+  setAllColumnsFilled(allFilled)
 
-    // Set useAlternateAgent to true when all columns are filled
-    if (allFilled) {
-      setUseAlternateAgent(true)
-      console.log("Switching to alternate agent ID: agent_032768381114b7bf21281a9790")
-    }
-  }, [apiCallData])
+  // Set useAlternateAgent to true when all columns are filled
+  if (allFilled) {
+    setUseAlternateAgent(true)
+    console.log("Switching to alternate agent ID: agent_032768381114b7bf21281a9790")
+  }
+}, [apiCallData])
+*/
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -436,6 +458,35 @@ export default function Centene2(): React.ReactElement {
         setCallInProgress(false)
       }
     } else {
+      // Reset API data and validation status when starting a new call
+      setApiCallData({
+        member_id: [],
+        shipping_address: [],
+        member_name: [],
+        _d_o_b: [],
+        phone: [],
+        email: [],
+      })
+      setApiData({
+        name: [],
+        dob: [],
+        email: [],
+        address: [],
+        medicalCode: [],
+        phone: [],
+      })
+      setUserDetails((prev) => ({
+        ...prev,
+        validation: {
+          name: "",
+          dob: "",
+          email: "",
+          address: "",
+          medicalCode: "",
+          phone: "",
+        },
+      }))
+      setAllColumnsFilled(false)
       try {
         // Reset callEnded state when starting a new call
         setCallEnded(false)
@@ -451,8 +502,8 @@ export default function Centene2(): React.ReactElement {
 
   // Modify the initiateConversation function to use the alternate agent ID when needed
   const initiateConversation = async () => {
-    // Use the alternate agent ID when useAlternateAgent is true
-    const agentId = useAlternateAgent ? "agent_032768381114b7bf21281a9790" : "agent_d3ca92c1776826ef142c084251"
+    // Always use the same agent ID
+    const agentId = "agent_d3ca92c1776826ef142c084251"
 
     try {
       const registerCallResponse = await registerCall(agentId)
@@ -521,48 +572,41 @@ export default function Centene2(): React.ReactElement {
 
   // Update the reopenVerificationForm function
   const reopenVerificationForm = () => {
-    if (allColumnsFilled) {
-      // Reset all data and show the form
-      setApiCallData({
-        member_id: [],
-        shipping_address: [],
-        member_name: [],
-        _d_o_b: [],
-        phone: [],
-        email: [],
-      })
-      setApiData({
-        name: [],
-        dob: [],
-        email: [],
-        address: [],
-        medicalCode: [],
-        phone: [],
-      })
-      setUserDetails({
+    // Reset only the API data but keep user details
+    setApiCallData({
+      member_id: [],
+      shipping_address: [],
+      member_name: [],
+      _d_o_b: [],
+      phone: [],
+      email: [],
+    })
+    setApiData({
+      name: [],
+      dob: [],
+      email: [],
+      address: [],
+      medicalCode: [],
+      phone: [],
+    })
+
+    // Reset validation status
+    setUserDetails((prev) => ({
+      ...prev,
+      validation: {
         name: "",
         dob: "",
         email: "",
-        address: "123 Maple Street, Nashville, Tennessee, 37201",
-        medicalCode: "U900312752",
-        phone: "6152314412",
-        validation: {
-          name: "",
-          dob: "",
-          email: "",
-          address: "",
-          medicalCode: "",
-          phone: "",
-        },
-      })
-      setShowVerificationForm(true)
-      setFormSubmitted(false)
-      setAllColumnsFilled(false)
+        address: "",
+        medicalCode: "",
+        phone: "",
+      },
+    }))
 
-      // Reset the agent ID to the original one
-      setUseAlternateAgent(false)
-      console.log("Reverting to original agent ID: agent_d3ca92c1776826ef142c084251")
-    }
+    setShowVerificationForm(true)
+    setFormSubmitted(false)
+    setAllColumnsFilled(false)
+    setUseAlternateAgent(false)
   }
 
   const generateMonthOptions = () => {
@@ -609,18 +653,26 @@ export default function Centene2(): React.ReactElement {
 
       <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
         <div className="w-full lg:w-1/3 flex flex-col items-center">
-          <img src="/centene_Hero.png" alt="Centene commitment" style={{ width: "600px", height: "220px" }} className="mb-4" />                  <p className="text-center mb-6 font-medium text-sm md:text-base">
+          <img
+            src="/centene_Hero.png"
+            alt="Centene commitment"
+            style={{ width: "600px", height: "220px" }}
+            className="mb-4"
+          />{" "}
+          <p className="text-center mb-6 font-medium text-sm md:text-base">
             Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
             innovative programs and health solutions that help families and individuals get well, stay well and be well.
           </p>
           <button onClick={toggleConversation} className="flex flex-col items-center group">
             <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                }`}
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+              }`}
             >
               <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
-                  }`}
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
+                  callStatus === "active" ? "animate-bounce" : ""
+                }`}
               />
             </div>
             <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
@@ -747,7 +799,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Choose DOB
                     </label>
@@ -790,7 +842,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="email"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Email id
                     </label>
@@ -805,7 +857,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="address"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Address
                     </label>
@@ -822,7 +874,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="medicalCode"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Medical ID
                     </label>
@@ -838,7 +890,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="phone"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Phone Number
                     </label>
