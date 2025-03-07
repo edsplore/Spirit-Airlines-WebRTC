@@ -364,15 +364,6 @@ export default function Centene2(): React.ReactElement {
           normalizeString(userDetails.medicalCode),
         )
 
-        setApiCallData((prev) => ({
-          member_id: [...prev.member_id, extractedData.medicalCode],
-          shipping_address: [...prev.shipping_address, extractedData.address],
-          member_name: [...prev.member_name, extractedData.name],
-          _d_o_b: [...prev._d_o_b, extractedData.dob],
-          phone: [...prev.phone, extractedData.phone],
-          email: [...prev.email, extractedData.email],
-        }))
-
         setUserDetails((prev) => ({
           ...prev,
           validation,
