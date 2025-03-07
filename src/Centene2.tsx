@@ -132,26 +132,26 @@ export default function Centene2(): React.ReactElement {
   const fetchCallData = useCallback(async (callId: string) => {
     setIsLoading(true)
     setError(null)
-    console.log(Attempting to fetch call data for ID: ${callId})
+    console.log(`Attempting to fetch call data for ID: ${callId}`)
 
     try {
-      const apiUrl = https://api.retellai.com/v2/get-call/${callId}
-      console.log(Making API request to: ${apiUrl})
+      const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
+      console.log(`Making API request to: ${apiUrl}`)
 
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: Bearer ${apiKey},
+          Authorization: `Bearer ${apiKey}`,
         },
       })
 
-      console.log(API response status: ${response.status})
+      console.log(`API response status: ${response.status}`)
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error(Failed to fetch call data. Status: ${response.status}, Response: ${errorText})
-        throw new Error(API Error: ${response.status}, ${errorText})
+        console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
+        throw new Error(`API Error: ${response.status}, ${errorText}`)
       }
 
       const data = await response.json()
@@ -308,7 +308,7 @@ export default function Centene2(): React.ReactElement {
             const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
             const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
             if (monthIndex !== -1) {
-              return ${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}
+              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
             }
           }
 
@@ -318,7 +318,7 @@ export default function Centene2(): React.ReactElement {
 
           if (slashMatch) {
             const [_, month, day, year] = slashMatch
-            return ${month.padStart(2, "0")}${day.padStart(2, "0")}${year}
+            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
           }
 
           // If no pattern matches, just normalize the string
@@ -402,7 +402,7 @@ export default function Centene2(): React.ReactElement {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     const monthName = monthNames[Number.parseInt(month) - 1]
 
-    const newDob = ${monthName}-${day.padStart(2, "0")}-${year}
+    const newDob = `${monthName}-${day.padStart(2, "0")}-${year}`
 
     const newEmail = newFormData.get("email") as string
 
@@ -484,7 +484,7 @@ export default function Centene2(): React.ReactElement {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: Bearer ${apiKey},
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           agent_id: agentId,
@@ -502,7 +502,7 @@ export default function Centene2(): React.ReactElement {
       })
 
       if (!response.ok) {
-        throw new Error(Error: ${response.status})
+        throw new Error(`Error: ${response.status}`)
       }
 
       const data = await response.json()
@@ -645,7 +645,7 @@ export default function Centene2(): React.ReactElement {
                   ].map((param, index) => (
                     <React.Fragment key={param.key}>
                       {[0, 1, 2].map((row) => (
-                        <tr key={${param.key}-${row}} className={index % 2 === 0 ? "bg-[#E6F3FF]" : "bg-white"}>
+                        <tr key={`${param.key}-${row}`} className={index % 2 === 0 ? "bg-[#E6F3FF]" : "bg-white"}>
                           {row === 0 && (
                             <>
                               <td className="border p-8" rowSpan={3}>
@@ -745,7 +745,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Choose DOB
                     </label>
@@ -803,7 +803,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="address"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Address
                     </label>
@@ -820,7 +820,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="medicalCode"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Medical ID
                     </label>
@@ -836,7 +836,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="phone"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Phone Number
                     </label>
