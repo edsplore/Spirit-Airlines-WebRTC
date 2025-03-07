@@ -1,10 +1,10 @@
 "use client"
 
-import "./App.css"
+import React from "react"
 
-import  React from "react"
-import { useEffect, useState } from "react"
-import { Mic, Edit2 } from "lucide-react"
+import "./App.css"
+import { useEffect, useState, useRef, useCallback } from "react"
+import { Mic, RefreshCcw } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
@@ -31,6 +31,15 @@ interface UserDetails {
   }
 }
 
+interface ApiData {
+  name: string
+  dob: string
+  email: string
+  address: string
+  medicalCode: string
+  phone: string
+}
+
 const webClient = new RetellWebClient()
 
 const notes = [
@@ -40,13 +49,15 @@ const notes = [
   "Phone# and Email id is required to send instant messages and confirmation",
 ]
 
+const apiKey = "key_98fef97480c54d6bf0698564addb"
+
 export default function Centene2(): React.ReactElement {
-  const [remainingTrials, setRemainingTrials] = useState(3)
+  const [allTrialsUsed, setAllTrialsUsed] = useState(false)
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
-    name: "Jacob Williams",
-    dob: "Dec-12-1990",
-    email: "jacobwilliam@gmail.com",
+    name: "",
+    dob: "",
+    email: "",
     address: "123 Maple Street, Nashville, Tennessee, 37201",
     medicalCode: "U900312752",
     phone: "6152314412",
@@ -60,6 +71,40 @@ export default function Centene2(): React.ReactElement {
     },
   })
 
+  // Replace the existing apiCallData state with this:
+  const [apiCallData, setApiCallData] = useState<{
+    member_id: string[]
+    shipping_address: string[]
+    member_name: string[]
+    _d_o_b: string[]
+    phone: string[]
+    email: string[]
+  }>({
+    member_id: [],
+    shipping_address: [],
+    member_name: [],
+    _d_o_b: [],
+    phone: [],
+    email: [],
+  })
+
+  // Replace the existing apiData state with this:
+  const [apiData, setApiData] = useState<{
+    name: string[]
+    dob: string[]
+    email: string[]
+    address: string[]
+    medicalCode: string[]
+    phone: string[]
+  }>({
+    name: [],
+    dob: [],
+    email: [],
+    address: [],
+    medicalCode: [],
+    phone: [],
+  })
+
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
@@ -69,9 +114,65 @@ export default function Centene2(): React.ReactElement {
   const [dobDay, setDobDay] = useState("")
   const [dobYear, setDobYear] = useState("")
 
-  // Clear form submitted state on page refresh/load
+  const [currentCallId, setCurrentCallId] = useState<string>("")
+  const callEndedRef = useRef(false)
+  const [callEnded, setCallEnded] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
   useEffect(() => {
     setFormSubmitted(false)
+    setAllTrialsUsed(false)
+  }, [])
+
+  // Modify the fetchCallData function to update the new state
+  const fetchCallData = useCallback(async (callId: string) => {
+    setIsLoading(true)
+    setError(null)
+    console.log(`Attempting to fetch call data for ID: ${callId}`)
+
+    try {
+      const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
+      console.log(`Making API request to: ${apiUrl}`)
+
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+      })
+
+      console.log(`API response status: ${response.status}`)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
+        throw new Error(`API Error: ${response.status}, ${errorText}`)
+      }
+
+      const data = await response.json()
+      console.log("Call data retrieved successfully:", JSON.stringify(data))
+
+      // Extract the custom analysis data
+      const customData = data.call_analysis.custom_analysis_data
+      setApiCallData((prev) => ({
+        member_id: [...prev.member_id, customData.member_id || ""],
+        shipping_address: [...prev.shipping_address, customData.shipping_address || ""],
+        member_name: [...prev.member_name, customData.member_name || ""],
+        _d_o_b: [...prev._d_o_b, customData._d_o_b || ""],
+        phone: [...prev.phone, customData.phone_number || customData.phone || ""],
+        email: [...prev.email, customData.email || ""],
+      }))
+
+      setIsLoading(false)
+      return data
+    } catch (err) {
+      console.error("Error in fetchCallData:", err)
+      setError(err instanceof Error ? err.message : "An unknown error occurred")
+      setIsLoading(false)
+      throw err
+    }
   }, [])
 
   useEffect(() => {
@@ -79,12 +180,23 @@ export default function Centene2(): React.ReactElement {
       console.log("Conversation started successfully")
       setCallStatus("active")
       setCallInProgress(false)
+      callEndedRef.current = false
+      // Explicitly ensure callEnded is false when conversation starts
+      setCallEnded(false)
     })
 
     webClient.on("conversationEnded", ({ code, reason }) => {
-      console.log("Conversation ended with code:", code, "reason:", reason)
+      console.log("Conversation ended event triggered with code:", code, "reason:", reason)
       setCallStatus("inactive")
       setCallInProgress(false)
+      callEndedRef.current = true
+
+      // Add a small delay before setting callEnded to true to ensure all other state updates have completed
+      setTimeout(() => {
+        setCallEnded(true)
+        console.log("Call ended, callEnded state set to true")
+        console.log("Current call ID:", currentCallId)
+      }, 500)
     })
 
     webClient.on("error", (error) => {
@@ -103,68 +215,211 @@ export default function Centene2(): React.ReactElement {
       webClient.off("error")
       webClient.off("update")
     }
-  }, [userDetails])
+  }, [currentCallId])
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    // Only run this effect when callEnded changes from false to true
+    if (callEnded && currentCallId) {
+      console.log("Call ended detected, preparing to fetch call data...")
+      console.log("Current call ID:", currentCallId)
+
+      // Increase the timeout to give the API more time to process the call data
+      timeoutId = setTimeout(() => {
+        console.log("Timeout completed, now fetching call data...")
+        fetchCallData(currentCallId)
+          .then((data) => {
+            console.log("Call data fetched successfully:", data)
+            return processCallData(data)
+          })
+          .then(() => {
+            console.log("Call data processed successfully")
+            // Reset callEnded after processing to prevent repeated API calls
+            setCallEnded(false)
+          })
+          .catch((error) => console.error("Error fetching or processing call data:", error))
+      }, 5000) // Increased from 1000ms to 3000ms to ensure the API has time to process
+    }
+
+    return () => {
+      if (timeoutId) {
+        console.log("Clearing timeout for API call")
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [callEnded, currentCallId, fetchCallData])
+
+  // Replace the processCallData function with this updated version
+  // Replace the processCallData function with this improved version
+  const processCallData = useCallback(
+    (callData: any) => {
+      try {
+        console.log("Processing call data:", JSON.stringify(callData))
+
+        const userInfo = callData.transcript?.user_info
+        const customData = callData.call_analysis?.custom_analysis_data || {}
+
+        if (!userInfo && !customData) {
+          console.error("User info not found in call data")
+          return
+        }
+
+        // Prefer data from custom_analysis_data if available, fall back to user_info
+        const extractedData = {
+          name: customData.member_name || userInfo?.name || "",
+          dob: customData._d_o_b || userInfo?.dob || "",
+          email: customData.email || userInfo?.email || "",
+          address: customData.shipping_address || userInfo?.address || "",
+          medicalCode: customData.member_id || userInfo?.medical_id || userInfo?.member_id || "",
+          phone: customData.phone_number || customData.phone || userInfo?.phone || "",
+        }
+
+        console.log("Extracted data from API:", extractedData)
+        console.log("User details:", userDetails)
+
+        setApiData((prev) => ({
+          name: [...prev.name, extractedData.name],
+          dob: [...prev.dob, extractedData.dob],
+          email: [...prev.email, extractedData.email],
+          address: [...prev.address, extractedData.address],
+          medicalCode: [...prev.medicalCode, extractedData.medicalCode],
+          phone: [...prev.phone, extractedData.phone],
+        }))
+
+        // Improved normalization functions
+        const normalizeString = (str: string) => {
+          if (!str) return "";
+          return str.toLowerCase().replace(/[^a-z0-9]/g, "");
+        }
+
+        const normalizeDOB = (dob: string) => {
+          if (!dob) return "";
+
+          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
+          const dashPattern = /([a-z]+)-(\d+)-(\d+)/i;
+          const dashMatch = dob.match(dashPattern);
+
+          if (dashMatch) {
+            const [_, month, day, year] = dashMatch;
+            const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3));
+            if (monthIndex !== -1) {
+              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`;
+            }
+          }
+
+          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
+          const slashPattern = /(\d+)\/(\d+)\/(\d+)/;
+          const slashMatch = dob.match(slashPattern);
+
+          if (slashMatch) {
+            const [_, month, day, year] = slashMatch;
+            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`;
+          }
+
+          // If no pattern matches, just normalize the string
+          return normalizeString(dob);
+        }
+
+        // Normalize phone number (remove all non-digits)
+        const normalizePhone = (phone: string) => {
+          if (!phone) return "";
+          return phone.replace(/\D/g, "");
+        }
+
+        // Perform validations
+        const userDOB = normalizeDOB(userDetails.dob);
+        const extractedDOB = normalizeDOB(extractedData.dob);
+
+        console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB);
+
+        const validation = {
+          name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
+          dob: userDOB === extractedDOB ? "valid" : "invalid",
+          email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
+          address: normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
+          phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
+          medicalCode: normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode) ? "valid" : "invalid",
+        }
+
+        console.log("Validation results:", validation)
+        console.log("Normalized comparisons:")
+        console.log("Name:", normalizeString(extractedData.name), "vs", normalizeString(userDetails.name))
+        console.log("DOB:", userDOB, "vs", extractedDOB)
+        console.log("Email:", normalizeString(extractedData.email), "vs", normalizeString(userDetails.email))
+        console.log("Address:", normalizeString(extractedData.address), "vs", normalizeString(userDetails.address))
+        console.log("Phone:", normalizePhone(extractedData.phone), "vs", normalizePhone(userDetails.phone))
+        console.log("Medical ID:", normalizeString(extractedData.medicalCode), "vs", normalizeString(userDetails.medicalCode))
+
+        setApiCallData((prev) => ({
+          member_id: [...prev.member_id, extractedData.medicalCode],
+          shipping_address: [...prev.shipping_address, extractedData.address],
+          member_name: [...prev.member_name, extractedData.name],
+          _d_o_b: [...prev._d_o_b, extractedData.dob],
+          phone: [...prev.phone, extractedData.phone],
+          email: [...prev.email, extractedData.email],
+        }))
+
+        setUserDetails((prev) => ({
+          ...prev,
+          validation,
+        }))
+      } catch (error) {
+        console.error("Error processing call data:", error)
+      }
+    },
+    [userDetails],
+  )
+
+  // Add this new state to track if all columns are filled
+  const [allColumnsFilled, setAllColumnsFilled] = useState(false)
+
+  // Add this useEffect to check if all columns are filled
+  useEffect(() => {
+    const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
+    setAllColumnsFilled(columnCount >= 3)
+  }, [apiCallData])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (remainingTrials <= 0) {
-      return // Don't allow submission if no trials are left
-    }
     const newFormData = new FormData(e.currentTarget)
     const newName = newFormData.get("name") as string
     const month = dobMonth
     const day = dobDay
     const year = dobYear
 
-    // Convert month number to month name
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     const monthName = monthNames[Number.parseInt(month) - 1]
 
-    // Format as MMM-DD-YYYY
-    const newDob = `${monthName}-${day}-${year}`
+    const newDob = `${monthName}-${day.padStart(2, "0")}-${year}`
 
     const newEmail = newFormData.get("email") as string
-    const newAddress = newFormData.get("address") as string
 
-    // Validate inputs against expected values
-    const validation = {
-      name: newName.trim().toLowerCase() === "jacob williams" ? "valid" : "invalid",
-      dob: newDob === "Dec-12-1990" ? "valid" : "invalid",
-      email: newEmail.trim().toLowerCase() === "jacobwilliam@gmail.com" ? "valid" : "invalid",
-      address:
-        newAddress.trim().toLowerCase() === "123 maple street, nashville, tennessee, 37201" ? "valid" : "invalid",
-      phone: userDetails.phone === "6152314412" ? "valid" : "invalid",
-      medicalCode: userDetails.medicalCode === "U900312752" ? "valid" : "invalid",
-    } as UserDetails["validation"]
-
-    // Update userDetails with form data
     const newUserDetails = {
+      ...userDetails,
       name: newName,
       dob: newDob,
       email: newEmail,
-      address: newAddress,
-      medicalCode: userDetails.medicalCode,
-      phone: userDetails.phone,
-      validation: validation,
     }
 
     setUserDetails(newUserDetails)
     setFormSubmitted(true)
-
-    // Decrement trials on each submission, but not below 0
-    setRemainingTrials((prev) => Math.max(0, prev - 1))
-
-    // Close the form after each submission
     setShowVerificationForm(false)
+    console.log("Form submitted with details:", newUserDetails)
   }
 
   const toggleConversation = async () => {
     if (callInProgress) return
     setCallInProgress(true)
+
     if (callStatus === "active") {
       try {
+        console.log("Stopping the call...")
         await webClient.stopCall()
         setCallStatus("inactive")
+        setCallEnded(true)
+        console.log("Call stopped, callEnded state set to true")
       } catch (error) {
         console.error("Error stopping the call:", error)
       } finally {
@@ -172,6 +427,8 @@ export default function Centene2(): React.ReactElement {
       }
     } else {
       try {
+        // Reset callEnded state when starting a new call
+        setCallEnded(false)
         await navigator.mediaDevices.getUserMedia({ audio: true })
         await initiateConversation()
       } catch (error) {
@@ -187,6 +444,9 @@ export default function Centene2(): React.ReactElement {
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
+        setCurrentCallId(registerCallResponse.callId)
+        console.log("Call ID set to:", registerCallResponse.callId)
+
         await webClient.startCall({
           accessToken: registerCallResponse.access_token || "",
           callId: registerCallResponse.callId,
@@ -202,7 +462,6 @@ export default function Centene2(): React.ReactElement {
 
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
     console.log("Registering call for agent:", agentId)
-    const apiKey = "key_98fef97480c54d6bf0698564addb"
     const sampleRate = Number.parseInt(process.env.NEXT_PUBLIC_RETELL_SAMPLE_RATE || "16000", 10)
     const policy_date = format(addDays(new Date(), 15), "dd MMM yyyy")
 
@@ -224,7 +483,7 @@ export default function Centene2(): React.ReactElement {
             DOB: userDetails.dob,
             policy_date: policy_date,
             phone: userDetails.phone,
-            member_id: userDetails.medicalCode, // Add this line to pass medical ID as member_id
+            member_id: userDetails.medicalCode,
           },
         }),
       })
@@ -247,11 +506,45 @@ export default function Centene2(): React.ReactElement {
     }
   }
 
+  // Update the reopenVerificationForm function
   const reopenVerificationForm = () => {
-    if (remainingTrials > 0) {
+    if (allColumnsFilled) {
+      // Reset all data and show the form
+      setApiCallData({
+        member_id: [],
+        shipping_address: [],
+        member_name: [],
+        _d_o_b: [],
+        phone: [],
+        email: [],
+      })
+      setApiData({
+        name: [],
+        dob: [],
+        email: [],
+        address: [],
+        medicalCode: [],
+        phone: [],
+      })
+      setUserDetails({
+        name: "",
+        dob: "",
+        email: "",
+        address: "123 Maple Street, Nashville, Tennessee, 37201",
+        medicalCode: "U900312752",
+        phone: "6152314412",
+        validation: {
+          name: "",
+          dob: "",
+          email: "",
+          address: "",
+          medicalCode: "",
+          phone: "",
+        },
+      })
       setShowVerificationForm(true)
-    } else {
-      alert("No more trials left. Please contact support for assistance.")
+      setFormSubmitted(false)
+      setAllColumnsFilled(false)
     }
   }
 
@@ -300,22 +593,18 @@ export default function Centene2(): React.ReactElement {
       <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
         <div className="w-full lg:w-3/4">
           <div className="bg-white p-4 rounded-lg shadow border">
+            {/* Update the JSX for the table header to include the Refresh button */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
-                Customer Identity Verification (CIV) Status
-                {remainingTrials < 3 && (
-                  <span className="ml-2 text-red-500 text-sm">
-                    ({remainingTrials} {remainingTrials === 1 ? "trial" : "trials"} remaining)
-                  </span>
-                )}
-              </h2>
-              <button
-                onClick={reopenVerificationForm}
-                className="flex items-center text-[#2E5388] hover:text-[#1e81b0]"
-              >
-                <Edit2 className="w-5 h-5 mr-1" />
-                Edit
-              </button>
+              <h2 className="text-xl font-bold">Customer Identity Verification (CIV) Status</h2>
+              {allColumnsFilled && (
+                <button
+                  onClick={reopenVerificationForm}
+                  className="flex items-center text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
+                >
+                  <RefreshCcw className="w-4 h-4 mr-1" />
+                  Refresh
+                </button>
+              )}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -328,82 +617,50 @@ export default function Centene2(): React.ReactElement {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="bg-[#E6F3FF]">
-                    <td className="border p-2">Medical ID</td>
-                    <td className="border p-2 font-bold">U900312752</td>
-                    <td className="border p-2">{formSubmitted ? userDetails.medicalCode : ""}</td>
-                    <td className="border p-2">
-                      {formSubmitted && (
-                        <span
-                          className={userDetails.validation.medicalCode === "valid" ? "text-green-500" : "text-red-500"}
-                        >
-                          {userDetails.validation.medicalCode === "valid" ? "Valid" : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="bg-white">
-                    <td className="border p-2">Member Name</td>
-                    <td className="border p-2 font-bold">Jacob Williams</td>
-                    <td className="border p-2">{formSubmitted ? userDetails.name : ""}</td>
-                    <td className="border p-2">
-                      {formSubmitted && (
-                        <span className={userDetails.validation.name === "valid" ? "text-green-500" : "text-red-500"}>
-                          {userDetails.validation.name === "valid" ? "Valid" : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="bg-[#E6F3FF]">
-                    <td className="border p-2">Date of Birth</td>
-                    <td className="border p-2 font-bold">Dec-12-1990</td>
-                    <td className="border p-2">{formSubmitted ? userDetails.dob : ""}</td>
-                    <td className="border p-2">
-                      {formSubmitted && (
-                        <span className={userDetails.validation.dob === "valid" ? "text-green-500" : "text-red-500"}>
-                          {userDetails.validation.dob === "valid" ? "Valid" : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="bg-white">
-                    <td className="border p-2">Address</td>
-                    <td className="border p-2 font-bold">123 Maple Street, Nashville, Tennessee, 37201</td>
-                    <td className="border p-2">{formSubmitted ? userDetails.address : ""}</td>
-                    <td className="border p-2">
-                      {formSubmitted && (
-                        <span
-                          className={userDetails.validation.address === "valid" ? "text-green-500" : "text-red-500"}
-                        >
-                          {userDetails.validation.address === "valid" ? "Valid" : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="bg-[#E6F3FF]">
-                    <td className="border p-2">Phone Number</td>
-                    <td className="border p-2 font-bold">6152314412</td>
-                    <td className="border p-2">{formSubmitted ? userDetails.phone : ""}</td>
-                    <td className="border p-2">
-                      {formSubmitted && (
-                        <span className={userDetails.validation.phone === "valid" ? "text-green-500" : "text-red-500"}>
-                          {userDetails.validation.phone === "valid" ? "Valid" : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="bg-white">
-                    <td className="border p-2">Email ID</td>
-                    <td className="border p-2 font-bold">jacobwilliam@gmail.com</td>
-                    <td className="border p-2">{formSubmitted ? userDetails.email : ""}</td>
-                    <td className="border p-2">
-                      {formSubmitted && (
-                        <span className={userDetails.validation.email === "valid" ? "text-green-500" : "text-red-500"}>
-                          {userDetails.validation.email === "valid" ? "Valid" : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
+                  {/* Update the table rows to show validation status for each input */}
+                  {[
+                    { label: "Medical ID", key: "medicalCode", apiKey: "member_id" },
+                    { label: "Member Name", key: "name", apiKey: "member_name" },
+                    { label: "Date of Birth", key: "dob", apiKey: "_d_o_b" },
+                    { label: "Address", key: "address", apiKey: "shipping_address" },
+                    { label: "Phone Number", key: "phone", apiKey: "phone" },
+                    { label: "Email ID", key: "email", apiKey: "email" },
+                  ].map((param, index) => (
+                    <React.Fragment key={param.key}>
+                      {[0, 1, 2].map((row) => (
+                        <tr key={`${param.key}-${row}`} className={index % 2 === 0 ? "bg-[#E6F3FF]" : "bg-white"}>
+                          {row === 0 && (
+                            <>
+                              <td className="border p-8" rowSpan={3}>
+                                {param.label}
+                              </td>
+                              <td className="border p-8 font-bold" rowSpan={3}>
+                                {formSubmitted ? userDetails[param.key as keyof UserDetails] : ""}
+                              </td>
+                            </>
+                          )}
+                          <td className="border p-2">
+                            {apiCallData[param.apiKey as keyof typeof apiCallData][row] || ""}
+                          </td>
+                          <td className="border p-2">
+                            {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
+                              <span
+                                className={
+                                  userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }
+                              >
+                                {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
+                                  ? "Valid"
+                                  : "Invalid"}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -413,14 +670,12 @@ export default function Centene2(): React.ReactElement {
         <div className="w-full lg:w-1/4 flex items-start justify-center lg:mt-16">
           <button onClick={toggleConversation} className="flex flex-col items-center group">
             <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-              }`}
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                }`}
             >
               <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
-                  callStatus === "active" ? "animate-bounce" : ""
-                }`}
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${callStatus === "active" ? "animate-bounce" : ""
+                  }`}
               />
             </div>
             <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
@@ -449,9 +704,6 @@ export default function Centene2(): React.ReactElement {
           <div className="bg-[#2E5388] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
             <h2 className="text-base sm:text-xl font-medium text-white mb-4 sm:mb-6">
               Customer details required for verification and authentication
-              <span className="ml-2 text-yellow-300 text-sm block sm:inline">
-                ({remainingTrials} {remainingTrials === 1 ? "trial" : "trials"} remaining)
-              </span>
             </h2>
             <form onSubmit={handleSubmitDetails} className="space-y-4">
               <div className="grid gap-4 max-w-lg mx-auto">
@@ -474,7 +726,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Choose DOB
                     </label>
@@ -532,7 +784,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="address"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Address
                     </label>
@@ -549,7 +801,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="medicalCode"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Medical ID
                     </label>
@@ -565,7 +817,7 @@ export default function Centene2(): React.ReactElement {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
                       htmlFor="phone"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
                       Phone Number
                     </label>
@@ -583,14 +835,9 @@ export default function Centene2(): React.ReactElement {
               <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className={`px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold ${
-                    remainingTrials > 0 ? "hover:bg-gray-800" : "opacity-50 cursor-not-allowed"
-                  }`}
-                  disabled={remainingTrials <= 0}
+                  className="px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold hover:bg-gray-800"
                 >
-                  {remainingTrials > 0
-                    ? `Submit (${remainingTrials} ${remainingTrials === 1 ? "trial" : "trials"} left)`
-                    : "No trials left"}
+                  Submit
                 </button>
               </div>
               <div className="mt-4 bg-white p-3 rounded-lg">
@@ -615,6 +862,10 @@ export default function Centene2(): React.ReactElement {
           </div>
         </div>
       )}
+      <div>
+        {isLoading && <p className="text-blue-500 font-bold">Loading call data...</p>}
+        {error && <p className="text-red-500 font-bold">Error: {error}</p>}
+      </div>
     </div>
   )
 }
