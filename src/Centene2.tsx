@@ -1,11 +1,10 @@
-
 "use client"
 
 import React from "react"
 
 import "./App.css"
 import { useEffect, useState, useRef, useCallback } from "react"
-import { Mic, RefreshCcw, CheckCircle, XCircle } from "lucide-react"
+import { Mic, RefreshCcw } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
@@ -32,14 +31,15 @@ interface UserDetails {
   }
 }
 
-interface ApiData {
-  name: string
-  dob: string
-  email: string
-  address: string
-  medicalCode: string
-  phone: string
-}
+// Removing unused interface
+// interface ApiData {
+//   name: string
+//   dob: string
+//   email: string
+//   address: string
+//   medicalCode: string
+//   phone: string
+// }
 
 const webClient = new RetellWebClient()
 
@@ -53,7 +53,8 @@ const notes = [
 const apiKey = "key_98fef97480c54d6bf0698564addb"
 
 export default function Centene2(): React.ReactElement {
-  const [allTrialsUsed, setAllTrialsUsed] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_allTrialsUsed, setAllTrialsUsed] = useState(false)
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "",
@@ -89,8 +90,8 @@ export default function Centene2(): React.ReactElement {
     email: [],
   })
 
-  // Replace the existing apiData state with this:
-  const [apiData, setApiData] = useState<{
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_apiData, setApiData] = useState<{
     name: string[]
     dob: string[]
     email: string[]
@@ -121,63 +122,204 @@ export default function Centene2(): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Add a new state to track which agent ID to use
-  const [useAlternateAgent, setUseAlternateAgent] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_useAlternateAgent, setUseAlternateAgent] = useState(false)
+
+  // Add this new state to track if all columns are filled
+  const [allColumnsFilled, setAllColumnsFilled] = useState(false)
 
   useEffect(() => {
     setFormSubmitted(false)
     setAllTrialsUsed(false)
   }, [])
 
-  // Modify the fetchCallData function to update the new state
-  const fetchCallData = useCallback(async (callId: string) => {
-    setIsLoading(true)
-    setError(null)
-    console.log(`Attempting to fetch call data for ID: ${callId}`)
+  // Replace the existing processCallData function with this updated version
+  const processCallData = useCallback(
+    (callData: any) => {
+      try {
+        console.log("Processing call data:", JSON.stringify(callData))
 
-    try {
-      const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
-      console.log(`Making API request to: ${apiUrl}`)
+        const customData = callData.call_analysis?.custom_analysis_data || {}
+        console.log("Custom data from API:", customData)
 
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-      })
+        if (!customData) {
+          console.error("Custom data not found in call data")
+          return
+        }
 
-      console.log(`API response status: ${response.status}`)
+        // Extract all the data from the custom_analysis_data object
+        // This now handles the new format with multiple fields (member_id, member_id2, etc.)
+        const extractedData = {
+          name: customData.member_name || "",
+          name2: customData.member_name2 || "",
+          name3: customData.member_name3 || "",
+          dob: customData._d_o_b || "",
+          dob2: customData._d_o_b2 || "",
+          dob3: customData._d_o_b3 || "",
+          address: customData.shipping_address || "",
+          address2: customData.shipping_address2 || "",
+          address3: customData.shipping_address3 || "",
+          medicalCode: customData.member_id || "",
+          medicalCode2: customData.member_id2 || "",
+          medicalCode3: customData.member_id3 || "",
+          phone: customData.phone_number || "",
+          phone2: customData.phone_number2 || "",
+          phone3: customData.phone_number3 || "",
+          email: customData.email || "",
+          email2: customData.email2 || "",
+          email3: customData.email3 || "",
+        }
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
-        throw new Error(`API Error: ${response.status}, ${errorText}`)
+        console.log("Extracted data from API:", extractedData)
+
+        // Update the API data state with all three sets of data at once
+        setApiData({
+          name: [extractedData.name, extractedData.name2, extractedData.name3].filter(Boolean),
+          dob: [extractedData.dob, extractedData.dob2, extractedData.dob3].filter(Boolean),
+          email: [extractedData.email, extractedData.email2, extractedData.email3].filter(Boolean),
+          address: [extractedData.address, extractedData.address2, extractedData.address3].filter(Boolean),
+          medicalCode: [extractedData.medicalCode, extractedData.medicalCode2, extractedData.medicalCode3].filter(
+            Boolean,
+          ),
+          phone: [extractedData.phone, extractedData.phone2, extractedData.phone3].filter(Boolean),
+        })
+
+        // Also update the apiCallData state with all three sets of data at once
+        setApiCallData({
+          member_id: [customData.member_id, customData.member_id2, customData.member_id3].filter(Boolean),
+          shipping_address: [
+            customData.shipping_address,
+            customData.shipping_address2,
+            customData.shipping_address3,
+          ].filter(Boolean),
+          member_name: [customData.member_name, customData.member_name2, customData.member_name3].filter(Boolean),
+          _d_o_b: [customData._d_o_b, customData._d_o_b2, customData._d_o_b3].filter(Boolean),
+          phone: [customData.phone_number, customData.phone_number2, customData.phone_number3].filter(Boolean),
+          email: [customData.email, customData.email2, customData.email3].filter(Boolean),
+        })
+
+        // Improved normalization functions
+        const normalizeString = (str: string) => {
+          if (!str) return ""
+          return str.toLowerCase().replace(/[^a-z0-9]/g, "")
+        }
+
+        const normalizeDOB = (dob: string) => {
+          if (!dob) return ""
+
+          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
+          const dashPattern = /([a-z]+)-(\d+)-(\d+)/i
+          const dashMatch = dob.match(dashPattern)
+
+          if (dashMatch) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const [_, month, day, year] = dashMatch
+            const monthNames = ["jan", "feb", ', "mar', "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
+            if (monthIndex !== -1) {
+              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
+            }
+          }
+
+          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
+          const slashPattern = /(\d+)\/(\d+)\/(\d+)/
+          const slashMatch = dob.match(slashPattern)
+
+          if (slashMatch) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const [_, month, day, year] = slashMatch
+            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
+          }
+
+          // If no pattern matches, just normalize the string
+          return normalizeString(dob)
+        }
+
+        // Normalize phone number (remove all non-digits)
+        const normalizePhone = (phone: string) => {
+          if (!phone) return ""
+          return phone.replace(/\D/g, "")
+        }
+
+        // Perform validations
+        const userDOB = normalizeDOB(userDetails.dob)
+        const extractedDOB = normalizeDOB(extractedData.dob)
+
+        console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB)
+
+        const validation: UserDetails["validation"] = {
+          name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
+          dob: userDOB === extractedDOB ? "valid" : "invalid",
+          email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
+          address:
+            normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
+          phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
+          medicalCode:
+            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
+              ? "valid"
+              : "invalid",
+        }
+
+        console.log("Validation results:", validation)
+
+        setUserDetails((prev) => ({
+          ...prev,
+          validation,
+        }))
+
+        // Set allColumnsFilled to true since we now get all data at once
+        setAllColumnsFilled(true)
+      } catch (error) {
+        console.error("Error processing call data:", error)
       }
+    },
+    [userDetails],
+  )
 
-      const data = await response.json()
-      console.log("Call data retrieved successfully:", JSON.stringify(data))
+  // Now define fetchCallData after processCallData
+  const fetchCallData = useCallback(
+    async (callId: string) => {
+      setIsLoading(true)
+      setError(null)
+      console.log(`Attempting to fetch call data for ID: ${callId}`)
 
-      // Extract the custom analysis data
-      const customData = data.call_analysis.custom_analysis_data
-      setApiCallData((prev) => ({
-        member_id: [...prev.member_id, customData.member_id || ""],
-        shipping_address: [...prev.shipping_address, customData.shipping_address || ""],
-        member_name: [...prev.member_name, customData.member_name || ""],
-        _d_o_b: [...prev._d_o_b, customData._d_o_b || ""],
-        phone: [...prev.phone, customData.phone_number || customData.phone || ""],
-        email: [...prev.email, customData.email || ""],
-      }))
+      try {
+        const apiUrl = `https://api.retellai.com/v2/get-call/${callId}`
+        console.log(`Making API request to: ${apiUrl}`)
 
-      setIsLoading(false)
-      return data
-    } catch (err) {
-      console.error("Error in fetchCallData:", err)
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
-      setIsLoading(false)
-      throw err
-    }
-  }, [])
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+        })
+
+        console.log(`API response status: ${response.status}`)
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error(`Failed to fetch call data. Status: ${response.status}, Response: ${errorText}`)
+          throw new Error(`API Error: ${response.status}, ${errorText}`)
+        }
+
+        const data = await response.json()
+        console.log("Call data retrieved successfully:", JSON.stringify(data))
+
+        // Process the call data directly
+        processCallData(data)
+
+        setIsLoading(false)
+        return data
+      } catch (err) {
+        console.error("Error in fetchCallData:", err)
+        setError(err instanceof Error ? err.message : "An unknown error occurred")
+        setIsLoading(false)
+        throw err
+      }
+    },
+    [processCallData],
+  )
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -221,6 +363,7 @@ export default function Centene2(): React.ReactElement {
     }
   }, [currentCallId])
 
+  // Now update the useEffect that uses fetchCallData
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
@@ -235,7 +378,8 @@ export default function Centene2(): React.ReactElement {
         fetchCallData(currentCallId)
           .then((data) => {
             console.log("Call data fetched successfully:", data)
-            return processCallData(data)
+            // No need to call processCallData again as it's already called in fetchCallData
+            return data
           })
           .then(() => {
             console.log("Call data processed successfully")
@@ -254,143 +398,20 @@ export default function Centene2(): React.ReactElement {
     }
   }, [callEnded, currentCallId, fetchCallData])
 
-  // Replace the processCallData function with this updated version
-  // Replace the processCallData function with this improved version
-  const processCallData = useCallback(
-    (callData: any) => {
-      try {
-        console.log("Processing call data:", JSON.stringify(callData))
-
-        const userInfo = callData.transcript?.user_info
-        const customData = callData.call_analysis?.custom_analysis_data || {}
-
-        if (!userInfo && !customData) {
-          console.error("User info not found in call data")
-          return
-        }
-
-        // Prefer data from custom_analysis_data if available, fall back to user_info
-        const extractedData = {
-          name: customData.member_name || userInfo?.name || "",
-          dob: customData._d_o_b || userInfo?.dob || "",
-          email: customData.email || userInfo?.email || "",
-          address: customData.shipping_address || userInfo?.address || "",
-          medicalCode: customData.member_id || userInfo?.medical_id || userInfo?.member_id || "",
-          phone: customData.phone_number || customData.phone || userInfo?.phone || "",
-        }
-
-        console.log("Extracted data from API:", extractedData)
-        console.log("User details:", userDetails)
-
-        setApiData((prev) => ({
-          name: [...prev.name, extractedData.name],
-          dob: [...prev.dob, extractedData.dob],
-          email: [...prev.email, extractedData.email],
-          address: [...prev.address, extractedData.address],
-          medicalCode: [...prev.medicalCode, extractedData.medicalCode],
-          phone: [...prev.phone, extractedData.phone],
-        }))
-
-        // Improved normalization functions
-        const normalizeString = (str: string) => {
-          if (!str) return ""
-          return str.toLowerCase().replace(/[^a-z0-9]/g, "")
-        }
-
-        const normalizeDOB = (dob: string) => {
-          if (!dob) return ""
-
-          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
-          const dashPattern = /([a-z]+)-(\d+)-(\d+)/i
-          const dashMatch = dob.match(dashPattern)
-
-          if (dashMatch) {
-            const [_, month, day, year] = dashMatch
-            const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
-            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
-            if (monthIndex !== -1) {
-              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
-            }
-          }
-
-          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
-          const slashPattern = /(\d+)\/(\d+)\/(\d+)/
-          const slashMatch = dob.match(slashPattern)
-
-          if (slashMatch) {
-            const [_, month, day, year] = slashMatch
-            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
-          }
-
-          // If no pattern matches, just normalize the string
-          return normalizeString(dob)
-        }
-
-        // Normalize phone number (remove all non-digits)
-        const normalizePhone = (phone: string) => {
-          if (!phone) return ""
-          return phone.replace(/\D/g, "")
-        }
-
-        // Perform validations
-        const userDOB = normalizeDOB(userDetails.dob)
-        const extractedDOB = normalizeDOB(extractedData.dob)
-
-        console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB)
-
-        const validation: UserDetails["validation"] = {
-          name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
-          dob: userDOB === extractedDOB ? "valid" : "invalid",
-          email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
-          address:
-            normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
-          phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
-          medicalCode:
-            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
-              ? "valid"
-              : "invalid",
-        }
-
-        console.log("Validation results:", validation)
-        console.log("Normalized comparisons:")
-        console.log("Name:", normalizeString(extractedData.name), "vs", normalizeString(userDetails.name))
-        console.log("DOB:", userDOB, "vs", extractedDOB)
-        console.log("Email:", normalizeString(extractedData.email), "vs", normalizeString(userDetails.email))
-        console.log("Address:", normalizeString(extractedData.address), "vs", normalizeString(userDetails.address))
-        console.log("Phone:", normalizePhone(extractedData.phone), "vs", normalizePhone(userDetails.phone))
-        console.log(
-          "Medical ID:",
-          normalizeString(extractedData.medicalCode),
-          "vs",
-          normalizeString(userDetails.medicalCode),
-        )
-
-        setUserDetails((prev) => ({
-          ...prev,
-          validation,
-        }))
-      } catch (error) {
-        console.error("Error processing call data:", error)
-      }
-    },
-    [userDetails],
-  )
-
-  // Add this new state to track if all columns are filled
-  const [allColumnsFilled, setAllColumnsFilled] = useState(false)
-
   // Add this useEffect to check if all columns are filled
-  useEffect(() => {
-    const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
-    const allFilled = columnCount >= 3
-    setAllColumnsFilled(allFilled)
+  /*
+useEffect(() => {
+  const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
+  const allFilled = columnCount >= 3
+  setAllColumnsFilled(allFilled)
 
-    // Set useAlternateAgent to true when all columns are filled
-    if (allFilled) {
-      setUseAlternateAgent(true)
-      console.log("Switching to alternate agent ID: agent_032768381114b7bf21281a9790")
-    }
-  }, [apiCallData])
+  // Set useAlternateAgent to true when all columns are filled
+  if (allFilled) {
+    setUseAlternateAgent(true)
+    console.log("Switching to alternate agent ID: agent_032768381114b7bf21281a9790")
+  }
+}, [apiCallData])
+*/
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -437,6 +458,35 @@ export default function Centene2(): React.ReactElement {
         setCallInProgress(false)
       }
     } else {
+      // Reset API data and validation status when starting a new call
+      setApiCallData({
+        member_id: [],
+        shipping_address: [],
+        member_name: [],
+        _d_o_b: [],
+        phone: [],
+        email: [],
+      })
+      setApiData({
+        name: [],
+        dob: [],
+        email: [],
+        address: [],
+        medicalCode: [],
+        phone: [],
+      })
+      setUserDetails((prev) => ({
+        ...prev,
+        validation: {
+          name: "",
+          dob: "",
+          email: "",
+          address: "",
+          medicalCode: "",
+          phone: "",
+        },
+      }))
+      setAllColumnsFilled(false)
       try {
         // Reset callEnded state when starting a new call
         setCallEnded(false)
@@ -452,8 +502,8 @@ export default function Centene2(): React.ReactElement {
 
   // Modify the initiateConversation function to use the alternate agent ID when needed
   const initiateConversation = async () => {
-    // Use the alternate agent ID when useAlternateAgent is true
-    const agentId = useAlternateAgent ? "agent_032768381114b7bf21281a9790" : "agent_d3ca92c1776826ef142c084251"
+    // Always use the same agent ID
+    const agentId = "agent_d3ca92c1776826ef142c084251"
 
     try {
       const registerCallResponse = await registerCall(agentId)
@@ -522,48 +572,41 @@ export default function Centene2(): React.ReactElement {
 
   // Update the reopenVerificationForm function
   const reopenVerificationForm = () => {
-    if (allColumnsFilled) {
-      // Reset all data and show the form
-      setApiCallData({
-        member_id: [],
-        shipping_address: [],
-        member_name: [],
-        _d_o_b: [],
-        phone: [],
-        email: [],
-      })
-      setApiData({
-        name: [],
-        dob: [],
-        email: [],
-        address: [],
-        medicalCode: [],
-        phone: [],
-      })
-      setUserDetails({
+    // Reset only the API data but keep user details
+    setApiCallData({
+      member_id: [],
+      shipping_address: [],
+      member_name: [],
+      _d_o_b: [],
+      phone: [],
+      email: [],
+    })
+    setApiData({
+      name: [],
+      dob: [],
+      email: [],
+      address: [],
+      medicalCode: [],
+      phone: [],
+    })
+
+    // Reset validation status
+    setUserDetails((prev) => ({
+      ...prev,
+      validation: {
         name: "",
         dob: "",
         email: "",
-        address: "123 Maple Street, Nashville, Tennessee, 37201",
-        medicalCode: "U900312752",
-        phone: "6152314412",
-        validation: {
-          name: "",
-          dob: "",
-          email: "",
-          address: "",
-          medicalCode: "",
-          phone: "",
-        },
-      })
-      setShowVerificationForm(true)
-      setFormSubmitted(false)
-      setAllColumnsFilled(false)
+        address: "",
+        medicalCode: "",
+        phone: "",
+      },
+    }))
 
-      // Reset the agent ID to the original one
-      setUseAlternateAgent(false)
-      console.log("Reverting to original agent ID: agent_d3ca92c1776826ef142c084251")
-    }
+    setShowVerificationForm(true)
+    setFormSubmitted(false)
+    setAllColumnsFilled(false)
+    setUseAlternateAgent(false)
   }
 
   const generateMonthOptions = () => {
@@ -593,52 +636,78 @@ export default function Centene2(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 relative flex flex-col">
-      {/* Modern header with gradient */}
-      <nav className="bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] shadow-md w-full">
-        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-3">
-          <img src="/centene_logo.png" alt="Centene" className="h-10 bg-transparent mb-4 md:mb-0" />
-          <div className="flex flex-wrap justify-center md:justify-end items-center gap-3 md:gap-6 text-white text-sm md:text-base font-medium">
-            {["Who are we", "Why we are different", "Products and Services", "Careers", "Investors", "News"].map((item, index) => (
-              <span key={index} className="cursor-pointer whitespace-nowrap hover:text-blue-200 transition-colors px-2 py-1 rounded">
-                {item}
-              </span>
-            ))}
+    <div className="min-h-screen bg-white relative flex flex-col">
+      <nav className="bg-[#2E5388] w-full">
+        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-2">
+          <img src="/centene_logo.png" alt="Centene" className="h-12 bg-transparent mb-4 md:mb-0" />
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-white text-sm md:text-lg font-bold">
+            <span className="cursor-pointer whitespace-nowrap">Who are we</span>
+            <span className="cursor-pointer whitespace-nowrap">Why we are different</span>
+            <span className="cursor-pointer whitespace-nowrap">Products and Services</span>
+            <span className="cursor-pointer whitespace-nowrap">Careers</span>
+            <span className="cursor-pointer whitespace-nowrap">Investors</span>
+            <span className="cursor-pointer whitespace-nowrap">News</span>
           </div>
         </div>
       </nav>
 
-      <div className="flex flex-col lg:flex-row gap-6 mt-6 px-4 lg:px-8 flex-grow">
-        {/* Left column - Table */}
+      <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
+        <div className="w-full lg:w-1/3 flex flex-col items-center">
+          <img
+            src="/centene_Hero.png"
+            alt="Centene commitment"
+            style={{ width: "600px", height: "220px" }}
+            className="mb-4"
+          />{" "}
+          <p className="text-center mb-6 font-medium text-sm md:text-base">
+            Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
+            innovative programs and health solutions that help families and individuals get well, stay well and be well.
+          </p>
+          <button onClick={toggleConversation} className="flex flex-col items-center group">
+            <div
+              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
+                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+              }`}
+            >
+              <Mic
+                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
+                  callStatus === "active" ? "animate-bounce" : ""
+                }`}
+              />
+            </div>
+            <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
+              {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
+            </span>
+          </button>
+        </div>
+
         <div className="w-full lg:w-3/4">
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-            {/* Table header with refresh button */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-[#1a4a7c]">Customer Identity Verification (CIV) Status</h2>
+          <div className="bg-white p-4 rounded-lg shadow border">
+            {/* Update the JSX for the table header to include the Refresh button */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Customer Identity Verification (CIV) Status</h2>
               {allColumnsFilled && (
                 <button
                   onClick={reopenVerificationForm}
-                  className="flex items-center text-white bg-[#2E5388] hover:bg-[#1a4a7c] px-4 py-2 rounded-lg transition-colors shadow-sm"
+                  className="flex items-center text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
                 >
-                  <RefreshCcw className="w-4 h-4 mr-2" />
+                  <RefreshCcw className="w-4 h-4 mr-1" />
                   Refresh
                 </button>
               )}
             </div>
-
-            {/* Modern table with hover effects */}
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] text-white">
-                    <th className="border border-gray-300 p-3 text-left rounded-tl-lg">CIV Parameter</th>
-                    <th className="border border-gray-300 p-3 text-left">Customer Details</th>
-                    <th className="border border-gray-300 p-3 text-left">Input Provided</th>
-                    <th className="border border-gray-300 p-3 text-left rounded-tr-lg">Authentication Status</th>
+                  <tr className="bg-[#2E5388] text-white">
+                    <th className="border p-2 text-left">CIV Parameter</th>
+                    <th className="border p-2 text-left">Customer Details</th>
+                    <th className="border p-2 text-left">Input Provided</th>
+                    <th className="border p-2 text-left">Authentication Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Table rows with improved styling */}
+                  {/* Update the table rows to show validation status for each input */}
                   {[
                     { label: "Medical ID", key: "medicalCode", apiKey: "member_id" },
                     { label: "Member Name", key: "name", apiKey: "member_name" },
@@ -649,38 +718,33 @@ export default function Centene2(): React.ReactElement {
                   ].map((param, index) => (
                     <React.Fragment key={param.key}>
                       {[0, 1, 2].map((row) => (
-                        <tr 
-                          key={`${param.key}-${row}`} 
-                          className={`${index % 2 === 0 ? "bg-[#f0f7ff]" : "bg-white"} hover:bg-blue-50 transition-colors`}
-                        >
+                        <tr key={`${param.key}-${row}`} className={index % 2 === 0 ? "bg-[#E6F3FF]" : "bg-white"}>
                           {row === 0 && (
                             <>
-                              <td className="border border-gray-200 p-4 font-semibold text-[#1a4a7c]" rowSpan={3}>
+                              <td className="border p-8" rowSpan={3}>
                                 {param.label}
                               </td>
-                              <td className="border border-gray-200 p-4 font-bold" rowSpan={3}>
+                              <td className="border p-8 font-bold" rowSpan={3}>
                                 {formSubmitted ? String(userDetails[param.key as keyof UserDetails]) : ""}
                               </td>
                             </>
                           )}
-                          <td className="border border-gray-200 p-3">
+                          <td className="border p-2">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] || ""}
                           </td>
-                          <td className="border border-gray-200 p-3">
+                          <td className="border p-2">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
-                              <div className="flex items-center">
-                                {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid" ? (
-                                  <>
-                                    <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
-                                    <span className="text-green-600 font-medium">Valid</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <XCircle className="w-5 h-5 mr-2 text-red-500" />
-                                    <span className="text-red-600 font-medium">Invalid</span>
-                                  </>
-                                )}
-                              </div>
+                              <span
+                                className={
+                                  userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }
+                              >
+                                {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
+                                  ? "Valid"
+                                  : "Invalid"}
+                              </span>
                             )}
                           </td>
                         </tr>
@@ -692,106 +756,59 @@ export default function Centene2(): React.ReactElement {
             </div>
           </div>
         </div>
-
-        {/* Right column - Talk button */}
-        <div className="w-full lg:w-1/4 flex flex-col items-center justify-start lg:mt-16">
-          <button onClick={toggleConversation} className="flex flex-col items-center group">
-            <div
-              className={`p-8 bg-gradient-to-br from-[#1a4a7c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
-              }`}
-            >
-              <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-white ${
-                  callStatus === "active" ? "animate-bounce" : ""
-                }`}
-              />
-            </div>
-            <span className="mt-6 text-[#1a4a7c] text-2xl md:text-3xl font-bold">
-              {callStatus === "active" ? (
-                <span className="text-red-500">Click to Disconnect</span>
-              ) : (
-                "Let's Talk"
-              )}
-            </span>
-          </button>
-          
-          {/* Customer service picture */}
-          <div className="mt-8 rounded-lg overflow-hidden shadow-md">
-            <img 
-              src="/centene-hero2.png" 
-              alt="Customer service" 
-              className="w-full h-auto max-w-xs object-cover"
-            />
-          </div>
-          
-          {/* Commitment statement */}
-          <div className="mt-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200 text-center">
-            <p className="text-[#1a4a7c] font-medium">
-              Centene is committed to helping people live healthier lives through high-quality healthcare solutions.
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Modern footer */}
       <div
-        className="bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] text-white py-6 mt-8"
-        style={{ marginTop: "auto" }}
+        className="bg-fit bg-center text-white py-8 mt-8"
+        style={{
+          backgroundImage: "url('/Centene_Footer.png')",
+          marginTop: "auto",
+        }}
       >
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center mb-4 md:mb-0">
-            <img src="/centene_logo.png" alt="Centene" className="h-8 bg-transparent mr-4" />
-            <div className="text-sm">
-              <p className="font-bold">Transform the health of communities,</p>
-              <p>one person at a time.</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="font-bold text-sm">Centene Headquarters:</p>
-            <p className="text-sm">Centene Corporation, Centene Plaza,</p>
-            <p className="text-sm">7700 Forsyth Boulevard St. Louis, MO 63105</p>
-          </div>
+        <div className="container mx-auto px-4 text-right">
+          <p className="text-[#2E5388] font-bold text-sm md:text-base">Centene Headquarters:</p>
+          <p className="text-[#2E5388] text-sm md:text-base">Centene Corporation, Centene Plaza,</p>
+          <p className="text-[#2E5388] text-sm md:text-base">7700 Forsyth Boulevard St. Louis, MO 63105</p>
         </div>
       </div>
 
-      {/* Verification form modal with improved styling */}
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-xl mx-auto shadow-2xl overflow-y-auto max-h-[90vh] animate-fadeIn">
-            <h2 className="text-xl font-bold text-[#1a4a7c] mb-6 text-center">
-              Customer Details Verification
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#2E5388] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
+            <h2 className="text-base sm:text-xl font-medium text-white mb-4 sm:mb-6">
+              Customer details required for verification and authentication
             </h2>
-            
-            <form onSubmit={handleSubmitDetails} className="space-y-5">
-              <div className="grid gap-5 max-w-lg mx-auto">
+            <form onSubmit={handleSubmitDetails} className="space-y-4">
+              <div className="grid gap-4 max-w-lg mx-auto">
                 <div className="grid gap-4">
-                  {/* Member Name */}
-                  <div className="flex flex-col">
-                    <label htmlFor="name" className="text-[#1a4a7c] text-sm font-medium mb-1">
-                      Member Name <span className="text-red-500">*</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="name"
+                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
+                      Member Name
                     </label>
                     <input
                       type="text"
                       id="name"
                       name="name"
                       required
-                      className="p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
-                      placeholder="Enter your full name"
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
-                  
-                  {/* Date of Birth */}
-                  <div className="flex flex-col">
-                    <label htmlFor="dob" className="text-[#1a4a7c] text-sm font-medium mb-1">
-                      Date of Birth <span className="text-red-500">*</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="dob"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
+                      Choose DOB
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex-1 flex gap-2">
                       <select
                         id="dobMonth"
                         name="dobMonth"
                         required
-                        className="flex-1 p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
+                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                         value={dobMonth}
                         onChange={(e) => setDobMonth(e.target.value)}
                       >
@@ -802,7 +819,7 @@ export default function Centene2(): React.ReactElement {
                         id="dobDay"
                         name="dobDay"
                         required
-                        className="flex-1 p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
+                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                         value={dobDay}
                         onChange={(e) => setDobDay(e.target.value)}
                       >
@@ -813,7 +830,7 @@ export default function Centene2(): React.ReactElement {
                         id="dobYear"
                         name="dobYear"
                         required
-                        className="flex-1 p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
+                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                         value={dobYear}
                         onChange={(e) => setDobYear(e.target.value)}
                       >
@@ -822,25 +839,26 @@ export default function Centene2(): React.ReactElement {
                       </select>
                     </div>
                   </div>
-                  
-                  {/* Email */}
-                  <div className="flex flex-col">
-                    <label htmlFor="email" className="text-[#1a4a7c] text-sm font-medium mb-1">
-                      Email Address <span className="text-red-500">*</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="email"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
+                      Email id
                     </label>
                     <input
                       type="email"
                       id="email"
                       name="email"
                       required
-                      className="p-2.5 rounded-lg bg-white text-black border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-sm"
-                      placeholder="your.email@example.com"
+                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
-                  
-                  {/* Address - Read only */}
-                  <div className="flex flex-col">
-                    <label htmlFor="address" className="text-[#1a4a7c] text-sm font-medium mb-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="address"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
                       Address
                     </label>
                     <input
@@ -848,15 +866,16 @@ export default function Centene2(): React.ReactElement {
                       id="address"
                       name="address"
                       required
-                      className="p-2.5 rounded-lg bg-gray-100 text-black border border-gray-300 text-sm cursor-not-allowed"
+                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                       defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
                       readOnly
                     />
                   </div>
-                  
-                  {/* Medical ID - Read only */}
-                  <div className="flex flex-col">
-                    <label htmlFor="medicalCode" className="text-[#1a4a7c] text-sm font-medium mb-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="medicalCode"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
                       Medical ID
                     </label>
                     <input
@@ -865,13 +884,14 @@ export default function Centene2(): React.ReactElement {
                       name="medicalCode"
                       defaultValue="U900312752"
                       readOnly
-                      className="p-2.5 rounded-lg bg-gray-100 text-black border border-gray-300 text-sm cursor-not-allowed"
+                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
-                  
-                  {/* Phone Number - Read only */}
-                  <div className="flex flex-col">
-                    <label htmlFor="phone" className="text-[#1a4a7c] text-sm font-medium mb-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <label
+                      htmlFor="phone"
+                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                    >
                       Phone Number
                     </label>
                     <input
@@ -880,28 +900,25 @@ export default function Centene2(): React.ReactElement {
                       name="phone"
                       defaultValue="6152314412"
                       readOnly
-                      className="p-2.5 rounded-lg bg-gray-100 text-black border border-gray-300 text-sm cursor-not-allowed"
+                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
                     />
                   </div>
                 </div>
               </div>
-              
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="px-10 py-2.5 bg-gradient-to-r from-[#1a4a7c] to-[#2E5388] text-white text-base rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 font-bold"
+                  className="px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold hover:bg-gray-800"
                 >
-                  Submit Details
+                  Submit
                 </button>
               </div>
-              
-              {/* Notes section */}
-              <div className="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <p className="font-medium text-[#1a4a7c] mb-2">Important Notes:</p>
-                <ul className="space-y-2 text-gray-700 text-sm">
+              <div className="mt-4 bg-white p-3 rounded-lg">
+                <p className="font-medium text-[#8B0000] mb-1">Note</p>
+                <ul className="space-y-1 text-black text-sm">
                   {notes.map((note, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-0.5">•</span>
+                      <span className="text-black">➤</span>
                       {index === 1 ? (
                         <span>
                           <span className="text-red-500">*</span>
@@ -918,20 +935,10 @@ export default function Centene2(): React.ReactElement {
           </div>
         </div>
       )}
-      
-      {/* Loading and error states */}
-      {isLoading && (
-        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
-          <p className="flex items-center">
-            <span className="animate-spin mr-2">⟳</span> Loading call data...
-          </p>
-        </div>
-      )}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg">
-          <p className="font-bold">Error: {error}</p>
-        </div>
-      )}
+      <div>
+        {isLoading && <p className="text-blue-400 font-bold">Loading call data...</p>}
+        {error && <p className="text-red-500 font-bold">Error: {error}</p>}
+      </div>
     </div>
   )
 }
