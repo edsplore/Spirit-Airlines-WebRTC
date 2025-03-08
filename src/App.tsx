@@ -10,6 +10,7 @@ import Recruiter from "./Recruiter.tsx";
 import SixtHomepage from "./Sixt.tsx";
 import Lumicera from "./Lumicera.tsx";
 import Centene2 from "./Centene2.tsx";
+// import Experian from "./Experian.tsx";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/demo/airline/spirit" element={<SpiritAirlinesDemo />} />
       <Route path="/demo/healthcare/centene" element={<Centene />} />
       <Route path="/demo/healthcare/centene2" element={<Centene2 />} />
+      {/* <Route path="/demo/healthcare/experian" element={<Experian />} /> */}
 
       <Route path="/demo/telecom/M1" element={<Mone />} />
       <Route path="/demo/HR/Recruiter" element={<Recruiter />} />

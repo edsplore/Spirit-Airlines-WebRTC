@@ -1,4 +1,3 @@
-
 "use client"
 
 import React from "react"
@@ -141,22 +140,22 @@ export default function Centene2(): React.ReactElement {
         // Extract all the data from the custom_analysis_data object
         // This now handles the new format with multiple fields (member_id, member_id2, etc.)
         const extractedData = {
-          name: customData.member_name || "",
+          name: customData.member_name1 || "",
           name2: customData.member_name2 || "",
           name3: customData.member_name3 || "",
-          dob: customData._d_o_b || "",
+          dob: customData._d_o_b1 || "",
           dob2: customData._d_o_b2 || "",
           dob3: customData._d_o_b3 || "",
-          address: customData.shipping_address || "",
+          address: customData.shipping_address1 || "",
           address2: customData.shipping_address2 || "",
           address3: customData.shipping_address3 || "",
-          medicalCode: customData.member_id || "",
+          medicalCode: customData.member_id1 || "",
           medicalCode2: customData.member_id2 || "",
           medicalCode3: customData.member_id3 || "",
-          phone: customData.phone_number || "",
+          phone: customData.phone_number1 || "",
           phone2: customData.phone_number2 || "",
           phone3: customData.phone_number3 || "",
-          email: customData.email || "",
+          email: customData.email1 || "",
           email2: customData.email2 || "",
           email3: customData.email3 || "",
         }
@@ -177,16 +176,16 @@ export default function Centene2(): React.ReactElement {
 
         // Also update the apiCallData state with all three sets of data at once
         setApiCallData({
-          member_id: [customData.member_id, customData.member_id2, customData.member_id3].filter(Boolean),
+          member_id: [customData.member_id1, customData.member_id2, customData.member_id3].filter(Boolean),
           shipping_address: [
-            customData.shipping_address,
+            customData.shipping_address1,
             customData.shipping_address2,
             customData.shipping_address3,
           ].filter(Boolean),
-          member_name: [customData.member_name, customData.member_name2, customData.member_name3].filter(Boolean),
-          _d_o_b: [customData._d_o_b, customData._d_o_b2, customData._d_o_b3].filter(Boolean),
-          phone: [customData.phone_number, customData.phone_number2, customData.phone_number3].filter(Boolean),
-          email: [customData.email, customData.email2, customData.email3].filter(Boolean),
+          member_name: [customData.member_name1, customData.member_name2, customData.member_name3].filter(Boolean),
+          _d_o_b: [customData._d_o_b1, customData._d_o_b2, customData._d_o_b3].filter(Boolean),
+          phone: [customData.phone_number1, customData.phone_number2, customData.phone_number3].filter(Boolean),
+          email: [customData.email1, customData.email2, customData.email3].filter(Boolean),
         })
 
         // Improved normalization functions
@@ -618,18 +617,26 @@ export default function Centene2(): React.ReactElement {
         <div className="flex items-center justify-between px-4 md:px-12 py-4">
           <img src="/centene_logo.png" alt="Centene" className="h-10 bg-transparent" />
           <div className="hidden md:flex items-center gap-6 text-white">
-            {["Who are we", "Why we are different", "Products and Services", "Careers", "Investors", "News"].map((item, index) => (
-              <div key={index} className="group relative cursor-pointer">
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-medium hover:text-blue-200 transition-colors">{item}</span>
-                  <ChevronDown size={16} className="text-blue-200" />
+            {["Who are we", "Why we are different", "Products and Services", "Careers", "Investors", "News"].map(
+              (item, index) => (
+                <div key={index} className="group relative cursor-pointer">
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-medium hover:text-blue-200 transition-colors">{item}</span>
+                    <ChevronDown size={16} className="text-blue-200" />
+                  </div>
+                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-300 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </div>
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-300 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
           <button className="block md:hidden text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="h-6 w-6"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
             </svg>
           </button>
@@ -640,32 +647,26 @@ export default function Centene2(): React.ReactElement {
         {/* Left section with brand info and mic button */}
         <div className="w-full lg:w-1/3 flex flex-col">
           <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6">
-            <img
-              src="/centene_Hero.png"
-              alt="Centene commitment"
-              className="w-full h-48 object-cover"
-            />
+            <img src="/centene_Hero.png" alt="Centene commitment" className="w-full h-48 object-cover" />
             <div className="p-5">
               <p className="text-gray-700 text-sm md:text-base leading-relaxed">
-                Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
-                innovative programs and health solutions that help families and individuals get well, stay well and be well.
+                Centene is committed to helping people live healthier lives. We provide access to high-quality
+                healthcare, innovative programs and health solutions that help families and individuals get well, stay
+                well and be well.
               </p>
             </div>
           </div>
-          
+
           <div className="flex justify-center">
-            <button 
-              onClick={toggleConversation} 
+            <button
+              onClick={toggleConversation}
               className="group flex flex-col items-center justify-center transform transition-all hover:scale-105"
             >
-              <div className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${
-                callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
-              }`}>
-                <Mic
-                  className={`w-12 h-12 text-white ${
-                    callStatus === "active" ? "animate-bounce" : ""
+              <div
+                className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
                   }`}
-                />
+              >
+                <Mic className={`w-12 h-12 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
               </div>
               <span className="mt-4 text-[#1a4b8c] text-xl font-bold">
                 {callStatus === "active" ? "Click to Disconnect" : "Let's Talk"}
@@ -689,12 +690,14 @@ export default function Centene2(): React.ReactElement {
                 </button>
               )}
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="bg-[#1a4b8c] text-white py-3 px-4 rounded-tl-lg text-left font-medium">CIV Parameter</th>
+                    <th className="bg-[#1a4b8c] text-white py-3 px-4 rounded-tl-lg text-left font-medium">
+                      CIV Parameter
+                    </th>
                     <th className="bg-[#1a4b8c] text-white py-3 px-4 text-left font-medium">Customer Details</th>
                     <th className="bg-[#1a4b8c] text-white py-3 px-4 text-left font-medium">Input Provided</th>
                     <th className="bg-[#1a4b8c] text-white py-3 px-4 rounded-tr-lg text-left font-medium">Status</th>
@@ -708,12 +711,11 @@ export default function Centene2(): React.ReactElement {
                     { label: "Date of Birth", key: "dob", apiKey: "_d_o_b" },
                     { label: "Address", key: "address", apiKey: "shipping_address" },
                     { label: "Phone Number", key: "phone", apiKey: "phone" },
-                    { label: "Email ID", key: "email", apiKey: "email" },
                   ].map((param, index) => (
                     <React.Fragment key={param.key}>
                       {[0, 1, 2].map((row) => (
-                        <tr 
-                          key={`${param.key}-${row}`} 
+                        <tr
+                          key={`${param.key}-${row}`}
                           className={`${index % 2 === 0 ? "bg-blue-50" : "bg-white"} border-b border-gray-100 hover:bg-blue-100 transition-colors`}
                         >
                           {row === 0 && (
@@ -732,11 +734,10 @@ export default function Centene2(): React.ReactElement {
                           <td className="py-3 px-4">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                                  }`}
                               >
                                 {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
                                   ? "Valid"
@@ -748,6 +749,26 @@ export default function Centene2(): React.ReactElement {
                       ))}
                     </React.Fragment>
                   ))}
+                  {/* Add Email ID as a single row */}
+                  <tr
+                    className={`${[0, 2, 4].includes(5) ? "bg-blue-50" : "bg-white"} border-b border-gray-100 hover:bg-blue-100 transition-colors`}
+                  >
+                    <td className="py-3 px-4 font-medium text-gray-700">Email ID</td>
+                    <td className="py-3 px-4 font-medium">{formSubmitted ? String(userDetails.email) : ""}</td>
+                    <td className="py-3 px-4">{apiCallData.email[0] || ""}</td>
+                    <td className="py-3 px-4">
+                      {apiCallData.email[0] && (
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${userDetails.validation.email === "valid"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                            }`}
+                        >
+                          {userDetails.validation.email === "valid" ? "Valid" : "Invalid"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -756,15 +777,15 @@ export default function Centene2(): React.ReactElement {
       </div>
 
       {/* Footer with styled gradient */}
-      <div
-        className="bg-gradient-to-r from-[#e7f0fd] to-[#d4e5f7] py-6 mt-auto"
-      >
+      <div className="py-4 mt-auto bg-cover bg-center" style={{ backgroundImage: "url('/Centene_Footer.png')", height: '8rem' }}>
         <div className="container mx-auto px-4 text-right">
           <p className="text-[#1a4b8c] font-bold">Centene Headquarters:</p>
           <p className="text-[#2E5388]">Centene Corporation, Centene Plaza,</p>
           <p className="text-[#2E5388]">7700 Forsyth Boulevard St. Louis, MO 63105</p>
         </div>
       </div>
+
+
 
       {/* Verification modal with improved styling */}
       {showVerificationForm && (
@@ -773,7 +794,7 @@ export default function Centene2(): React.ReactElement {
             <h2 className="text-xl font-semibold text-white mb-6 text-center">
               Customer details required for verification and authentication
             </h2>
-            
+
             <form onSubmit={handleSubmitDetails} className="space-y-5">
               <div className="space-y-4">
                 <div className="flex flex-col">
@@ -789,7 +810,7 @@ export default function Centene2(): React.ReactElement {
                     placeholder="Enter your name"
                   />
                 </div>
-                
+
                 <div className="flex flex-col">
                   <label htmlFor="dob" className="text-white text-sm mb-1 font-medium">
                     Choose Date of Birth
@@ -830,7 +851,7 @@ export default function Centene2(): React.ReactElement {
                     </select>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col">
                   <label htmlFor="email" className="text-white text-sm mb-1 font-medium">
                     Email ID
@@ -844,7 +865,7 @@ export default function Centene2(): React.ReactElement {
                     placeholder="Enter your email"
                   />
                 </div>
-                
+
                 <div className="flex flex-col">
                   <label htmlFor="address" className="text-white text-sm mb-1 font-medium">
                     Address
@@ -859,7 +880,7 @@ export default function Centene2(): React.ReactElement {
                     readOnly
                   />
                 </div>
-                
+
                 <div className="flex flex-col">
                   <label htmlFor="medicalCode" className="text-white text-sm mb-1 font-medium">
                     Medical ID
@@ -873,7 +894,7 @@ export default function Centene2(): React.ReactElement {
                     className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
                   />
                 </div>
-                
+
                 <div className="flex flex-col">
                   <label htmlFor="phone" className="text-white text-sm mb-1 font-medium">
                     Phone Number
@@ -888,7 +909,7 @@ export default function Centene2(): React.ReactElement {
                   />
                 </div>
               </div>
-              
+
               <div className="flex justify-center mt-8">
                 <button
                   type="submit"
@@ -897,7 +918,7 @@ export default function Centene2(): React.ReactElement {
                   Submit
                 </button>
               </div>
-              
+
               <div className="mt-6 bg-white p-4 rounded-xl shadow">
                 <p className="font-medium text-red-700 mb-2">Note</p>
                 <ul className="space-y-2 text-gray-700 text-sm">
@@ -920,25 +941,38 @@ export default function Centene2(): React.ReactElement {
           </div>
         </div>
       )}
-      
+
       {/* Loading/Error indicators */}
       {isLoading && (
         <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
           <div className="flex items-center gap-2">
-            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             <span>Loading call data...</span>
           </div>
         </div>
       )}
-      
+
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg">
           <div className="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
             </svg>
             <span>Error: {error}</span>
           </div>
@@ -947,3 +981,4 @@ export default function Centene2(): React.ReactElement {
     </div>
   )
 }
+
