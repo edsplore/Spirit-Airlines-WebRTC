@@ -1,10 +1,11 @@
+
 "use client"
 
 import React from "react"
 
 import "./App.css"
 import { useEffect, useState, useRef, useCallback } from "react"
-import { Mic, RefreshCcw } from "lucide-react"
+import { Mic, RefreshCcw, ChevronDown } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
@@ -30,16 +31,6 @@ interface UserDetails {
     phone: "valid" | "invalid" | ""
   }
 }
-
-// Removing unused interface
-// interface ApiData {
-//   name: string
-//   dob: string
-//   email: string
-//   address: string
-//   medicalCode: string
-//   phone: string
-// }
 
 const webClient = new RetellWebClient()
 
@@ -398,21 +389,6 @@ export default function Centene2(): React.ReactElement {
     }
   }, [callEnded, currentCallId, fetchCallData])
 
-  // Add this useEffect to check if all columns are filled
-  /*
-useEffect(() => {
-  const columnCount = Object.values(apiCallData).reduce((max, arr) => Math.max(max, arr.length), 0)
-  const allFilled = columnCount >= 3
-  setAllColumnsFilled(allFilled)
-
-  // Set useAlternateAgent to true when all columns are filled
-  if (allFilled) {
-    setUseAlternateAgent(true)
-    console.log("Switching to alternate agent ID: agent_032768381114b7bf21281a9790")
-  }
-}, [apiCallData])
-*/
-
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newFormData = new FormData(e.currentTarget)
@@ -636,74 +612,92 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-white relative flex flex-col">
-      <nav className="bg-[#2E5388] w-full">
-        <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-2">
-          <img src="/centene_logo.png" alt="Centene" className="h-12 bg-transparent mb-4 md:mb-0" />
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 text-white text-sm md:text-lg font-bold">
-            <span className="cursor-pointer whitespace-nowrap">Who are we</span>
-            <span className="cursor-pointer whitespace-nowrap">Why we are different</span>
-            <span className="cursor-pointer whitespace-nowrap">Products and Services</span>
-            <span className="cursor-pointer whitespace-nowrap">Careers</span>
-            <span className="cursor-pointer whitespace-nowrap">Investors</span>
-            <span className="cursor-pointer whitespace-nowrap">News</span>
+    <div className="min-h-screen bg-gray-50 relative flex flex-col">
+      {/* Header/Navigation - Modern gradient style */}
+      <nav className="bg-gradient-to-r from-[#1a4b8c] to-[#2E5388] shadow-lg w-full">
+        <div className="flex items-center justify-between px-4 md:px-12 py-4">
+          <img src="/centene_logo.png" alt="Centene" className="h-10 bg-transparent" />
+          <div className="hidden md:flex items-center gap-6 text-white">
+            {["Who are we", "Why we are different", "Products and Services", "Careers", "Investors", "News"].map((item, index) => (
+              <div key={index} className="group relative cursor-pointer">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-medium hover:text-blue-200 transition-colors">{item}</span>
+                  <ChevronDown size={16} className="text-blue-200" />
+                </div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-300 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              </div>
+            ))}
           </div>
+          <button className="block md:hidden text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          </button>
         </div>
       </nav>
 
-      <div className="flex flex-col lg:flex-row gap-6 mt-4 px-4 lg:px-8 flex-grow">
-        <div className="w-full lg:w-1/3 flex flex-col items-center">
-          <img
-            src="/centene_Hero.png"
-            alt="Centene commitment"
-            style={{ width: "600px", height: "220px" }}
-            className="mb-4"
-          />{" "}
-          <p className="text-center mb-6 font-medium text-sm md:text-base">
-            Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
-            innovative programs and health solutions that help families and individuals get well, stay well and be well.
-          </p>
-          <button onClick={toggleConversation} className="flex flex-col items-center group">
-            <div
-              className={`p-8 md:p-16 bg-black rounded-full transition-all duration-300 group-hover:scale-105 ${
-                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-              }`}
-            >
-              <Mic
-                className={`w-12 h-12 md:w-16 md:h-16 text-[#1e81b0] ${
-                  callStatus === "active" ? "animate-bounce" : ""
-                }`}
-              />
+      <div className="flex flex-col lg:flex-row gap-6 p-6 lg:p-8 flex-grow">
+        {/* Left section with brand info and mic button */}
+        <div className="w-full lg:w-1/3 flex flex-col">
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6">
+            <img
+              src="/centene_Hero.png"
+              alt="Centene commitment"
+              className="w-full h-48 object-cover"
+            />
+            <div className="p-5">
+              <p className="text-gray-700 text-sm md:text-base leading-relaxed">
+                Centene is committed to helping people live healthier lives. We provide access to high-quality healthcare,
+                innovative programs and health solutions that help families and individuals get well, stay well and be well.
+              </p>
             </div>
-            <span className="mt-4 text-[#1e81b0] text-xl md:text-3xl font-bold">
-              {callStatus === "active" ? <span className="text-[#1e81b0]">Click to Disconnect</span> : "Let's Talk"}
-            </span>
-          </button>
+          </div>
+          
+          <div className="flex justify-center">
+            <button 
+              onClick={toggleConversation} 
+              className="group flex flex-col items-center justify-center transform transition-all hover:scale-105"
+            >
+              <div className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${
+                callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
+              }`}>
+                <Mic
+                  className={`w-12 h-12 text-white ${
+                    callStatus === "active" ? "animate-bounce" : ""
+                  }`}
+                />
+              </div>
+              <span className="mt-4 text-[#1a4b8c] text-xl font-bold">
+                {callStatus === "active" ? "Click to Disconnect" : "Let's Talk"}
+              </span>
+            </button>
+          </div>
         </div>
 
-        <div className="w-full lg:w-3/4">
-          <div className="bg-white p-4 rounded-lg shadow border">
-            {/* Update the JSX for the table header to include the Refresh button */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Customer Identity Verification (CIV) Status</h2>
+        {/* Right section with verification table */}
+        <div className="w-full lg:w-2/3">
+          <div className="bg-white rounded-2xl shadow-md p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-[#1a4b8c]">Customer Identity Verification (CIV) Status</h2>
               {allColumnsFilled && (
                 <button
                   onClick={reopenVerificationForm}
-                  className="flex items-center text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
+                  className="flex items-center text-white bg-gradient-to-r from-[#1a4b8c] to-[#2E5388] px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all"
                 >
-                  <RefreshCcw className="w-4 h-4 mr-1" />
+                  <RefreshCcw className="w-4 h-4 mr-2" />
                   Refresh
                 </button>
               )}
             </div>
+            
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-[#2E5388] text-white">
-                    <th className="border p-2 text-left">CIV Parameter</th>
-                    <th className="border p-2 text-left">Customer Details</th>
-                    <th className="border p-2 text-left">Input Provided</th>
-                    <th className="border p-2 text-left">Authentication Status</th>
+                  <tr>
+                    <th className="bg-[#1a4b8c] text-white py-3 px-4 rounded-tl-lg text-left font-medium">CIV Parameter</th>
+                    <th className="bg-[#1a4b8c] text-white py-3 px-4 text-left font-medium">Customer Details</th>
+                    <th className="bg-[#1a4b8c] text-white py-3 px-4 text-left font-medium">Input Provided</th>
+                    <th className="bg-[#1a4b8c] text-white py-3 px-4 rounded-tr-lg text-left font-medium">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -718,28 +712,31 @@ useEffect(() => {
                   ].map((param, index) => (
                     <React.Fragment key={param.key}>
                       {[0, 1, 2].map((row) => (
-                        <tr key={`${param.key}-${row}`} className={index % 2 === 0 ? "bg-[#E6F3FF]" : "bg-white"}>
+                        <tr 
+                          key={`${param.key}-${row}`} 
+                          className={`${index % 2 === 0 ? "bg-blue-50" : "bg-white"} border-b border-gray-100 hover:bg-blue-100 transition-colors`}
+                        >
                           {row === 0 && (
                             <>
-                              <td className="border p-8" rowSpan={3}>
+                              <td className="py-3 px-4 font-medium text-gray-700" rowSpan={3}>
                                 {param.label}
                               </td>
-                              <td className="border p-8 font-bold" rowSpan={3}>
+                              <td className="py-3 px-4 font-medium" rowSpan={3}>
                                 {formSubmitted ? String(userDetails[param.key as keyof UserDetails]) : ""}
                               </td>
                             </>
                           )}
-                          <td className="border p-2">
+                          <td className="py-3 px-4">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] || ""}
                           </td>
-                          <td className="border p-2">
+                          <td className="py-3 px-4">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
                               <span
-                                className={
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
-                                    ? "text-green-500"
-                                    : "text-red-500"
-                                }
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
                               >
                                 {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
                                   ? "Valid"
@@ -758,167 +755,155 @@ useEffect(() => {
         </div>
       </div>
 
+      {/* Footer with styled gradient */}
       <div
-        className="bg-fit bg-center text-white py-8 mt-8"
-        style={{
-          backgroundImage: "url('/Centene_Footer.png')",
-          marginTop: "auto",
-        }}
+        className="bg-gradient-to-r from-[#e7f0fd] to-[#d4e5f7] py-6 mt-auto"
       >
         <div className="container mx-auto px-4 text-right">
-          <p className="text-[#2E5388] font-bold text-sm md:text-base">Centene Headquarters:</p>
-          <p className="text-[#2E5388] text-sm md:text-base">Centene Corporation, Centene Plaza,</p>
-          <p className="text-[#2E5388] text-sm md:text-base">7700 Forsyth Boulevard St. Louis, MO 63105</p>
+          <p className="text-[#1a4b8c] font-bold">Centene Headquarters:</p>
+          <p className="text-[#2E5388]">Centene Corporation, Centene Plaza,</p>
+          <p className="text-[#2E5388]">7700 Forsyth Boulevard St. Louis, MO 63105</p>
         </div>
       </div>
 
+      {/* Verification modal with improved styling */}
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#2E5388] rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-black shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
-            <h2 className="text-base sm:text-xl font-medium text-white mb-4 sm:mb-6">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] rounded-3xl p-6 w-full max-w-xl mx-auto shadow-2xl overflow-y-auto max-h-[90vh] animate-fadeIn">
+            <h2 className="text-xl font-semibold text-white mb-6 text-center">
               Customer details required for verification and authentication
             </h2>
-            <form onSubmit={handleSubmitDetails} className="space-y-4">
-              <div className="grid gap-4 max-w-lg mx-auto">
-                <div className="grid gap-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="name"
-                      className="w-full sm:w-40 text-white text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Member Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
+            
+            <form onSubmit={handleSubmitDetails} className="space-y-5">
+              <div className="space-y-4">
+                <div className="flex flex-col">
+                  <label htmlFor="name" className="text-white text-sm mb-1 font-medium">
+                    Member Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    className="p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    placeholder="Enter your name"
+                  />
+                </div>
+                
+                <div className="flex flex-col">
+                  <label htmlFor="dob" className="text-white text-sm mb-1 font-medium">
+                    Choose Date of Birth
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      id="dobMonth"
+                      name="dobMonth"
                       required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="dob"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="flex-1 p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                      value={dobMonth}
+                      onChange={(e) => setDobMonth(e.target.value)}
                     >
-                      Choose DOB
-                    </label>
-                    <div className="flex-1 flex gap-2">
-                      <select
-                        id="dobMonth"
-                        name="dobMonth"
-                        required
-                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                        value={dobMonth}
-                        onChange={(e) => setDobMonth(e.target.value)}
-                      >
-                        <option value="">Month</option>
-                        {generateMonthOptions()}
-                      </select>
-                      <select
-                        id="dobDay"
-                        name="dobDay"
-                        required
-                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                        value={dobDay}
-                        onChange={(e) => setDobDay(e.target.value)}
-                      >
-                        <option value="">Day</option>
-                        {generateDayOptions()}
-                      </select>
-                      <select
-                        id="dobYear"
-                        name="dobYear"
-                        required
-                        className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                        value={dobYear}
-                        onChange={(e) => setDobYear(e.target.value)}
-                      >
-                        <option value="">Year</option>
-                        {generateYearOptions()}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="email"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Email id
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
+                      <option value="">Month</option>
+                      {generateMonthOptions()}
+                    </select>
+                    <select
+                      id="dobDay"
+                      name="dobDay"
                       required
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="address"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="flex-1 p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                      value={dobDay}
+                      onChange={(e) => setDobDay(e.target.value)}
                     >
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
+                      <option value="">Day</option>
+                      {generateDayOptions()}
+                    </select>
+                    <select
+                      id="dobYear"
+                      name="dobYear"
                       required
-                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
-                      defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
-                      readOnly
-                    />
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="medicalCode"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="flex-1 p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                      value={dobYear}
+                      onChange={(e) => setDobYear(e.target.value)}
                     >
-                      Medical ID
-                    </label>
-                    <input
-                      type="text"
-                      id="medicalCode"
-                      name="medicalCode"
-                      defaultValue="U900312752"
-                      readOnly
-                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <label
-                      htmlFor="phone"
-                      className="w-full sm:w-40 text-white text-sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
-                    >
-                      Phone Number
-                    </label>
-                    <input
-                      type="text"
-                      id="phone"
-                      name="phone"
-                      defaultValue="6152314412"
-                      readOnly
-                      className="flex-1 p-1.5 rounded bg-[#D9D9D9] text-black border border-gray-300 font-bold text-sm"
-                    />
+                      <option value="">Year</option>
+                      {generateYearOptions()}
+                    </select>
                   </div>
                 </div>
+                
+                <div className="flex flex-col">
+                  <label htmlFor="email" className="text-white text-sm mb-1 font-medium">
+                    Email ID
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    className="p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                
+                <div className="flex flex-col">
+                  <label htmlFor="address" className="text-white text-sm mb-1 font-medium">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    required
+                    className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                    defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
+                    readOnly
+                  />
+                </div>
+                
+                <div className="flex flex-col">
+                  <label htmlFor="medicalCode" className="text-white text-sm mb-1 font-medium">
+                    Medical ID
+                  </label>
+                  <input
+                    type="text"
+                    id="medicalCode"
+                    name="medicalCode"
+                    defaultValue="U900312752"
+                    readOnly
+                    className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                  />
+                </div>
+                
+                <div className="flex flex-col">
+                  <label htmlFor="phone" className="text-white text-sm mb-1 font-medium">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    defaultValue="6152314412"
+                    readOnly
+                    className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                  />
+                </div>
               </div>
-              <div className="flex justify-center mt-6">
+              
+              <div className="flex justify-center mt-8">
                 <button
                   type="submit"
-                  className="px-10 py-1.5 bg-black text-[#1e81b0] text-base rounded-full transition-colors font-bold hover:bg-gray-800"
+                  className="px-8 py-3 bg-white text-[#1a4b8c] text-base rounded-full shadow-md hover:shadow-lg transition-all transform hover:scale-105 font-bold"
                 >
                   Submit
                 </button>
               </div>
-              <div className="mt-4 bg-white p-3 rounded-lg">
-                <p className="font-medium text-[#8B0000] mb-1">Note</p>
-                <ul className="space-y-1 text-black text-sm">
+              
+              <div className="mt-6 bg-white p-4 rounded-xl shadow">
+                <p className="font-medium text-red-700 mb-2">Note</p>
+                <ul className="space-y-2 text-gray-700 text-sm">
                   {notes.map((note, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <span className="text-black">➤</span>
+                      <span className="text-blue-600 mt-0.5">•</span>
                       {index === 1 ? (
                         <span>
                           <span className="text-red-500">*</span>
@@ -935,10 +920,30 @@ useEffect(() => {
           </div>
         </div>
       )}
-      <div>
-        {isLoading && <p className="text-blue-400 font-bold">Loading call data...</p>}
-        {error && <p className="text-red-500 font-bold">Error: {error}</p>}
-      </div>
+      
+      {/* Loading/Error indicators */}
+      {isLoading && (
+        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
+          <div className="flex items-center gap-2">
+            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Loading call data...</span>
+          </div>
+        </div>
+      )}
+      
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg">
+          <div className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span>Error: {error}</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
