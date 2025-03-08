@@ -708,6 +708,7 @@ export default function Centene2(): React.ReactElement {
                     { label: "Date of Birth", key: "dob", apiKey: "_d_o_b" },
                     { label: "Address", key: "address", apiKey: "shipping_address" },
                     { label: "Phone Number", key: "phone", apiKey: "phone" },
+                    { label: "Email ID", key: "email", apiKey: "email" },
                   ].map((param, index) => (
                     <React.Fragment key={param.key}>
                       {[0, 1, 2].map((row) => (
@@ -747,34 +748,6 @@ export default function Centene2(): React.ReactElement {
                       ))}
                     </React.Fragment>
                   ))}
-                  
-                  {/* Email row - single row instead of three */}
-                  <tr className="bg-blue-50 border-b border-gray-100 hover:bg-blue-100 transition-colors">
-                    <td className="py-3 px-4 font-medium text-gray-700">
-                      Email ID
-                    </td>
-                    <td className="py-3 px-4 font-medium">
-                      {formSubmitted ? userDetails.email : ""}
-                    </td>
-                    <td className="py-3 px-4">
-                      {formSubmitted ? userDetails.email : ""}
-                    </td>
-                    <td className="py-3 px-4">
-                      {formSubmitted && (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            userDetails.validation.email === "valid"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {userDetails.validation.email === "valid"
-                            ? "Valid"
-                            : "Invalid"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
