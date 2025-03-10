@@ -1,5 +1,5 @@
 import "./App.css";
-import type React from "react"
+import React from "react"
 import { useEffect, useState } from "react"
 import { Mic, MessageCircle } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"

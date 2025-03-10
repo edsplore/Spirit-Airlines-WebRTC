@@ -35,7 +35,7 @@ const webClient = new RetellWebClient()
 
 const notes = [
   "The platform isn't integrated with company systems, so it requires authentication details.",
-  "Enter the name the Virtual Assistant should use.",
+  <span key="1">"Enter the name the Virtual Assistant should use."</span>,
   "An email ID is needed for instant messages and confirmation.",
 ]
 

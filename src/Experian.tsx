@@ -34,10 +34,9 @@ interface UserDetails {
 const webClient = new RetellWebClient()
 
 const notes = [
-  "The platform is not integrated into the company systems, therefore asking for specific details for authentication and verification",
-  <span key="1">Please enter the name that the Virtual Assistant wants to address you as.</span>,
-  "Upon authentication request by Virtual Assistant please mention confirmation code # and full name as shown on the top right side of the bar for reference upon this form submission.",
-  "Phone# and Email id is required to send instant messages and confirmation",
+  "The platform isn't integrated with company systems, so it requires authentication details.",
+  <span key="1">"Enter the name the Virtual Assistant should use."</span>,
+  "An email ID is needed for instant messages and confirmation.",
 ]
 
 const apiKey = "key_98fef97480c54d6bf0698564addb"
@@ -952,169 +951,198 @@ export default function Experian(): React.ReactElement {
         </div>
       </footer>
 
-      {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div
-            className="bg-white rounded-2xl w-full max-w-xl mx-auto shadow-2xl border border-purple-200 flex flex-col"
-            style={{ maxHeight: "90vh" }}
-          >
-            {/* Fixed header at top of popup */}
-            <div className="bg-gradient-to-r from-purple-700 to-blue-700 px-6 py-5 rounded-t-2xl">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">Customer Verification Portal</h2>
-              <p className="text-white/80 text-sm">Please provide your details for identity verification</p>
-            </div>
-
-            {/* Scrollable content area only */}
-            <div className="overflow-y-auto flex-1 px-6 py-6" id="verification-form-content">
-              <form id="verification-form" onSubmit={handleSubmitDetails} className="space-y-6">
-                <div className="space-y-5">
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="name" className="text-purple-800 font-semibold text-sm">
-                      Member Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-gray-800"
-                      placeholder="Enter your full name"
-                    />
+            {showVerificationForm && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+                <div
+                  className="bg-white rounded-2xl w-full max-w-md mx-auto shadow-2xl border border-purple-200 flex flex-col"
+                  style={{ maxHeight: "80vh" }} // Reduced max height
+                >
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-purple-700 to-blue-700 px-4 py-3 rounded-t-2xl">
+                    <h2 className="text-base sm:text-lg font-bold text-white mb-1">
+                      Customer Verification Portal
+                    </h2>
+                    <p className="text-white/80 text-xs sm:text-sm">
+                      Please provide your details for identity verification
+                    </p>
                   </div>
 
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="dob" className="text-purple-800 font-semibold text-sm">
-                      Date of Birth <span className="text-red-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-3 gap-3">
-                      <select
-                        id="dobMonth"
-                        name="dobMonth"
-                        required
-                        className="px-3 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-gray-800"
-                        value={dobMonth}
-                        onChange={(e) => setDobMonth(e.target.value)}
-                      >
-                        <option value="">Month</option>
-                        {generateMonthOptions()}
-                      </select>
-                      <select
-                        id="dobDay"
-                        name="dobDay"
-                        required
-                        className="px-3 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-gray-800"
-                        value={dobDay}
-                        onChange={(e) => setDobDay(e.target.value)}
-                      >
-                        <option value="">Day</option>
-                        {generateDayOptions()}
-                      </select>
-                      <select
-                        id="dobYear"
-                        name="dobYear"
-                        required
-                        className="px-3 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-gray-800"
-                        value={dobYear}
-                        onChange={(e) => setDobYear(e.target.value)}
-                      >
-                        <option value="">Year</option>
-                        {generateYearOptions()}
-                      </select>
+                  {/* Scrollable (if needed) content area */}
+                  <div className="overflow-y-auto flex-1 px-4 py-4" id="verification-form-content">
+                    <form id="verification-form" onSubmit={handleSubmitDetails} className="space-y-3">
+                      <div className="space-y-2">
+                        {/* Member Name */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="name" className="text-purple-800 font-semibold text-xs">
+                            Member Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            required
+                            className="w-full px-2 py-2 rounded-lg bg-gray-50 border border-gray-200
+                                       focus:border-purple-500 focus:ring-1 focus:ring-purple-200
+                                       outline-none transition-all text-gray-800 text-sm"
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+
+                        {/* Date of Birth */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="dob" className="text-purple-800 font-semibold text-xs">
+                            Date of Birth <span className="text-red-500">*</span>
+                          </label>
+                          <div className="grid grid-cols-3 gap-2">
+                            <select
+                              id="dobMonth"
+                              name="dobMonth"
+                              required
+                              className="px-2 py-2 rounded-lg bg-gray-50 border border-gray-200
+                                         focus:border-purple-500 focus:ring-1 focus:ring-purple-200
+                                         outline-none transition-all text-gray-800 text-sm"
+                              value={dobMonth}
+                              onChange={(e) => setDobMonth(e.target.value)}
+                            >
+                              <option value="">Month</option>
+                              {generateMonthOptions()}
+                            </select>
+                            <select
+                              id="dobDay"
+                              name="dobDay"
+                              required
+                              className="px-2 py-2 rounded-lg bg-gray-50 border border-gray-200
+                                         focus:border-purple-500 focus:ring-1 focus:ring-purple-200
+                                         outline-none transition-all text-gray-800 text-sm"
+                              value={dobDay}
+                              onChange={(e) => setDobDay(e.target.value)}
+                            >
+                              <option value="">Day</option>
+                              {generateDayOptions()}
+                            </select>
+                            <select
+                              id="dobYear"
+                              name="dobYear"
+                              required
+                              className="px-2 py-2 rounded-lg bg-gray-50 border border-gray-200
+                                         focus:border-purple-500 focus:ring-1 focus:ring-purple-200
+                                         outline-none transition-all text-gray-800 text-sm"
+                              value={dobYear}
+                              onChange={(e) => setDobYear(e.target.value)}
+                            >
+                              <option value="">Year</option>
+                              {generateYearOptions()}
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Email */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="email" className="text-purple-800 font-semibold text-xs">
+                            Email Address <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            required
+                            className="w-full px-2 py-2 rounded-lg bg-gray-50 border border-gray-200
+                                       focus:border-purple-500 focus:ring-1 focus:ring-purple-200
+                                       outline-none transition-all text-gray-800 text-sm"
+                            placeholder="your.email@example.com"
+                          />
+                        </div>
+
+                        {/* Reference ID */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="medicalCode" className="text-purple-800 font-semibold text-xs">
+                            Reference ID
+                          </label>
+                          <input
+                            type="text"
+                            id="medicalCode"
+                            name="medicalCode"
+                            defaultValue="99 BE-99-9E09"
+                            readOnly
+                            className="w-full px-2 py-2 rounded-lg bg-gray-100 border border-gray-200
+                                       text-gray-500 cursor-not-allowed text-sm"
+                          />
+                        </div>
+
+                        {/* SSN */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="ssn" className="text-purple-800 font-semibold text-xs">
+                            SSN
+                          </label>
+                          <input
+                            type="text"
+                            id="ssn"
+                            name="ssn"
+                            defaultValue="111223333"
+                            readOnly
+                            className="w-full px-2 py-2 rounded-lg bg-gray-100 border border-gray-200
+                                       text-gray-500 cursor-not-allowed text-sm"
+                          />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="phone" className="text-purple-800 font-semibold text-xs">
+                            Phone Number
+                          </label>
+                          <input
+                            type="text"
+                            id="phone"
+                            name="phone"
+                            defaultValue="2707111234"
+                            readOnly
+                            className="w-full px-2 py-2 rounded-lg bg-gray-100 border border-gray-200
+                                       text-gray-500 cursor-not-allowed text-sm"
+                          />
+                        </div>
+
+                        {/* Address */}
+                        <div className="flex flex-col space-y-1">
+                          <label htmlFor="address" className="text-purple-800 font-semibold text-xs">
+                            Address
+                          </label>
+                          <input
+                            type="text"
+                            id="address"
+                            name="address"
+                            required
+                            defaultValue="116 Dogwood Rd, Lancaster, Kentucky(KY), 40444"
+                            readOnly
+                            className="w-full px-2 py-2 rounded-lg bg-gray-100 border border-gray-200
+                                       text-gray-500 cursor-not-allowed text-sm"
+                          />
+                        </div>
+                      </div>
+                    </form>
+
+                    {/* Notes Section */}
+                    <div className="bg-blue-50 p-3 mt-4 rounded-xl border border-blue-100">
+                      <p className="font-bold text-blue-800 text-sm mb-2">Important Notes:</p>
+                      <ul className="space-y-1 text-xs text-blue-700">
+                        {notes.map((note, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="text-blue-500 mt-0.5">•</span>
+                            {index === 1 ? (
+                              <span>
+                                <span className="text-red-500 font-bold">*</span>
+                                {note}
+                              </span>
+                            ) : (
+                              <span>{note}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="email" className="text-purple-800 font-semibold text-sm">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-gray-800"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="medicalCode" className="text-purple-800 font-semibold text-sm">
-                      Reference ID
-                    </label>
-                    <input
-                      type="text"
-                      id="medicalCode"
-                      name="medicalCode"
-                      defaultValue="99 BE-99-9E09"
-                      readOnly
-                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="ssn" className="text-purple-800 font-semibold text-sm">
-                      SSN
-                    </label>
-                    <input
-                      type="text"
-                      id="ssn"
-                      name="ssn"
-                      defaultValue="111223333"
-                      readOnly
-                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="phone" className="text-purple-800 font-semibold text-sm">
-                      Phone Number
-                    </label>
-                    <input
-                      type="text"
-                      id="phone"
-                      name="phone"
-                      defaultValue="2707111234"
-                      readOnly
-                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <label htmlFor="address" className="text-purple-800 font-semibold text-sm">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      required
-                      className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed"
-                      defaultValue="116 Dogwood Rd, Lancaster, Kentucky(KY), 40444"
-                      readOnly
-                    />
-                  </div>
                 </div>
-              </form>
-
-              <div className="bg-blue-50 p-5 mt-6 rounded-xl border border-blue-100">
-                <p className="font-bold text-blue-800 mb-2">Important Notes:</p>
-                <ul className="space-y-2 text-sm text-blue-700">
-                  {notes.map((note, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-0.5">•</span>
-                      {index === 1 ? (
-                        <span>
-                          <span className="text-red-500 font-bold">*</span>
-                          {note}
-                        </span>
-                      ) : (
-                        <span>{note}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
               </div>
-            </div>
+            )}
 
             {/* Fixed footer at bottom of popup */}
             <div className="bg-gray-50 p-6 border-t border-gray-200 rounded-b-2xl flex justify-center">
