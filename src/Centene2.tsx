@@ -785,142 +785,174 @@ export default function Centene2(): React.ReactElement {
       </div>
 
 
-
-      {/* Verification modal with improved styling */}
+      {/* Verification modal with reduced spacing for smaller screens */}
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] rounded-3xl p-6 w-full max-w-xl mx-auto shadow-2xl animate-fadeIn">
-            <h2 className="text-xl font-semibold text-white mb-6 text-center">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 backdrop-blur-sm">
+          <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] 
+                          rounded-xl p-4 w-full max-w-md mx-auto 
+                          shadow-2xl animate-fadeIn">
+            <h2 className="text-lg font-semibold text-white mb-4 text-center">
               Customer details required for verification and authentication
             </h2>
 
-            <form onSubmit={handleSubmitDetails} className="space-y-5">
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <label htmlFor="name" className="text-white text-sm mb-1 font-medium">
-                    Member Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
+            <form onSubmit={handleSubmitDetails} className="space-y-3">
+              {/* Member Name */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="name"
+                  className="text-white text-sm mb-1 font-medium"
+                >
+                  Member Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  className="p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
+                             focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  placeholder="Enter your name"
+                />
+              </div>
+
+              {/* Date of Birth */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="dob"
+                  className="text-white text-sm mb-1 font-medium"
+                >
+                  Choose Date of Birth
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    id="dobMonth"
+                    name="dobMonth"
                     required
-                    className="p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    placeholder="Enter your name"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="dob" className="text-white text-sm mb-1 font-medium">
-                    Choose Date of Birth
-                  </label>
-                  <div className="flex gap-2">
-                    <select
-                      id="dobMonth"
-                      name="dobMonth"
-                      required
-                      className="flex-1 p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                      value={dobMonth}
-                      onChange={(e) => setDobMonth(e.target.value)}
-                    >
-                      <option value="">Month</option>
-                      {generateMonthOptions()}
-                    </select>
-                    <select
-                      id="dobDay"
-                      name="dobDay"
-                      required
-                      className="flex-1 p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                      value={dobDay}
-                      onChange={(e) => setDobDay(e.target.value)}
-                    >
-                      <option value="">Day</option>
-                      {generateDayOptions()}
-                    </select>
-                    <select
-                      id="dobYear"
-                      name="dobYear"
-                      required
-                      className="flex-1 p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                      value={dobYear}
-                      onChange={(e) => setDobYear(e.target.value)}
-                    >
-                      <option value="">Year</option>
-                      {generateYearOptions()}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="email" className="text-white text-sm mb-1 font-medium">
-                    Email ID
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
+                    className="flex-1 p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
+                               focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    value={dobMonth}
+                    onChange={(e) => setDobMonth(e.target.value)}
+                  >
+                    <option value="">Month</option>
+                    {generateMonthOptions()}
+                  </select>
+                  <select
+                    id="dobDay"
+                    name="dobDay"
                     required
-                    className="p-3 rounded-lg bg-white text-gray-800 border border-blue-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    placeholder="Enter your email"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="address" className="text-white text-sm mb-1 font-medium">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
+                    className="flex-1 p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
+                               focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    value={dobDay}
+                    onChange={(e) => setDobDay(e.target.value)}
+                  >
+                    <option value="">Day</option>
+                    {generateDayOptions()}
+                  </select>
+                  <select
+                    id="dobYear"
+                    name="dobYear"
                     required
-                    className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
-                    defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
-                    readOnly
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="medicalCode" className="text-white text-sm mb-1 font-medium">
-                    Medical ID
-                  </label>
-                  <input
-                    type="text"
-                    id="medicalCode"
-                    name="medicalCode"
-                    defaultValue="U900312752"
-                    readOnly
-                    className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="phone" className="text-white text-sm mb-1 font-medium">
-                    Phone Number
-                  </label>
-                  <input
-                    type="text"
-                    id="phone"
-                    name="phone"
-                    defaultValue="6152314412"
-                    readOnly
-                    className="p-3 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
-                  />
+                    className="flex-1 p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
+                               focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    value={dobYear}
+                    onChange={(e) => setDobYear(e.target.value)}
+                  >
+                    <option value="">Year</option>
+                    {generateYearOptions()}
+                  </select>
                 </div>
               </div>
 
-              <div className="flex justify-center mt-8">
+              {/* Email */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="email"
+                  className="text-white text-sm mb-1 font-medium"
+                >
+                  Email ID
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  className="p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
+                             focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  placeholder="Enter your email"
+                />
+              </div>
+
+              {/* Address */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="address"
+                  className="text-white text-sm mb-1 font-medium"
+                >
+                  Address
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  required
+                  className="p-2 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                  defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
+                  readOnly
+                />
+              </div>
+
+              {/* Medical ID */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="medicalCode"
+                  className="text-white text-sm mb-1 font-medium"
+                >
+                  Medical ID
+                </label>
+                <input
+                  type="text"
+                  id="medicalCode"
+                  name="medicalCode"
+                  defaultValue="U900312752"
+                  readOnly
+                  className="p-2 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                />
+              </div>
+
+              {/* Phone Number */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="phone"
+                  className="text-white text-sm mb-1 font-medium"
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  defaultValue="6152314412"
+                  readOnly
+                  className="p-2 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                />
+              </div>
+
+              {/* Submit button */}
+              <div className="flex justify-center mt-4">
                 <button
                   type="submit"
-                  className="px-8 py-3 bg-white text-[#1a4b8c] text-base rounded-full shadow-md hover:shadow-lg transition-all transform hover:scale-105 font-bold"
+                  className="px-6 py-2 bg-white text-[#1a4b8c] text-sm 
+                             rounded-full shadow-md hover:shadow-lg 
+                             transition-all transform hover:scale-105 font-bold"
                 >
                   Submit
                 </button>
               </div>
 
-              <div className="mt-6 bg-white p-4 rounded-xl shadow">
+              {/* Notes section */}
+              <div className="mt-4 bg-white p-3 rounded-xl shadow">
                 <p className="font-medium text-red-700 mb-2">Note</p>
-                <ul className="space-y-2 text-gray-700 text-sm">
+                <ul className="space-y-1 text-gray-700 text-xs">
                   {notes.map((note, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <span className="text-blue-600 mt-0.5">•</span>
