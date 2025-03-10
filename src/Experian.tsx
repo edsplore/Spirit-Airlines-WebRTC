@@ -205,7 +205,7 @@ export default function Experian(): React.ReactElement {
 
                 setApiCallData({
                     member_id: [customData.reference_number_try1, customData.reference_number_try2].filter(Boolean),
-                    shipping_address: [customData.address_try1, customData.full_name_try2].filter(Boolean),
+                    shipping_address: [customData.address_try1, customData.address_try2].filter(Boolean),
                     member_name: [customData.full_name_try1, customData.full_name_try2].filter(Boolean),
                     _d_o_b: [customData.DOB_try1, customData.DOB_try2].filter(Boolean),
                     phone: [customData.phone_number_try1, customData.phone_number_try2].filter(Boolean),
