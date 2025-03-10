@@ -155,15 +155,15 @@ export default function Experian(): React.ReactElement {
         console.log("Extracted data from API:", extractedData)
 
         setApiData({
-          name: [extractedData.name, extractedData.name2, extractedData.name3].filter(Boolean),
-          dob: [extractedData.dob, extractedData.dob2, extractedData.dob3].filter(Boolean),
-          email: [extractedData.email, extractedData.email2, extractedData.email3].filter(Boolean),
-          address: [extractedData.address, extractedData.address2, extractedData.address3].filter(Boolean),
-          medicalCode: [extractedData.medicalCode, extractedData.medicalCode2, extractedData.medicalCode3].filter(
+          name: [extractedData.name, extractedData.name2].filter(Boolean),
+          dob: [extractedData.dob, extractedData.dob2].filter(Boolean),
+          email: [extractedData.email, extractedData.email2].filter(Boolean),
+          address: [extractedData.address, extractedData.address2].filter(Boolean),
+          medicalCode: [extractedData.medicalCode, extractedData.medicalCode2].filter(
             Boolean,
           ),
-          phone: [extractedData.phone, extractedData.phone2, extractedData.phone3].filter(Boolean),
-          ssn: [extractedData.ssn, extractedData.ssn2, extractedData.ssn3].filter(Boolean),
+          phone: [extractedData.phone, extractedData.phone2].filter(Boolean),
+          ssn: [extractedData.ssn, extractedData.ssn2].filter(Boolean),
         })
 
         setApiCallData({
@@ -457,7 +457,7 @@ export default function Experian(): React.ReactElement {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_d3ca92c1776826ef142c084251"
+    const agentId = "agent_3e2ad94206b3865925e9004395"
 
     try {
       const registerCallResponse = await registerCall(agentId)
@@ -959,7 +959,7 @@ export default function Experian(): React.ReactElement {
                   </div>
 
                   {/* Scrollable (if needed) content area */}
-                  <div className="overflow-y-auto flex-1 px-4 py-4" id="verification-form-content">
+                  <div className="fixed flex-1 px-4 py-4" id="verification-form-content">
                     <form id="verification-form" onSubmit={handleSubmitDetails} className="space-y-3">
                       <div className="space-y-2">
                         {/* Member Name */}
