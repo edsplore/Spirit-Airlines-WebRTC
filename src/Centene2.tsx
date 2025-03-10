@@ -1070,7 +1070,7 @@ export default function Centene2(): React.ReactElement {
                   id="address"
                   name="address"
                   readOnly
-                  defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
+                  defaultValue="11234, Plainview, Texas, 79072"
                   className="p-2 rounded bg-blue-100 text-gray-800 border border-blue-300
            text-sm"
 
