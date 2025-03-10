@@ -1143,21 +1143,7 @@ export default function Experian(): React.ReactElement {
               </button>
             </div>
      
-
-                 
-
-
-
-            {/* Fixed footer at bottom of popup */}
-            <div className="bg-gray-50 p-6 border-t border-gray-200 rounded-b-2xl flex justify-center">
-              <button
-                type="submit"
-                onClick={handleSubmitDetails}
-                className="px-8 py-3 bg-gradient-to-r from-purple-700 to-purple-900 text-white font-bold rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 text-lg"
-              >
-                Submit
-              </button>
-            </div>
+     
           </div>
         </div>
       )}
