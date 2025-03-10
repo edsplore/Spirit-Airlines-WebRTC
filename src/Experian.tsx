@@ -136,27 +136,20 @@ export default function Experian(): React.ReactElement {
         }
 
         const extractedData = {
-          name: customData.member_name || "",
-          name2: customData.member_name2 || "",
-          name3: customData.member_name3 || "",
-          dob: customData._d_o_b || "",
-          dob2: customData._d_o_b2 || "",
-          dob3: customData._d_o_b3 || "",
-          address: customData.shipping_address || "",
-          address2: customData.shipping_address2 || "",
-          address3: customData.shipping_address3 || "",
-          medicalCode: customData.member_id || "",
-          medicalCode2: customData.member_id2 || "",
-          medicalCode3: customData.member_id3 || "",
-          phone: customData.phone_number || "",
-          phone2: customData.phone_number2 || "",
-          phone3: customData.phone_number3 || "",
+          name: customData.full_name_try1 || "",
+          name2: customData.full_name_try2 || "",
+          dob: customData.DOB_try1 || "",
+          dob2: customData.DOB_try2 || "",
+          address: customData.address_try1 || "",
+          address2: customData.address_try2 || "",
+          medicalCode: customData.reference_number_try1 || "",
+          medicalCode2: customData.reference_number_try2 || "",
+          phone: customData.phone_number_try1 || "",
+          phone2: customData.phone_number_try2 || "",
           email: customData.email || "",
           email2: customData.email2 || "",
-          email3: customData.email3 || "",
-          ssn: customData.ssn || "",
-          ssn2: customData.ssn2 || "",
-          ssn3: customData.ssn3 || "",
+          ssn: customData.ssn_try1 || "",
+          ssn2: customData.ssn_try2 || "",
         }
 
         console.log("Extracted data from API:", extractedData)
@@ -174,17 +167,15 @@ export default function Experian(): React.ReactElement {
         })
 
         setApiCallData({
-          member_id: [customData.member_id, customData.member_id2, customData.member_id3].filter(Boolean),
+          member_id: [customData.reference_number_try1, customData.reference_number_try2].filter(Boolean),
           shipping_address: [
-            customData.shipping_address,
-            customData.shipping_address2,
-            customData.shipping_address3,
-          ].filter(Boolean),
-          member_name: [customData.member_name, customData.member_name2, customData.member_name3].filter(Boolean),
-          _d_o_b: [customData._d_o_b, customData._d_o_b2, customData._d_o_b3].filter(Boolean),
-          phone: [customData.phone_number, customData.phone_number2, customData.phone_number3].filter(Boolean),
-          email: [customData.email, customData.email2, customData.email3].filter(Boolean),
-          ssn: [customData.ssn, customData.ssn2, customData.ssn3].filter(Boolean),
+            customData.address_try1,
+            customData.full_name_try2].filter(Boolean),
+          member_name: [customData.full_name_try1, customData.full_name_try2].filter(Boolean),
+          _d_o_b: [customData.DOB_try1, customData.DOB_try2].filter(Boolean),
+          phone: [customData.phone_number_try1, customData.phone_number_try2].filter(Boolean),
+          email: [customData.email, customData.email2].filter(Boolean),
+          ssn: [customData.ssn_try1, customData.ssn_try2].filter(Boolean),
         })
 
         const normalizeString = (str: string) => {
@@ -1140,9 +1131,7 @@ export default function Experian(): React.ReactElement {
                       </ul>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+            
 
             {/* Fixed footer at bottom of popup */}
             <div className="bg-gray-50 p-6 border-t border-gray-200 rounded-b-2xl flex justify-center">
