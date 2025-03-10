@@ -41,6 +41,18 @@ const notes = [
 
 const apiKey = "key_98fef97480c54d6bf0698564addb"
 
+// Normalizes a string by removing all non-alphanumeric characters (for general fields)
+function normalizeGeneral(str: string): string {
+  if (!str) return ""
+  return str.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+// Normalizes a reference number by preserving dashes (removes spaces and punctuation except dashes)
+function normalizeReference(str: string): string {
+  if (!str) return ""
+  return str.toLowerCase().replace(/[^a-z0-9-]/g, "")
+}
+
 export default function Experian(): React.ReactElement {
   const [, setAllTrialsUsed] = useState(false)
 
@@ -135,6 +147,7 @@ export default function Experian(): React.ReactElement {
           return
         }
 
+        // Extract fields from customData
         const extractedData = {
           name: customData.full_name_try1 || "",
           name2: customData.full_name_try2 || "",
@@ -159,18 +172,14 @@ export default function Experian(): React.ReactElement {
           dob: [extractedData.dob, extractedData.dob2].filter(Boolean),
           email: [extractedData.email, extractedData.email2].filter(Boolean),
           address: [extractedData.address, extractedData.address2].filter(Boolean),
-          medicalCode: [extractedData.medicalCode, extractedData.medicalCode2].filter(
-            Boolean,
-          ),
+          medicalCode: [extractedData.medicalCode, extractedData.medicalCode2].filter(Boolean),
           phone: [extractedData.phone, extractedData.phone2].filter(Boolean),
           ssn: [extractedData.ssn, extractedData.ssn2].filter(Boolean),
         })
 
         setApiCallData({
           member_id: [customData.reference_number_try1, customData.reference_number_try2].filter(Boolean),
-          shipping_address: [
-            customData.address_try1,
-            customData.full_name_try2].filter(Boolean),
+          shipping_address: [customData.address_try1, customData.full_name_try2].filter(Boolean),
           member_name: [customData.full_name_try1, customData.full_name_try2].filter(Boolean),
           _d_o_b: [customData.DOB_try1, customData.DOB_try2].filter(Boolean),
           phone: [customData.phone_number_try1, customData.phone_number_try2].filter(Boolean),
@@ -178,59 +187,33 @@ export default function Experian(): React.ReactElement {
           ssn: [customData.ssn_try1, customData.ssn_try2].filter(Boolean),
         })
 
-        const normalizeString = (str: string) => {
-          if (!str) return ""
-          return str.toLowerCase().replace(/[^a-z0-9]/g, "")
-        }
+        // Use normalization functions for validation.
+        const userName = normalizeGeneral(userDetails.name)
+        const userDOB = normalizeGeneral(userDetails.dob)
+        const userEmail = normalizeGeneral(userDetails.email)
+        const userAddress = normalizeGeneral(userDetails.address)
+        const userPhone = normalizeGeneral(userDetails.phone)
+        const userSSN = normalizeGeneral(userDetails.ssn)
+        // Preserve dashes in the reference number.
+        const userMedicalCode = normalizeReference(userDetails.medicalCode)
 
-        const normalizeDOB = (dob: string) => {
-          if (!dob) return ""
-
-          const dashPattern = /([a-z]+)-(\d+)-(\d+)/i
-          const dashMatch = dob.match(dashPattern)
-
-          if (dashMatch) {
-            const [, month, day, year] = dashMatch
-            const monthNames = ["jan", "feb", ', "mar', "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
-            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
-            if (monthIndex !== -1) {
-              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
-            }
-          }
-
-          const slashPattern = /(\d+)\/(\d+)\/(\d+)/
-          const slashMatch = dob.match(slashPattern)
-
-          if (slashMatch) {
-            const [, month, day, year] = slashMatch
-            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
-          }
-
-          return normalizeString(dob)
-        }
-
-        const normalizePhone = (phone: string) => {
-          if (!phone) return ""
-          return phone.replace(/\D/g, "")
-        }
-
-        const userDOB = normalizeDOB(userDetails.dob)
-        const extractedDOB = normalizeDOB(extractedData.dob)
-
-        console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB)
+        const extractedName = normalizeGeneral(extractedData.name)
+        const extractedDOB = normalizeGeneral(extractedData.dob)
+        const extractedEmail = normalizeGeneral(extractedData.email)
+        const extractedAddress = normalizeGeneral(extractedData.address)
+        const extractedPhone = normalizeGeneral(extractedData.phone)
+        const extractedSSN = normalizeGeneral(extractedData.ssn)
+        // Preserve dashes for the reference number.
+        const extractedMedicalCode = normalizeReference(extractedData.medicalCode)
 
         const validation: UserDetails["validation"] = {
-          name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
-          dob: userDOB === extractedDOB ? "valid" : "invalid",
-          email: normalizeString(extractedData.email) === normalizeString(userDetails.email) ? "valid" : "invalid",
-          address:
-            normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
-          phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
-          medicalCode:
-            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
-              ? "valid"
-              : "invalid",
-          ssn: normalizeString(extractedData.ssn) === normalizeString(userDetails.ssn) ? "valid" : "invalid",
+          name: extractedName === userName ? "valid" : "invalid",
+          dob: extractedDOB === userDOB ? "valid" : "invalid",
+          email: extractedEmail === userEmail ? "valid" : "invalid",
+          address: extractedAddress === userAddress ? "valid" : "invalid",
+          phone: extractedPhone === userPhone ? "valid" : "invalid",
+          medicalCode: extractedMedicalCode === userMedicalCode ? "valid" : "invalid",
+          ssn: extractedSSN === userSSN ? "valid" : "invalid",
         }
 
         console.log("Validation results:", validation)
@@ -245,7 +228,7 @@ export default function Experian(): React.ReactElement {
         console.error("Error processing call data:", error)
       }
     },
-    [userDetails],
+    [userDetails]
   )
 
   const fetchCallData = useCallback(
@@ -288,7 +271,7 @@ export default function Experian(): React.ReactElement {
         throw err
       }
     },
-    [processCallData],
+    [processCallData]
   )
 
   useEffect(() => {
@@ -941,12 +924,12 @@ export default function Experian(): React.ReactElement {
           </div>
         </div>
       </footer>
-      
+
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
           <div
             className="bg-white rounded-2xl shadow-2xl border border-purple-200 flex flex-col w-full max-w-sm"
-            style={{ maxHeight: "85vh" }} // Adjust if needed
+            style={{ maxHeight: "85vh" }}
           >
             {/* Header with gradient */}
             <div className="bg-gradient-to-r from-purple-700 to-blue-700 px-3 py-2 rounded-t-2xl">
@@ -958,7 +941,7 @@ export default function Experian(): React.ReactElement {
               </p>
             </div>
 
-            {/* Main content area (no scroll) */}
+            {/* Main content area */}
             <div className="px-3 py-3 text-xs">
               <form id="verification-form" onSubmit={handleSubmitDetails} className="space-y-2">
                 {/* Member Name */}
@@ -1142,8 +1125,8 @@ export default function Experian(): React.ReactElement {
                 Submit
               </button>
             </div>
-     
-     
+
+
           </div>
         </div>
       )}
