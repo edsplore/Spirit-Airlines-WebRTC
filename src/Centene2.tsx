@@ -34,10 +34,9 @@ interface UserDetails {
 const webClient = new RetellWebClient()
 
 const notes = [
-  "The platform is not integrated into the company systems, therefore asking for specific details for authentication and verification",
-  <span key="1">Please enter the name that the Virtual Assistant wants to address you as.</span>,
-  "Upon authentication request by Virtual Assistant please mention confirmation code # and full name as shown on the top right side of the bar for reference upon this form submission.",
-  "Phone# and Email id is required to send instant messages and confirmation",
+  "The platform isn't integrated with company systems, so it requires authentication details.",
+  "Enter the name the Virtual Assistant should use.",
+  "An email ID is needed for instant messages and confirmation.",
 ]
 
 const apiKey = "key_98fef97480c54d6bf0698564addb"
@@ -790,7 +789,7 @@ export default function Centene2(): React.ReactElement {
       {/* Verification modal with improved styling */}
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] rounded-3xl p-6 w-full max-w-xl mx-auto shadow-2xl overflow-y-auto max-h-[90vh] animate-fadeIn">
+          <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] rounded-3xl p-6 w-full max-w-xl mx-auto shadow-2xl animate-fadeIn">
             <h2 className="text-xl font-semibold text-white mb-6 text-center">
               Customer details required for verification and authentication
             </h2>
