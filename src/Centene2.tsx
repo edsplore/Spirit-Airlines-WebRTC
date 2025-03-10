@@ -324,7 +324,9 @@ export default function Centene2(): React.ReactElement {
         console.error("Error processing call data:", error)
       }
     },
-    [userDetails],
+// eslint-disable-next-line react-hooks/exhaustive-deps
+    [userDetails],    
+
   )
 
   // Now define fetchCallData after processCallData
