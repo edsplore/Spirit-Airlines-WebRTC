@@ -715,7 +715,7 @@ export default function Experian(): React.ReactElement {
                       { label: "Email ID", key: "email", apiKey: "email" },
                     ].map((param, index) => (
                       <React.Fragment key={param.key}>
-                        {[0, 1, 2].map((row) => (
+                        {(param.key === "email" ? [0, 1, 2] : [0, 1]).map((row) => (
                           <tr
                             key={`${param.key}-${row}`}
                             className={`${
@@ -726,7 +726,7 @@ export default function Experian(): React.ReactElement {
                               <>
                                 <td
                                   className="p-4 font-bold text-[#681b75] border-r border-gray-200 group-hover:text-purple-900 transition-colors duration-200 relative"
-                                  rowSpan={3}
+                                  rowSpan={param.key === "email" ? 3 : 2}
                                   style={{
                                     background: "linear-gradient(to right, rgba(104, 27, 117, 0.05), transparent)",
                                   }}
@@ -739,7 +739,7 @@ export default function Experian(): React.ReactElement {
                                 </td>
                                 <td
                                   className="p-4 font-medium text-gray-700 border-r border-gray-200 group-hover:bg-blue-50 transition-all duration-300"
-                                  rowSpan={3}
+                                  rowSpan={param.key === "email" ? 3 : 2}
                                   style={{
                                     boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.03)",
                                   }}
