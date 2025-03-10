@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useEffect, useState, useRef, useCallback } from "react"
-import { Mic, RefreshCcw, CheckCircle, XCircle } from 'lucide-react'
+import { Mic, RefreshCcw, CheckCircle, XCircle } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 import { addDays, format } from "date-fns"
 
@@ -41,16 +41,42 @@ const notes = [
 
 const apiKey = "key_98fef97480c54d6bf0698564addb"
 
-// Normalizes a string by removing all non-alphanumeric characters (for general fields)
+// Improve the normalization functions to be more consistent and handle edge cases
+// Replace the existing normalization functions with these enhanced versions:
+
 function normalizeGeneral(str: string): string {
   if (!str) return ""
+  // Convert to lowercase and remove all non-alphanumeric characters
   return str.toLowerCase().replace(/[^a-z0-9]/g, "")
 }
 
-// Normalizes a reference number by preserving dashes (removes spaces and punctuation except dashes)
 function normalizeReference(str: string): string {
   if (!str) return ""
+  // Preserve dashes but remove all other non-alphanumeric characters
   return str.toLowerCase().replace(/[^a-z0-9-]/g, "")
+}
+
+// Fix the normalizePhone function to ensure consistent formatting
+// Replace the existing normalizePhone function with this improved version:
+function normalizePhone(str: string): string {
+  if (!str) return ""
+  // Remove all non-numeric characters and ensure we're working with just the digits
+  const digitsOnly = str.replace(/\D/g, "")
+
+  // Handle US phone numbers with or without country code
+  // If it starts with 1 and has 11 digits, remove the leading 1
+  if (digitsOnly.length === 11 && digitsOnly.startsWith("1")) {
+    return digitsOnly.substring(1)
+  }
+
+  // Return just the digits
+  return digitsOnly
+}
+
+function normalizeEmail(str: string): string {
+  if (!str) return ""
+  // For emails, we want to keep the @ and . characters
+  return str.toLowerCase().trim()
 }
 
 export default function Experian(): React.ReactElement {
@@ -187,23 +213,31 @@ export default function Experian(): React.ReactElement {
           ssn: [customData.ssn_try1, customData.ssn_try2].filter(Boolean),
         })
 
-        // Use normalization functions for validation.
+        // Update the processCallData function to use the appropriate normalization for each field type
+        // Replace the validation section in processCallData with this improved version:
+
+        // Use appropriate normalization functions for each field type
         const userName = normalizeGeneral(userDetails.name)
         const userDOB = normalizeGeneral(userDetails.dob)
-        const userEmail = normalizeGeneral(userDetails.email)
+        const userEmail = normalizeEmail(userDetails.email)
         const userAddress = normalizeGeneral(userDetails.address)
-        const userPhone = normalizeGeneral(userDetails.phone)
+        // Update the validation section in processCallData to use more robust comparison
+        // In the processCallData function, replace the phone validation line with:
+        const userPhone = normalizePhone(userDetails.phone)
+        const extractedPhone = normalizePhone(extractedData.phone)
+        console.log("Normalized phone comparison:", { userPhone, extractedPhone })
+
         const userSSN = normalizeGeneral(userDetails.ssn)
-        // Preserve dashes in the reference number.
+        // Preserve dashes in the reference number
         const userMedicalCode = normalizeReference(userDetails.medicalCode)
 
         const extractedName = normalizeGeneral(extractedData.name)
         const extractedDOB = normalizeGeneral(extractedData.dob)
-        const extractedEmail = normalizeGeneral(extractedData.email)
+        const extractedEmail = normalizeEmail(extractedData.email)
         const extractedAddress = normalizeGeneral(extractedData.address)
-        const extractedPhone = normalizeGeneral(extractedData.phone)
+
         const extractedSSN = normalizeGeneral(extractedData.ssn)
-        // Preserve dashes for the reference number.
+        // Preserve dashes for the reference number
         const extractedMedicalCode = normalizeReference(extractedData.medicalCode)
 
         const validation: UserDetails["validation"] = {
@@ -211,7 +245,7 @@ export default function Experian(): React.ReactElement {
           dob: extractedDOB === userDOB ? "valid" : "invalid",
           email: extractedEmail === userEmail ? "valid" : "invalid",
           address: extractedAddress === userAddress ? "valid" : "invalid",
-          phone: extractedPhone === userPhone ? "valid" : "invalid",
+          phone: userPhone === extractedPhone ? "valid" : "invalid",
           medicalCode: extractedMedicalCode === userMedicalCode ? "valid" : "invalid",
           ssn: extractedSSN === userSSN ? "valid" : "invalid",
         }
@@ -228,7 +262,7 @@ export default function Experian(): React.ReactElement {
         console.error("Error processing call data:", error)
       }
     },
-    [userDetails]
+    [userDetails],
   )
 
   const fetchCallData = useCallback(
@@ -271,7 +305,7 @@ export default function Experian(): React.ReactElement {
         throw err
       }
     },
-    [processCallData]
+    [processCallData],
   )
 
   useEffect(() => {
@@ -573,12 +607,15 @@ export default function Experian(): React.ReactElement {
     ))
   }
 
+  // Add improved responsive styling to the main container and table
+  // Replace the return statement with this enhanced responsive version:
+
   return (
     <div className="min-h-screen bg-white relative flex flex-col">
       <nav className="bg-white w-full border-b border-gray-200">
         <div className="flex items-center justify-between px-4 md:px-20 py-2">
           <img src="/experian_logo.svg" alt="Experian" className="h-8" />
-          <div className="flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-8">
             <span className="cursor-pointer text-gray-700 text-sm font-medium">Bureau Membership</span>
             <div className="relative group">
               <span className="cursor-pointer text-gray-700 text-sm font-medium flex items-center">
@@ -611,30 +648,49 @@ export default function Experian(): React.ReactElement {
               </svg>
             </div>
           </div>
+          <div className="md:hidden">
+            <button className="text-gray-700">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 
       <div className="relative w-full">
-        <img src="/experian_hero.png" alt="Centene commitment" className="w-full h-[300px] object-cover" />
+        <img src="/experian_hero.png" alt="Centene commitment" className="w-full h-[200px] md:h-[300px] object-cover" />
       </div>
 
       <div className="flex flex-col-reverse lg:flex-row gap-6 px-4 lg:px-8 flex-grow mt-6">
         <div className="w-full lg:w-3/4">
-          <div className="bg-white p-6 rounded-xl shadow-xl border border-gray-200">
-            <div className="flex justify-between items-center mb-6">
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-xl border border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
               <h2 className="text-xl font-bold text-[#2E5388]">Customer Identity Verification (CIV) Status</h2>
               {allColumnsFilled && (
                 <button
                   onClick={reopenVerificationForm}
-                  className="flex items-center text-white bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2 rounded-full transition-all duration-200 hover:shadow-lg hover:scale-105"
+                  className="flex items-center text-white bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2 rounded-full transition-all duration-200 hover:shadow-lg hover:scale-105 w-full sm:w-auto justify-center"
                 >
                   <RefreshCcw className="w-4 h-4 mr-2" />
                   Refresh
                 </button>
               )}
             </div>
-            <div className="overflow-x-auto">
-              <div className="rounded-xl overflow-hidden border border-gray-200 shadow-[0_0_20px_rgba(0,0,0,0.08)]">
+            <div className="overflow-x-auto -mx-4 px-4">
+              <div className="rounded-xl overflow-hidden border border-gray-200 shadow-[0_0_20px_rgba(0,0,0,0.08)] min-w-[768px]">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gradient-to-r from-[#2E5388] to-[#1E3A6D]">
@@ -918,7 +974,7 @@ export default function Experian(): React.ReactElement {
         </div>
         <div className="container mx-auto px-4 mt-4">
           <div className="h-1 bg-gradient-to-r from-purple-600 via-blue-500 to-blue-700 w-full"></div>
-          <div className="flex justify-between items-center mt-3 text-xs text-gray-500">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-3 text-xs text-gray-500 gap-2">
             <p>© {new Date().getFullYear()} Experian. All rights reserved.</p>
             <p>Terms of Service | Privacy Policy | Cookie Preferences</p>
           </div>
@@ -926,23 +982,21 @@ export default function Experian(): React.ReactElement {
       </footer>
 
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
           <div
             className="bg-white rounded-2xl shadow-2xl border border-purple-200 flex flex-col w-full max-w-sm"
             style={{ maxHeight: "85vh" }}
           >
             {/* Header with gradient */}
             <div className="bg-gradient-to-r from-purple-700 to-blue-700 px-3 py-2 rounded-t-2xl">
-              <h2 className="text-xs sm:text-sm font-bold text-white mb-1">
-                Customer Verification Portal
-              </h2>
+              <h2 className="text-xs sm:text-sm font-bold text-white mb-1">Customer Verification Portal</h2>
               <p className="text-white/80 text-[10px] sm:text-xs">
                 Please provide your details for identity verification
               </p>
             </div>
 
             {/* Main content area */}
-            <div className="px-3 py-3 text-xs">
+            <div className="px-3 py-3 text-xs overflow-y-auto">
               <form id="verification-form" onSubmit={handleSubmitDetails} className="space-y-2">
                 {/* Member Name */}
                 <div className="flex flex-col">
@@ -955,8 +1009,8 @@ export default function Experian(): React.ReactElement {
                     name="name"
                     required
                     className="px-2 py-1 rounded bg-gray-50 border border-gray-200 
-                               focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
-                               outline-none transition-all text-gray-800 text-[11px]"
+                             focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
+                             outline-none transition-all text-gray-800 text-[11px]"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -972,8 +1026,8 @@ export default function Experian(): React.ReactElement {
                       name="dobMonth"
                       required
                       className="px-2 py-1 rounded bg-gray-50 border border-gray-200
-                                 focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
-                                 outline-none transition-all text-gray-800 text-[11px]"
+                               focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
+                               outline-none transition-all text-gray-800 text-[11px]"
                       value={dobMonth}
                       onChange={(e) => setDobMonth(e.target.value)}
                     >
@@ -985,8 +1039,8 @@ export default function Experian(): React.ReactElement {
                       name="dobDay"
                       required
                       className="px-2 py-1 rounded bg-gray-50 border border-gray-200
-                                 focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
-                                 outline-none transition-all text-gray-800 text-[11px]"
+                               focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
+                               outline-none transition-all text-gray-800 text-[11px]"
                       value={dobDay}
                       onChange={(e) => setDobDay(e.target.value)}
                     >
@@ -998,8 +1052,8 @@ export default function Experian(): React.ReactElement {
                       name="dobYear"
                       required
                       className="px-2 py-1 rounded bg-gray-50 border border-gray-200
-                                 focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
-                                 outline-none transition-all text-gray-800 text-[11px]"
+                               focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
+                               outline-none transition-all text-gray-800 text-[11px]"
                       value={dobYear}
                       onChange={(e) => setDobYear(e.target.value)}
                     >
@@ -1020,8 +1074,8 @@ export default function Experian(): React.ReactElement {
                     name="email"
                     required
                     className="px-2 py-1 rounded bg-gray-50 border border-gray-200 
-                               focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
-                               outline-none transition-all text-gray-800 text-[11px]"
+                             focus:border-purple-500 focus:ring-1 focus:ring-purple-200 
+                             outline-none transition-all text-gray-800 text-[11px]"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -1038,7 +1092,7 @@ export default function Experian(): React.ReactElement {
                     defaultValue="99 BE-99-9E09"
                     readOnly
                     className="px-2 py-1 rounded bg-gray-100 border border-gray-200 
-                               text-gray-500 cursor-not-allowed text-[11px]"
+                             text-gray-500 cursor-not-allowed text-[11px]"
                   />
                 </div>
 
@@ -1054,7 +1108,7 @@ export default function Experian(): React.ReactElement {
                     defaultValue="111223333"
                     readOnly
                     className="px-2 py-1 rounded bg-gray-100 border border-gray-200 
-                               text-gray-500 cursor-not-allowed text-[11px]"
+                             text-gray-500 cursor-not-allowed text-[11px]"
                   />
                 </div>
 
@@ -1070,7 +1124,7 @@ export default function Experian(): React.ReactElement {
                     defaultValue="2707111234"
                     readOnly
                     className="px-2 py-1 rounded bg-gray-100 border border-gray-200 
-                               text-gray-500 cursor-not-allowed text-[11px]"
+                             text-gray-500 cursor-not-allowed text-[11px]"
                   />
                 </div>
 
@@ -1087,7 +1141,7 @@ export default function Experian(): React.ReactElement {
                     defaultValue="116 Dogwood Rd, Lancaster, Kentucky(KY), 40444"
                     readOnly
                     className="px-2 py-1 rounded bg-gray-100 border border-gray-200 
-                               text-gray-500 cursor-not-allowed text-[11px]"
+                             text-gray-500 cursor-not-allowed text-[11px]"
                   />
                 </div>
               </form>
@@ -1119,14 +1173,12 @@ export default function Experian(): React.ReactElement {
                 type="submit"
                 onClick={handleSubmitDetails}
                 className="px-4 py-2 bg-gradient-to-r from-purple-700 to-purple-900 text-white 
-                           font-bold rounded-full hover:shadow-lg transform hover:scale-105 
-                           transition-all duration-200 text-[11px]"
+                         font-bold rounded-full hover:shadow-lg transform hover:scale-105 
+                         transition-all duration-200 text-[11px]"
               >
                 Submit
               </button>
             </div>
-
-
           </div>
         </div>
       )}
@@ -1138,3 +1190,4 @@ export default function Experian(): React.ReactElement {
     </div>
   )
 }
+

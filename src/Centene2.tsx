@@ -190,34 +190,72 @@ export default function Centene2(): React.ReactElement {
         // Improved normalization functions
         const normalizeString = (str: string) => {
           if (!str) return ""
-          return str.toLowerCase().replace(/[^a-z0-9]/g, "")
+          // Trim whitespace and convert to lowercase before removing non-alphanumeric characters
+          return str
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "")
         }
+
+        // After the normalization functions, add this debugging code before the validation:
+        console.log("Medical ID comparison:")
+        console.log("User medical ID:", userDetails.medicalCode, "->", normalizeString(userDetails.medicalCode))
+        console.log(
+          "Extracted medical ID:",
+          extractedData.medicalCode,
+          "->",
+          normalizeString(extractedData.medicalCode),
+        )
 
         const normalizeDOB = (dob: string) => {
           if (!dob) return ""
 
-          // Try to match "Month-Day-Year" format (e.g., "Jan-01-1990")
+          // Try to extract date components from various formats
+          let day, month, year
+
+          // Format: "Apr-04-2020" or "April-04-2020"
           const dashPattern = /([a-z]+)-(\d+)-(\d+)/i
           const dashMatch = dob.match(dashPattern)
 
-          if (dashMatch) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const [_, month, day, year] = dashMatch
-            const monthNames = ["jan", "feb", ', "mar', "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
-            const monthIndex = monthNames.indexOf(month.toLowerCase().substring(0, 3))
-            if (monthIndex !== -1) {
-              return `${(monthIndex + 1).toString().padStart(2, "0")}${day.padStart(2, "0")}${year}`
-            }
-          }
+          // Format: "April 04, 2020"
+          const longPattern = /([a-z]+)\s+(\d+),?\s+(\d+)/i
+          const longMatch = dob.match(longPattern)
 
-          // Try to match "Month/Day/Year" format (e.g., "01/01/1990")
+          // Format: "01/04/2020" or "1/4/2020"
           const slashPattern = /(\d+)\/(\d+)\/(\d+)/
           const slashMatch = dob.match(slashPattern)
 
+          if (dashMatch) {
+            const monthStr = dashMatch[1].toLowerCase().substring(0, 3)
+            const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+            const monthIndex = monthNames.indexOf(monthStr)
+
+            if (monthIndex !== -1) {
+              month = (monthIndex + 1).toString().padStart(2, "0")
+              day = dashMatch[2].padStart(2, "0")
+              year = dashMatch[3]
+              return `${month}${day}${year}`
+            }
+          }
+
+          if (longMatch) {
+            const monthStr = longMatch[1].toLowerCase().substring(0, 3)
+            const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+            const monthIndex = monthNames.indexOf(monthStr)
+
+            if (monthIndex !== -1) {
+              month = (monthIndex + 1).toString().padStart(2, "0")
+              day = longMatch[2].padStart(2, "0")
+              year = longMatch[3]
+              return `${month}${day}${year}`
+            }
+          }
+
           if (slashMatch) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const [_, month, day, year] = slashMatch
-            return `${month.padStart(2, "0")}${day.padStart(2, "0")}${year}`
+            month = slashMatch[1].padStart(2, "0")
+            day = slashMatch[2].padStart(2, "0")
+            year = slashMatch[3]
+            return `${month}${day}${year}`
           }
 
           // If no pattern matches, just normalize the string
@@ -236,6 +274,7 @@ export default function Centene2(): React.ReactElement {
 
         console.log("Normalized DOB comparison:", userDOB, "vs", extractedDOB)
 
+        // Then update the validation for medicalCode to be more lenient:
         const validation: UserDetails["validation"] = {
           name: normalizeString(extractedData.name) === normalizeString(userDetails.name) ? "valid" : "invalid",
           dob: userDOB === extractedDOB ? "valid" : "invalid",
@@ -243,10 +282,22 @@ export default function Centene2(): React.ReactElement {
           address:
             normalizeString(extractedData.address) === normalizeString(userDetails.address) ? "valid" : "invalid",
           phone: normalizePhone(extractedData.phone) === normalizePhone(userDetails.phone) ? "valid" : "invalid",
-          medicalCode:
-            normalizeString(extractedData.medicalCode) === normalizeString(userDetails.medicalCode)
-              ? "valid"
-              : "invalid",
+          // More lenient comparison for medical ID - check if one contains the other after normalization
+          medicalCode: (() => {
+            const normalizedUser = normalizeString(userDetails.medicalCode)
+            const normalizedExtracted = normalizeString(extractedData.medicalCode)
+
+            // Check exact match first
+            if (normalizedUser === normalizedExtracted) return "valid"
+
+            // If not exact match, check if one contains the other (for partial matches)
+            if (normalizedUser.includes(normalizedExtracted) || normalizedExtracted.includes(normalizedUser)) {
+              console.log("Partial match found for medical ID")
+              return "valid"
+            }
+
+            return "invalid"
+          })(),
         }
 
         console.log("Validation results:", validation)
@@ -662,8 +713,9 @@ export default function Centene2(): React.ReactElement {
               className="group flex flex-col items-center justify-center transform transition-all hover:scale-105"
             >
               <div
-                className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
-                  }`}
+                className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${
+                  callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
+                }`}
               >
                 <Mic className={`w-12 h-12 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
               </div>
@@ -733,10 +785,11 @@ export default function Centene2(): React.ReactElement {
                           <td className="py-3 px-4">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                                  }`}
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
                               >
                                 {userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid"
                                   ? "Valid"
@@ -758,10 +811,11 @@ export default function Centene2(): React.ReactElement {
                     <td className="py-3 px-4">
                       {apiCallData.email[0] && (
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${userDetails.validation.email === "valid"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                            }`}
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            userDetails.validation.email === "valid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
                         >
                           {userDetails.validation.email === "valid" ? "Valid" : "Invalid"}
                         </span>
@@ -776,7 +830,10 @@ export default function Centene2(): React.ReactElement {
       </div>
 
       {/* Footer with styled gradient */}
-      <div className="py-4 mt-auto bg-cover bg-center" style={{ backgroundImage: "url('/Centene_Footer.png')", height: '8rem' }}>
+      <div
+        className="py-4 mt-auto bg-cover bg-center"
+        style={{ backgroundImage: "url('/Centene_Footer.png')", height: "8rem" }}
+      >
         <div className="container mx-auto px-4 text-right">
           <p className="text-[#1a4b8c] font-bold">Centene Headquarters:</p>
           <p className="text-[#2E5388]">Centene Corporation, Centene Plaza,</p>
@@ -784,21 +841,20 @@ export default function Centene2(): React.ReactElement {
         </div>
       </div>
 
-
       {/* Verification modal with reduced spacing for smaller screens */}
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 backdrop-blur-sm">
-          <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] 
+          <div
+            className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] 
                           rounded-xl p-3 w-full max-w-sm mx-auto 
-                          shadow-2xl animate-fadeIn">
-
+                          shadow-2xl animate-fadeIn"
+          >
             {/* Title */}
             <h2 className="text-sm font-semibold text-white mb-2 text-center">
               Customer details required for verification and authentication
             </h2>
 
             <form onSubmit={handleSubmitDetails} className="space-y-2">
-
               {/* Member Name */}
               <div className="flex flex-col">
                 <label htmlFor="name" className="text-white text-xs mb-0.5 font-medium">
