@@ -184,6 +184,9 @@ export default function Experian(): React.ReactElement {
         setAllTrialsUsed(false)
     }, [])
 
+    // ------------------------
+    //  CHANGE BELOW (MINIMAL)
+    // ------------------------
     const processCallData = useCallback(
         (callData: any) => {
             try {
@@ -237,41 +240,62 @@ export default function Experian(): React.ReactElement {
                     ssn: [customData.ssn_try1, customData.ssn_try2].filter(Boolean),
                 })
 
-                // Update the processCallData function to use the appropriate normalization for each field type
-                // Replace the validation section in processCallData with this improved version:
-
-                // Use appropriate normalization functions for each field type
+                // Normalize user-provided data
                 const userName = normalizeGeneral(userDetails.name)
                 const userDOB = normalizeDOB(userDetails.dob)
                 const userEmail = normalizeEmail(userDetails.email)
                 const userAddress = normalizeGeneral(userDetails.address)
-                // Update the validation section in processCallData to use more robust comparison
-                // In the processCallData function, replace the phone validation line with:
                 const userPhone = normalizePhone(userDetails.phone)
-                const extractedPhone = normalizePhone(extractedData.phone)
-                console.log("Normalized phone comparison:", { userPhone, extractedPhone })
-
                 const userSSN = normalizeGeneral(userDetails.ssn)
-                // Preserve dashes in the reference number
                 const userMedicalCode = normalizeReference(userDetails.medicalCode)
 
-                const extractedName = normalizeGeneral(extractedData.name)
-                const extractedDOB = normalizeDOB(extractedData.dob)
-                const extractedEmail = normalizeEmail(extractedData.email)
-                const extractedAddress = normalizeGeneral(extractedData.address)
+                // Normalize extracted attempts
+                const extractedName1 = normalizeGeneral(extractedData.name)
+                const extractedName2 = normalizeGeneral(extractedData.name2)
+                const extractedDOB1 = normalizeDOB(extractedData.dob)
+                const extractedDOB2 = normalizeDOB(extractedData.dob2)
+                const extractedEmail1 = normalizeEmail(extractedData.email)
+                const extractedEmail2 = normalizeEmail(extractedData.email2)
+                const extractedAddress1 = normalizeGeneral(extractedData.address)
+                const extractedAddress2 = normalizeGeneral(extractedData.address2)
+                const extractedPhone1 = normalizePhone(extractedData.phone)
+                const extractedPhone2 = normalizePhone(extractedData.phone2)
+                const extractedSSN1 = normalizeGeneral(extractedData.ssn)
+                const extractedSSN2 = normalizeGeneral(extractedData.ssn2)
+                const extractedMedicalCode1 = normalizeReference(extractedData.medicalCode)
+                const extractedMedicalCode2 = normalizeReference(extractedData.medicalCode2)
 
-                const extractedSSN = normalizeGeneral(extractedData.ssn)
-                // Preserve dashes for the reference number
-                const extractedMedicalCode = normalizeReference(extractedData.medicalCode)
-
+                // Compare each field, marking valid if EITHER attempt matches
                 const validation: UserDetails["validation"] = {
-                    name: extractedName === userName ? "valid" : "invalid",
-                    dob: extractedDOB === userDOB ? "valid" : "invalid",
-                    email: extractedEmail === userEmail ? "valid" : "invalid",
-                    address: extractedAddress === userAddress ? "valid" : "invalid",
-                    phone: userPhone === extractedPhone ? "valid" : "invalid",
-                    medicalCode: extractedMedicalCode === userMedicalCode ? "valid" : "invalid",
-                    ssn: extractedSSN === userSSN ? "valid" : "invalid",
+                    name:
+                        extractedName1 === userName || extractedName2 === userName
+                            ? "valid"
+                            : "invalid",
+                    dob:
+                        extractedDOB1 === userDOB || extractedDOB2 === userDOB
+                            ? "valid"
+                            : "invalid",
+                    email:
+                        extractedEmail1 === userEmail || extractedEmail2 === userEmail
+                            ? "valid"
+                            : "invalid",
+                    address:
+                        extractedAddress1 === userAddress || extractedAddress2 === userAddress
+                            ? "valid"
+                            : "invalid",
+                    phone:
+                        extractedPhone1 === userPhone || extractedPhone2 === userPhone
+                            ? "valid"
+                            : "invalid",
+                    medicalCode:
+                        extractedMedicalCode1 === userMedicalCode ||
+                        extractedMedicalCode2 === userMedicalCode
+                            ? "valid"
+                            : "invalid",
+                    ssn:
+                        extractedSSN1 === userSSN || extractedSSN2 === userSSN
+                            ? "valid"
+                            : "invalid",
                 }
 
                 console.log("Validation results:", validation)
@@ -288,6 +312,9 @@ export default function Experian(): React.ReactElement {
         },
         [userDetails],
     )
+    // -----------------------
+    //  END OF SINGLE CHANGE
+    // -----------------------
 
     const fetchCallData = useCallback(
         async (callId: string) => {
@@ -637,9 +664,6 @@ export default function Experian(): React.ReactElement {
         ))
     }
 
-    // Add improved responsive styling to the main container and table
-    // Replace the return statement with this enhanced responsive version:
-
     return (
         <div className="min-h-screen bg-white relative flex flex-col">
             <nav className="bg-white w-full border-b border-gray-200">
@@ -748,8 +772,9 @@ export default function Experian(): React.ReactElement {
                                                 {(param.key === "email" ? [0, 1, 2] : [0, 1]).map((row) => (
                                                     <tr
                                                         key={`${param.key}-${row}`}
-                                                        className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                                            } hover:bg-blue-100/70 transition-all duration-300 group relative`}
+                                                        className={`${
+                                                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                                        } hover:bg-blue-100/70 transition-all duration-300 group relative`}
                                                     >
                                                         {row === 0 && (
                                                             <>
@@ -757,7 +782,8 @@ export default function Experian(): React.ReactElement {
                                                                     className="p-4 font-bold text-[#681b75] border-r border-gray-200 group-hover:text-purple-900 transition-colors duration-200 relative"
                                                                     rowSpan={param.key === "email" ? 3 : 2}
                                                                     style={{
-                                                                        background: "linear-gradient(to right, rgba(104, 27, 117, 0.05), transparent)",
+                                                                        background:
+                                                                            "linear-gradient(to right, rgba(104, 27, 117, 0.05), transparent)",
                                                                     }}
                                                                 >
                                                                     <div className="flex items-center">
@@ -794,21 +820,24 @@ export default function Experian(): React.ReactElement {
                                                         </td>
                                                         <td className="p-4 group-hover:bg-blue-50 transition-all duration-300">
                                                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] &&
-                                                                (userDetails.validation[param.key as keyof UserDetails["validation"]] === "valid" ? (
-                                                                    <div className="flex items-center justify-center">
-                                                                        <span className="text-green-600 font-medium flex items-center bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-full w-fit shadow-sm border border-green-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-green-100 group-hover:to-green-200 group-hover:scale-110">
-                                                                            <CheckCircle className="h-5 w-5 mr-2" />
-                                                                            Valid
-                                                                        </span>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="flex items-center justify-center">
-                                                                        <span className="text-red-600 font-medium flex items-center bg-gradient-to-r from-red-50 to-red-100 px-4 py-2 rounded-full w-fit shadow-sm border border-red-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-red-100 group-hover:to-red-200 group-hover:scale-110">
-                                                                            <XCircle className="h-5 w-5 mr-2" />
-                                                                            Invalid
-                                                                        </span>
-                                                                    </div>
-                                                                ))}
+                                                            userDetails.validation[param.key as keyof UserDetails["validation"]] ===
+                                                                "valid" ? (
+                                                                <div className="flex items-center justify-center">
+                                                                    <span className="text-green-600 font-medium flex items-center bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-full w-fit shadow-sm border border-green-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-green-100 group-hover:to-green-200 group-hover:scale-110">
+                                                                        <CheckCircle className="h-5 w-5 mr-2" />
+                                                                        Valid
+                                                                    </span>
+                                                                </div>
+                                                            ) : apiCallData[param.apiKey as keyof typeof apiCallData][row] ? (
+                                                                <div className="flex items-center justify-center">
+                                                                    <span className="text-red-600 font-medium flex items-center bg-gradient-to-r from-red-50 to-red-100 px-4 py-2 rounded-full w-fit shadow-sm border border-red-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-red-100 group-hover:to-red-200 group-hover:scale-110">
+                                                                        <XCircle className="h-5 w-5 mr-2" />
+                                                                        Invalid
+                                                                    </span>
+                                                                </div>
+                                                            ) : (
+                                                                ""
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -835,8 +864,9 @@ export default function Experian(): React.ReactElement {
                         disabled={callInProgress}
                     >
                         <div
-                            className={`p-4 md:p-8 bg-gradient-to-br from-purple-700 to-purple-900 rounded-full transition-all duration-300 group-hover:scale-105 shadow-lg ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                                }`}
+                            className={`p-4 md:p-8 bg-gradient-to-br from-purple-700 to-purple-900 rounded-full transition-all duration-300 group-hover:scale-105 shadow-lg ${
+                                callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                            }`}
                         >
                             {callInProgress ? (
                                 <div className="absolute inset-0 flex items-center justify-center">
@@ -844,7 +874,9 @@ export default function Experian(): React.ReactElement {
                                 </div>
                             ) : (
                                 <Mic
-                                    className={`w-12 h-12 md:w-16 md:h-16 text-white ${callStatus === "active" ? "animate-bounce" : ""}`}
+                                    className={`w-12 h-12 md:w-16 md:h-16 text-white ${
+                                        callStatus === "active" ? "animate-bounce" : ""
+                                    }`}
                                 />
                             )}
                         </div>
@@ -993,7 +1025,6 @@ export default function Experian(): React.ReactElement {
                         </div>
                     </div>
 
-                    {/* Gradient divider and copyright - made more compact */}
                     <div className="mt-2">
                         <div className="h-px bg-gradient-to-r from-purple-600 via-blue-500 to-blue-700 w-full"></div>
                         <div className="flex flex-col md:flex-row md:justify-between md:items-center py-1 text-xs text-gray-500">
@@ -1210,4 +1241,3 @@ export default function Experian(): React.ReactElement {
         </div>
     )
 }
-
