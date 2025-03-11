@@ -41,43 +41,67 @@ const notes = [
 
 const apiKey = "key_98fef97480c54d6bf0698564addb"
 
-// Improve the normalization functions to be more consistent and handle edge cases
-// Replace the existing normalization functions with these enhanced versions:
+/* ----------------------------------
+ *  NORMALIZATION HELPERS
+ * ---------------------------------- */
 
+// For general fields (name, address, SSN, etc.) ignoring punctuation/spaces
 function normalizeGeneral(str: string): string {
-    if (!str) return ""
-    // Convert to lowercase and remove all non-alphanumeric characters
-    return str.toLowerCase().replace(/[^a-z0-9]/g, "")
+  if (!str) return ""
+  return str.toLowerCase().replace(/[^a-z0-9]/g, "")
 }
 
+// For reference ID, preserve dashes but remove everything else non-alphanumeric
 function normalizeReference(str: string): string {
-    if (!str) return ""
-    // Preserve dashes but remove all other non-alphanumeric characters
-    return str.toLowerCase().replace(/[^a-z0-9-]/g, "")
+  if (!str) return ""
+  return str.toLowerCase().replace(/[^a-z0-9-]/g, "")
 }
 
-// Fix the normalizePhone function to ensure consistent formatting
-// Replace the existing normalizePhone function with this improved version:
+// For phone numbers, strip non-digits and handle leading "1" if it’s 11 digits
 function normalizePhone(str: string): string {
-    if (!str) return ""
-    // Remove all non-numeric characters and ensure we're working with just the digits
-    const digitsOnly = str.replace(/\D/g, "")
-
-    // Handle US phone numbers with or without country code
-    // If it starts with 1 and has 11 digits, remove the leading 1
-    if (digitsOnly.length === 11 && digitsOnly.startsWith("1")) {
-        return digitsOnly.substring(1)
-    }
-
-    // Return just the digits
-    return digitsOnly
+  if (!str) return ""
+  const digitsOnly = str.replace(/\D/g, "")
+  if (digitsOnly.length === 11 && digitsOnly.startsWith("1")) {
+    return digitsOnly.substring(1)
+  }
+  return digitsOnly
 }
 
+// For emails, we want to keep the @ and . characters; simply lowercase and trim
 function normalizeEmail(str: string): string {
-    if (!str) return ""
-    // For emails, we want to keep the @ and . characters
-    return str.toLowerCase().trim()
+  if (!str) return ""
+  return str.toLowerCase().trim()
 }
+
+// For DOB, parse out month/day/year and return a standard format (YYYYMMDD).
+// This treats "Jan-04-2018", "1/4/2018", "January 4, 2018" the same.
+function normalizeDOB(dob: string): string {
+  if (!dob) return ""
+  const lower = dob.toLowerCase().trim()
+  const textualPattern = /([a-z]+)[^\d]*(\d{1,2})[^\d]*(\d{2,4})/
+  const textMatch = lower.match(textualPattern)
+  if (textMatch) {
+    const [, rawMonth, rawDay, rawYear] = textMatch
+    const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+    const monthIndex = monthNames.indexOf(rawMonth.slice(0, 3))
+    if (monthIndex !== -1) {
+      const day = rawDay.padStart(2, "0")
+      const year = rawYear.length === 2 ? "20" + rawYear : rawYear
+      return `${year}${(monthIndex + 1).toString().padStart(2, "0")}${day}`
+    }
+  }
+  const numericPattern = /(\d{1,2})[^\d](\d{1,2})[^\d](\d{2,4})/
+  const numericMatch = lower.match(numericPattern)
+  if (numericMatch) {
+    const [, rawMonth, rawDay, rawYear] = numericMatch
+    const month = rawMonth.padStart(2, "0")
+    const day = rawDay.padStart(2, "0")
+    const year = rawYear.length === 2 ? "20" + rawYear : rawYear
+    return `${year}${month}${day}`
+  }
+  return normalizeGeneral(dob)
+}
+
 
 export default function Experian(): React.ReactElement {
     const [, setAllTrialsUsed] = useState(false)
@@ -218,7 +242,7 @@ export default function Experian(): React.ReactElement {
 
                 // Use appropriate normalization functions for each field type
                 const userName = normalizeGeneral(userDetails.name)
-                const userDOB = normalizeGeneral(userDetails.dob)
+                const userDOB = normalizeDOB(userDetails.dob)
                 const userEmail = normalizeEmail(userDetails.email)
                 const userAddress = normalizeGeneral(userDetails.address)
                 // Update the validation section in processCallData to use more robust comparison
@@ -232,7 +256,7 @@ export default function Experian(): React.ReactElement {
                 const userMedicalCode = normalizeReference(userDetails.medicalCode)
 
                 const extractedName = normalizeGeneral(extractedData.name)
-                const extractedDOB = normalizeGeneral(extractedData.dob)
+                const extractedDOB = normalizeDOB(extractedData.dob)
                 const extractedEmail = normalizeEmail(extractedData.email)
                 const extractedAddress = normalizeGeneral(extractedData.address)
 
