@@ -811,7 +811,7 @@ export default function Experian(): React.ReactElement {
                         disabled={callInProgress}
                     >
                         <div
-                            className={`p-8 md:p-16 bg-gradient-to-br from-purple-700 to-purple-900 rounded-full transition-all duration-300 group-hover:scale-105 shadow-lg ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                            className={`p-4 md:p-8 bg-gradient-to-br from-purple-700 to-purple-900 rounded-full transition-all duration-300 group-hover:scale-105 shadow-lg ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
                                 }`}
                         >
                             {callInProgress ? (
