@@ -324,9 +324,8 @@ export default function Centene2(): React.ReactElement {
         console.error("Error processing call data:", error)
       }
     },
-// eslint-disable-next-line react-hooks/exhaustive-deps
-    [userDetails],    
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userDetails],
   )
 
   // Now define fetchCallData after processCallData
@@ -726,8 +725,9 @@ export default function Centene2(): React.ReactElement {
               className="group flex flex-col items-center justify-center transform transition-all hover:scale-105"
             >
               <div
-                className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
-                  }`}
+                className={`p-8 bg-gradient-to-br from-[#1a4b8c] to-[#2E5388] rounded-full shadow-lg transition-all duration-300 ${
+                  callStatus === "active" ? "ring-4 ring-blue-300 animate-pulse" : ""
+                }`}
               >
                 <Mic className={`w-12 h-12 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
               </div>
@@ -767,9 +767,12 @@ export default function Centene2(): React.ReactElement {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Update the table rows to show validation status for each input */}
+                  {/* 
+                    Changed the label from "Medical ID" to "Member ID"
+                    but kept the logic (key: "medicalCode", apiKey: "member_id") intact.
+                  */}
                   {[
-                    { label: "Medical ID", key: "medicalCode", apiKey: "member_id" },
+                    { label: "Member ID", key: "medicalCode", apiKey: "member_id" }, // <-- Changed here
                     { label: "Member Name", key: "name", apiKey: "member_name" },
                     { label: "Date of Birth", key: "dob", apiKey: "_d_o_b" },
                     { label: "Address", key: "address", apiKey: "shipping_address" },
@@ -779,7 +782,9 @@ export default function Centene2(): React.ReactElement {
                       {[0, 1, 2].map((row) => (
                         <tr
                           key={`${param.key}-${row}`}
-                          className={`${index % 2 === 0 ? "bg-blue-50" : "bg-white"} border-b border-gray-100 hover:bg-blue-100 transition-colors`}
+                          className={`${
+                            index % 2 === 0 ? "bg-blue-50" : "bg-white"
+                          } border-b border-gray-100 hover:bg-blue-100 transition-colors`}
                         >
                           {row === 0 && (
                             <>
@@ -797,9 +802,10 @@ export default function Centene2(): React.ReactElement {
                           <td className="py-3 px-4">
                             {apiCallData[param.apiKey as keyof typeof apiCallData][row] && (
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${(
-                                  () => {
-                                    const inputValue = apiCallData[param.apiKey as keyof typeof apiCallData][row]
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  (() => {
+                                    const inputValue =
+                                      apiCallData[param.apiKey as keyof typeof apiCallData][row]
                                     const userData = userDetails[param.key as keyof UserDetails] as string
 
                                     // Debug logging
@@ -857,14 +863,14 @@ export default function Centene2(): React.ReactElement {
 
                                     // Default case
                                     return false
-                                  }
-                                )()
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                                  }`}
+                                  })()
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
                               >
                                 {(() => {
-                                  const inputValue = apiCallData[param.apiKey as keyof typeof apiCallData][row]
+                                  const inputValue =
+                                    apiCallData[param.apiKey as keyof typeof apiCallData][row]
                                   const userData = userDetails[param.key as keyof UserDetails] as string
 
                                   if (param.key === "name") {
@@ -910,16 +916,20 @@ export default function Centene2(): React.ReactElement {
                   ))}
                   {/* Add Email ID as a single row */}
                   <tr
-                    className={`${[0, 2, 4].includes(5) ? "bg-blue-50" : "bg-white"} border-b border-gray-100 hover:bg-blue-100 transition-colors`}
+                    className={`${
+                      [0, 2, 4].includes(5) ? "bg-blue-50" : "bg-white"
+                    } border-b border-gray-100 hover:bg-blue-100 transition-colors`}
                   >
                     <td className="py-3 px-4 font-medium text-gray-700">Email ID</td>
-                    <td className="py-3 px-4 font-medium">{formSubmitted ? String(userDetails.email) : ""}</td>
+                    <td className="py-3 px-4 font-medium">
+                      {formSubmitted ? String(userDetails.email) : ""}
+                    </td>
                     <td className="py-3 px-4">{apiCallData.email[0] || ""}</td>
                     <td className="py-3 px-4">
                       {apiCallData.email[0] && (
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${(
-                            () => {
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            (() => {
                               const userData = userDetails.email
                               const inputValue = apiCallData.email[0]
 
@@ -931,11 +941,10 @@ export default function Centene2(): React.ReactElement {
                                 `Email comparison: "${normalizedUser}" vs "${normalizedInput}" = ${isValid}`,
                               )
                               return isValid
-                            }
-                          )()
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                            }`}
+                            })()
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
                         >
                           {(() => {
                             const userData = userDetails.email
@@ -1073,14 +1082,19 @@ export default function Centene2(): React.ReactElement {
                   defaultValue="11234, Plainview, Texas, 79072"
                   className="p-2 rounded bg-blue-100 text-gray-800 border border-blue-300
            text-sm"
-
                 />
               </div>
 
-              {/* Medical ID */}
+              {/* 
+                Changed label from "Medical ID" to "Member ID" only for display;
+                the underlying variable is still "medicalCode".
+              */}
               <div className="flex flex-col">
-                <label htmlFor="medicalCode" className="text-white text-sm mb-0.5 font-medium">
-                  Medical ID
+                <label
+                  htmlFor="medicalCode"
+                  className="text-white text-sm mb-0.5 font-medium"
+                >
+                  Member ID {/* <-- Changed here */}
                 </label>
                 <input
                   type="text"
@@ -1184,4 +1198,3 @@ export default function Centene2(): React.ReactElement {
     </div>
   )
 }
-
