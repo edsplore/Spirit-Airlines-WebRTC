@@ -12,6 +12,7 @@ interface RegisterCallResponse {
     sampleRate: number
 }
 
+// CHANGED: Now each field in validation is an array of strings.
 interface UserDetails {
     name: string
     dob: string
@@ -21,13 +22,13 @@ interface UserDetails {
     phone: string
     ssn: string
     validation: {
-        name: "valid" | "invalid" | ""
-        dob: "valid" | "invalid" | ""
-        email: "valid" | "invalid" | ""
-        address: "valid" | "invalid" | ""
-        medicalCode: "valid" | "invalid" | ""
-        phone: "valid" | "invalid" | ""
-        ssn: "valid" | "invalid" | ""
+        name: Array<"valid" | "invalid" | "">
+        dob: Array<"valid" | "invalid" | "">
+        email: Array<"valid" | "invalid" | "">
+        address: Array<"valid" | "invalid" | "">
+        medicalCode: Array<"valid" | "invalid" | "">
+        phone: Array<"valid" | "invalid" | "">
+        ssn: Array<"valid" | "invalid" | "">
     }
 }
 
@@ -102,10 +103,10 @@ function normalizeDOB(dob: string): string {
   return normalizeGeneral(dob)
 }
 
-
 export default function Experian(): React.ReactElement {
     const [, setAllTrialsUsed] = useState(false)
 
+    // CHANGED: Initialize validation arrays with empty arrays for each field.
     const [userDetails, setUserDetails] = useState<UserDetails>({
         name: "",
         dob: "",
@@ -115,13 +116,13 @@ export default function Experian(): React.ReactElement {
         phone: "2707111234",
         ssn: "111223333",
         validation: {
-            name: "",
-            dob: "",
-            email: "",
-            address: "",
-            medicalCode: "",
-            phone: "",
-            ssn: "",
+            name: [],
+            dob: [],
+            email: [],
+            address: [],
+            medicalCode: [],
+            phone: [],
+            ssn: [],
         },
     })
 
@@ -185,7 +186,7 @@ export default function Experian(): React.ReactElement {
     }, [])
 
     // ------------------------
-    //  CHANGE BELOW (MINIMAL)
+    //  CHANGED: ROW-LEVEL VALIDATION
     // ------------------------
     const processCallData = useCallback(
         (callData: any) => {
@@ -250,59 +251,74 @@ export default function Experian(): React.ReactElement {
                 const userMedicalCode = normalizeReference(userDetails.medicalCode)
 
                 // Normalize extracted attempts
-                const extractedName1 = normalizeGeneral(extractedData.name)
-                const extractedName2 = normalizeGeneral(extractedData.name2)
-                const extractedDOB1 = normalizeDOB(extractedData.dob)
-                const extractedDOB2 = normalizeDOB(extractedData.dob2)
-                const extractedEmail1 = normalizeEmail(extractedData.email)
-                const extractedEmail2 = normalizeEmail(extractedData.email2)
-                const extractedAddress1 = normalizeGeneral(extractedData.address)
-                const extractedAddress2 = normalizeGeneral(extractedData.address2)
-                const extractedPhone1 = normalizePhone(extractedData.phone)
-                const extractedPhone2 = normalizePhone(extractedData.phone2)
-                const extractedSSN1 = normalizeGeneral(extractedData.ssn)
-                const extractedSSN2 = normalizeGeneral(extractedData.ssn2)
-                const extractedMedicalCode1 = normalizeReference(extractedData.medicalCode)
-                const extractedMedicalCode2 = normalizeReference(extractedData.medicalCode2)
+                const extractedNameArray = [
+                  normalizeGeneral(extractedData.name),
+                  normalizeGeneral(extractedData.name2),
+                ].filter(Boolean)
+                const extractedDOBArray = [
+                  normalizeDOB(extractedData.dob),
+                  normalizeDOB(extractedData.dob2),
+                ].filter(Boolean)
+                const extractedEmailArray = [
+                  normalizeEmail(extractedData.email),
+                  normalizeEmail(extractedData.email2),
+                ].filter(Boolean)
+                const extractedAddressArray = [
+                  normalizeGeneral(extractedData.address),
+                  normalizeGeneral(extractedData.address2),
+                ].filter(Boolean)
+                const extractedPhoneArray = [
+                  normalizePhone(extractedData.phone),
+                  normalizePhone(extractedData.phone2),
+                ].filter(Boolean)
+                const extractedSSNArray = [
+                  normalizeGeneral(extractedData.ssn),
+                  normalizeGeneral(extractedData.ssn2),
+                ].filter(Boolean)
+                const extractedMedicalCodeArray = [
+                  normalizeReference(extractedData.medicalCode),
+                  normalizeReference(extractedData.medicalCode2),
+                ].filter(Boolean)
 
-                // Compare each field, marking valid if EITHER attempt matches
-                const validation: UserDetails["validation"] = {
-                    name:
-                        extractedName1 === userName || extractedName2 === userName
-                            ? "valid"
-                            : "invalid",
-                    dob:
-                        extractedDOB1 === userDOB || extractedDOB2 === userDOB
-                            ? "valid"
-                            : "invalid",
-                    email:
-                        extractedEmail1 === userEmail || extractedEmail2 === userEmail
-                            ? "valid"
-                            : "invalid",
-                    address:
-                        extractedAddress1 === userAddress || extractedAddress2 === userAddress
-                            ? "valid"
-                            : "invalid",
-                    phone:
-                        extractedPhone1 === userPhone || extractedPhone2 === userPhone
-                            ? "valid"
-                            : "invalid",
-                    medicalCode:
-                        extractedMedicalCode1 === userMedicalCode ||
-                        extractedMedicalCode2 === userMedicalCode
-                            ? "valid"
-                            : "invalid",
-                    ssn:
-                        extractedSSN1 === userSSN || extractedSSN2 === userSSN
-                            ? "valid"
-                            : "invalid",
-                }
+                // For email, there could be 3 attempts in your table, but you only have 2 from the API
+                // We'll handle that gracefully (the 3rd row won't have any data).
 
-                console.log("Validation results:", validation)
+                // Build row-level validity arrays
+                // For each attempt, compare with user input. If match => "valid", else => "invalid"
+                const nameValidations = extractedNameArray.map(
+                  (attempt) => (attempt === userName ? "valid" : "invalid")
+                )
+                const dobValidations = extractedDOBArray.map(
+                  (attempt) => (attempt === userDOB ? "valid" : "invalid")
+                )
+                const emailValidations = extractedEmailArray.map(
+                  (attempt) => (attempt === userEmail ? "valid" : "invalid")
+                )
+                const addressValidations = extractedAddressArray.map(
+                  (attempt) => (attempt === userAddress ? "valid" : "invalid")
+                )
+                const phoneValidations = extractedPhoneArray.map(
+                  (attempt) => (attempt === userPhone ? "valid" : "invalid")
+                )
+                const ssnValidations = extractedSSNArray.map(
+                  (attempt) => (attempt === userSSN ? "valid" : "invalid")
+                )
+                const medicalCodeValidations = extractedMedicalCodeArray.map(
+                  (attempt) => (attempt === userMedicalCode ? "valid" : "invalid")
+                )
 
+                // Store them in state
                 setUserDetails((prev) => ({
                     ...prev,
-                    validation,
+                    validation: {
+                        name: nameValidations,
+                        dob: dobValidations,
+                        email: emailValidations,
+                        address: addressValidations,
+                        phone: phoneValidations,
+                        ssn: ssnValidations,
+                        medicalCode: medicalCodeValidations,
+                    },
                 }))
 
                 setAllColumnsFilled(true)
@@ -312,9 +328,6 @@ export default function Experian(): React.ReactElement {
         },
         [userDetails],
     )
-    // -----------------------
-    //  END OF SINGLE CHANGE
-    // -----------------------
 
     const fetchCallData = useCallback(
         async (callId: string) => {
@@ -505,16 +518,17 @@ export default function Experian(): React.ReactElement {
                 ssn: [],
             })
 
+            // Reset row-level validation arrays to empty
             setUserDetails((prev) => ({
                 ...prev,
                 validation: {
-                    name: "",
-                    dob: "",
-                    email: "",
-                    address: "",
-                    medicalCode: "",
-                    phone: "",
-                    ssn: "",
+                    name: [],
+                    dob: [],
+                    email: [],
+                    address: [],
+                    medicalCode: [],
+                    phone: [],
+                    ssn: [],
                 },
             }))
             setAllColumnsFilled(false)
@@ -619,16 +633,17 @@ export default function Experian(): React.ReactElement {
             ssn: [],
         })
 
+        // Reset row-level validation arrays
         setUserDetails((prev) => ({
             ...prev,
             validation: {
-                name: "",
-                dob: "",
-                email: "",
-                address: "",
-                medicalCode: "",
-                phone: "",
-                ssn: "",
+                name: [],
+                dob: [],
+                email: [],
+                address: [],
+                medicalCode: [],
+                phone: [],
+                ssn: [],
             },
         }))
 
@@ -767,89 +782,112 @@ export default function Experian(): React.ReactElement {
                                             { label: "Address", key: "address", apiKey: "shipping_address" },
                                             { label: "Phone Number", key: "phone", apiKey: "phone" },
                                             { label: "Email ID", key: "email", apiKey: "email" },
-                                        ].map((param, index) => (
-                                            <React.Fragment key={param.key}>
-                                                {(param.key === "email" ? [0, 1, 2] : [0, 1]).map((row) => (
-                                                    <tr
-                                                        key={`${param.key}-${row}`}
-                                                        className={`${
-                                                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                                                        } hover:bg-blue-100/70 transition-all duration-300 group relative`}
-                                                    >
-                                                        {row === 0 && (
-                                                            <>
-                                                                <td
-                                                                    className="p-4 font-bold text-[#681b75] border-r border-gray-200 group-hover:text-purple-900 transition-colors duration-200 relative"
-                                                                    rowSpan={param.key === "email" ? 3 : 2}
-                                                                    style={{
-                                                                        background:
-                                                                            "linear-gradient(to right, rgba(104, 27, 117, 0.05), transparent)",
-                                                                    }}
-                                                                >
-                                                                    <div className="flex items-center">
-                                                                        <div className="w-1.5 h-1.5 rounded-full bg-[#681b75] mr-2 group-hover:w-2 group-hover:h-2 transition-all duration-300"></div>
-                                                                        {param.label}
-                                                                    </div>
-                                                                    <div className="absolute inset-0 left-0 w-1 bg-purple-600 scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-bottom"></div>
-                                                                </td>
-                                                                <td
-                                                                    className="p-4 font-medium text-gray-700 border-r border-gray-200 group-hover:bg-blue-50 transition-all duration-300"
-                                                                    rowSpan={param.key === "email" ? 3 : 2}
-                                                                    style={{
-                                                                        boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.03)",
-                                                                    }}
-                                                                >
-                                                                    {formSubmitted ? (
-                                                                        <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100 group-hover:shadow-md group-hover:border-blue-200 transition-all duration-300">
-                                                                            {String(userDetails[param.key as keyof UserDetails])}
+                                        ].map((param, index) => {
+                                            // For email, we have up to 3 attempts in the table
+                                            const rowCount = param.key === "email" ? 3 : 2
+
+                                            return (
+                                                <React.Fragment key={param.key}>
+                                                    {Array.from({ length: rowCount }).map((_, row) => (
+                                                        <tr
+                                                            key={`${param.key}-${row}`}
+                                                            className={`${
+                                                                index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                                                            } hover:bg-blue-100/70 transition-all duration-300 group relative`}
+                                                        >
+                                                            {row === 0 && (
+                                                                <>
+                                                                    <td
+                                                                        className="p-4 font-bold text-[#681b75] border-r border-gray-200 group-hover:text-purple-900 transition-colors duration-200 relative"
+                                                                        rowSpan={rowCount}
+                                                                        style={{
+                                                                            background:
+                                                                                "linear-gradient(to right, rgba(104, 27, 117, 0.05), transparent)",
+                                                                        }}
+                                                                    >
+                                                                        <div className="flex items-center">
+                                                                            <div className="w-1.5 h-1.5 rounded-full bg-[#681b75] mr-2 group-hover:w-2 group-hover:h-2 transition-all duration-300"></div>
+                                                                            {param.label}
                                                                         </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                </td>
-                                                            </>
-                                                        )}
-                                                        <td className="p-4 border-r border-gray-200 group-hover:bg-blue-50 transition-all duration-300">
-                                                            {apiCallData[param.apiKey as keyof typeof apiCallData][row] ? (
-                                                                <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100 transition-all duration-300 group-hover:shadow-md group-hover:border-blue-200 group-hover:translate-y-[-2px]">
-                                                                    {apiCallData[param.apiKey as keyof typeof apiCallData][row]}
-                                                                </div>
-                                                            ) : (
-                                                                ""
+                                                                        <div className="absolute inset-0 left-0 w-1 bg-purple-600 scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-bottom"></div>
+                                                                    </td>
+                                                                    <td
+                                                                        className="p-4 font-medium text-gray-700 border-r border-gray-200 group-hover:bg-blue-50 transition-all duration-300"
+                                                                        rowSpan={rowCount}
+                                                                        style={{
+                                                                            boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.03)",
+                                                                        }}
+                                                                    >
+                                                                        {formSubmitted ? (
+                                                                            <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100 group-hover:shadow-md group-hover:border-blue-200 transition-all duration-300">
+                                                                                {String(userDetails[param.key as keyof UserDetails])}
+                                                                            </div>
+                                                                        ) : (
+                                                                            ""
+                                                                        )}
+                                                                    </td>
+                                                                </>
                                                             )}
-                                                        </td>
-                                                        <td className="p-4 group-hover:bg-blue-50 transition-all duration-300">
-                                                            {apiCallData[param.apiKey as keyof typeof apiCallData][row] &&
-                                                            userDetails.validation[param.key as keyof UserDetails["validation"]] ===
-                                                                "valid" ? (
-                                                                <div className="flex items-center justify-center">
-                                                                    <span className="text-green-600 font-medium flex items-center bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-full w-fit shadow-sm border border-green-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-green-100 group-hover:to-green-200 group-hover:scale-110">
-                                                                        <CheckCircle className="h-5 w-5 mr-2" />
-                                                                        Valid
-                                                                    </span>
-                                                                </div>
-                                                            ) : apiCallData[param.apiKey as keyof typeof apiCallData][row] ? (
-                                                                <div className="flex items-center justify-center">
-                                                                    <span className="text-red-600 font-medium flex items-center bg-gradient-to-r from-red-50 to-red-100 px-4 py-2 rounded-full w-fit shadow-sm border border-red-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-red-100 group-hover:to-red-200 group-hover:scale-110">
-                                                                        <XCircle className="h-5 w-5 mr-2" />
-                                                                        Invalid
-                                                                    </span>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                                {index < 6 && (
-                                                    <tr className="border-b border-gray-200">
-                                                        <td colSpan={4} className="p-0">
-                                                            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
+                                                            <td className="p-4 border-r border-gray-200 group-hover:bg-blue-50 transition-all duration-300">
+                                                                {apiCallData[param.apiKey as keyof typeof apiCallData][row] ? (
+                                                                    <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100 transition-all duration-300 group-hover:shadow-md group-hover:border-blue-200 group-hover:translate-y-[-2px]">
+                                                                        {apiCallData[param.apiKey as keyof typeof apiCallData][row]}
+                                                                    </div>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                            </td>
+                                                            <td className="p-4 group-hover:bg-blue-50 transition-all duration-300">
+                                                                {/* Retrieve row-level validation */}
+                                                                {(() => {
+                                                                    // If there's a validation array for this field, and we have a row index
+                                                                    const validations =
+                                                                        userDetails.validation[
+                                                                            param.key as keyof UserDetails["validation"]
+                                                                        ]
+                                                                    const rowValidation = validations[row] // might be undefined if no attempt
+                                                                    const hasInput =
+                                                                        !!apiCallData[param.apiKey as keyof typeof apiCallData][row]
+
+                                                                    if (!hasInput) {
+                                                                        // If no attempt data, show nothing
+                                                                        return ""
+                                                                    }
+
+                                                                    if (rowValidation === "valid") {
+                                                                        return (
+                                                                            <div className="flex items-center justify-center">
+                                                                                <span className="text-green-600 font-medium flex items-center bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-full w-fit shadow-sm border border-green-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-green-100 group-hover:to-green-200 group-hover:scale-110">
+                                                                                    <CheckCircle className="h-5 w-5 mr-2" />
+                                                                                    Valid
+                                                                                </span>
+                                                                            </div>
+                                                                        )
+                                                                    } else if (rowValidation === "invalid") {
+                                                                        return (
+                                                                            <div className="flex items-center justify-center">
+                                                                                <span className="text-red-600 font-medium flex items-center bg-gradient-to-r from-red-50 to-red-100 px-4 py-2 rounded-full w-fit shadow-sm border border-red-200 transition-all duration-300 group-hover:shadow-md group-hover:bg-gradient-to-r group-hover:from-red-100 group-hover:to-red-200 group-hover:scale-110">
+                                                                                    <XCircle className="h-5 w-5 mr-2" />
+                                                                                    Invalid
+                                                                                </span>
+                                                                            </div>
+                                                                        )
+                                                                    }
+                                                                    return ""
+                                                                })()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                    {index < 6 && (
+                                                        <tr className="border-b border-gray-200">
+                                                            <td colSpan={4} className="p-0">
+                                                                <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </React.Fragment>
+                                            )
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -957,7 +995,7 @@ export default function Experian(): React.ReactElement {
                             </ul>
                         </div>
                         <div>
-                            <h4 className="font-semibold text-gray-700 mb-2">Help & Support</h4>
+                            <h4 className="font-semibold text-gray-700 mb=2">Help & Support</h4>
                             <ul className="space-y-1">
                                 <li>
                                     <button type="button" className="text-gray-600 hover:text-gray-900">
