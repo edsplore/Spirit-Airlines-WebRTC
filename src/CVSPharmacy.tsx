@@ -194,7 +194,7 @@ export default function CSVPharmacy() {
 
   const initiateConversation = async () => {
     const agentId =
-      userDetails.language === "Spanish" ? "agent_076c8b8122e8d9d9cfe46100fb" : "agent_daa34732914c990996c9153ffc"
+      userDetails.language === "Spanish" ? "agent_0e3ef73032a9f6c137c0480285" : "agent_0e3ef73032a9f6c137c0480285"
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
