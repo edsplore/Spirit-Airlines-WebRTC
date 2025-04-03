@@ -3,8 +3,10 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import "./App.css"
-import { Mic } from "lucide-react"
+import { Mic } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
+
+
 
 interface RegisterCallResponse {
   access_token?: string
@@ -37,6 +39,8 @@ export default function CSVPharmacy() {
   })
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
+  const [formattedDob, setFormattedDob] = useState("Dec/12/1990")
+  const [rawDob, setRawDob] = useState("1990-12-12")
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -61,109 +65,95 @@ export default function CSVPharmacy() {
       console.log("Update received", update)
     })
 
-    // Add chatbot script
-    const addChatbotScript = () => {
-      const script = document.createElement("script")
-      const projectId = "676471f9262abee922cce364"
-      script.type = "text/javascript"
-      script.innerHTML = `
-        (function(d, t) {
-          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-          v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: '${projectId}' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production',
-              launch: {
-                event: {
-                  type: "launch",
-                  payload: {
-                    customer_name: "${userDetails.name}",
-                    email: "${userDetails.email}",
-                    phone: "${userDetails.phone}",
-                    member_id: "${userDetails.memberId}",
-                    dob: "${userDetails.dob}",
-                    address: "${userDetails.address}",
-                    language: "${userDetails.language}"
-                  }
-                }
-              },
-            });
-          }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-        })(document, 'script');
-      `
-      document.body.appendChild(script)
-      return script
-    }
+    // Format initial date
+    formatDate("1990-12-12")
 
-    const chatbotScript = addChatbotScript()
+    // Add chatbot script with launcher disabled
+    // const addChatbotScript = () => {
+    //   const script = document.createElement("script")
+    //   const projectId = "676471f9262abee922cce364"
+    //   script.type = "text/javascript"
+    //   script.innerHTML = `
+    //     (function(d, t) {
+    //       var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+    //       v.onload = function() {
+    //         window.voiceflow.chat.load({
+    //           verify: { projectID: '${projectId}' },
+    //           url: 'https://general-runtime.voiceflow.com',
+    //           versionID: 'production',
+    //           launch: {
+    //             event: {
+    //               type: "launch",
+    //               payload: {
+    //                 customer_name: "${userDetails.name}",
+    //                 email: "${userDetails.email}",
+    //                 phone: "${userDetails.phone}",
+    //                 member_id: "${userDetails.memberId}",
+    //                 dob: "${userDetails.dob}",
+    //                 address: "${userDetails.address}",
+    //                 language: "${userDetails.language}"
+    //               }
+    //             }
+    //           },
+    //           // Disable the chat launcher icon
+    //           launcher: { open: false, show: false },
+    //         });
+    //       }
+    //       v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+    //     })(document, 'script');
+    //   `
+    //   document.body.appendChild(script)
+    //   return script
+    // }
+
+    // const chatbotScript = addChatbotScript()
 
     return () => {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
       webClient.off("error")
       webClient.off("update")
-      if (chatbotScript && chatbotScript.parentNode) {
-        chatbotScript.parentNode.removeChild(chatbotScript)
-      }
+      //   if (chatbotScript && chatbotScript.parentNode) {
+      //     chatbotScript.parentNode.removeChild(chatbotScript)
+      //   }
     }
   }, [userDetails])
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return
+    
+    const date = new Date(dateString)
+    // Format as MMM/DD/YYYY (e.g., Dec/12/1990)
+    const formattedDate = date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric'
+    }).replace(/\s/g, '/')
+    
+    setFormattedDob(formattedDate)
+    setRawDob(dateString)
+  }
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value
+    formatDate(dateValue)
+  }
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
+    
     const newUserDetails = {
-      name: formData.get("name") as string,
-      dob: formData.get("dob") as string,
-      phone: formData.get("phone") as string,
-      email: formData.get("email") as string,
-      memberId: formData.get("memberId") as string,
-      address: formData.get("address") as string,
-      language: formData.get("language") as string,
+        name: formData.get("name") as string,
+        dob: formattedDob, // Use the formatted date
+        phone: formData.get("phone") as string,
+        email: formData.get("email") as string,
+        memberId: formData.get("memberId") as string,
+        address: formData.get("address") as string,
+        language: formData.get("language") as string,
     }
     setUserDetails(newUserDetails)
     setShowVerificationForm(false)
-
-    // Reload the chatbot script with new user details
-    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]')
-    if (existingScript && existingScript.parentNode) {
-      existingScript.parentNode.removeChild(existingScript)
-    }
-    const addChatbotScript = () => {
-      const script = document.createElement("script")
-      const projectId = "676471f9262abee922cce364"
-      script.type = "text/javascript"
-      script.innerHTML = `
-      (function(d, t) {
-        var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-        v.onload = function() {
-          window.voiceflow.chat.load({
-            verify: { projectID: '${projectId}' },
-            url: 'https://general-runtime.voiceflow.com',
-            versionID: 'production',
-            launch: {
-              event: {
-                type: "launch",
-                payload: {
-                  customer_name: "${newUserDetails.name}",
-                  email: "${newUserDetails.email}",
-                  phone: "${newUserDetails.phone}",
-                  member_id: "${newUserDetails.memberId}",
-                  dob: "${newUserDetails.dob}",
-                  address: "${newUserDetails.address}",
-                  language: "${newUserDetails.language}"
-                }
-              }
-            },
-          });
-        }
-        v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-      })(document, 'script');
-    `
-      document.body.appendChild(script)
-    }
-    addChatbotScript()
   }
 
   const toggleConversation = async () => {
@@ -269,11 +259,11 @@ export default function CSVPharmacy() {
   )
 
   return (
-    <div className="h-screen bg-white flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
       {showVerificationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-100 rounded-[40px] p-4 sm:p-6 w-full max-w-xl mx-auto border-2 border-gray-500 shadow-lg overflow-y-auto max-h-[90vh] sm:max-h-none">
-            <h2 className="text-base sm:text-xl font-bold text-center text-black mb-4 sm:mb-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-gray-100 rounded-[30px] sm:rounded-[40px] p-3 sm:p-6 w-full max-w-xl mx-auto border-2 border-gray-500 shadow-lg overflow-y-auto max-h-[90vh]">
+            <h2 className="text-sm sm:text-base md:text-xl font-bold text-center text-black mb-3 sm:mb-6">
               {getTranslatedText(
                 "Customer details are required for verification and authentication",
                 "Se requieren detalles del cliente para verificación y autenticación",
@@ -284,11 +274,10 @@ export default function CSVPharmacy() {
                 <div className="grid gap-4">
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
-                      htmlFor="name"
-                      className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                        htmlFor="name"
+                        className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
-                      {getTranslatedText("Member Name :", "Nombre del miembro :")}
-                      <span className="text-[#004B87]"> Choose</span>
+                        {getTranslatedText("Full Name:", "Nombre completo:")}
                     </label>
                     <input
                       type="text"
@@ -296,24 +285,46 @@ export default function CSVPharmacy() {
                       name="name"
                       required
                       defaultValue="John Smith"
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                      className="flex-1 p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
-                      htmlFor="dob"
-                      className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                        htmlFor="dob"
+                        className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
-                      {getTranslatedText("DOB :", "Fecha de nacimiento :")}
+                        {getTranslatedText("DOB:", "Fecha de nacimiento:")}
                     </label>
-                    <input
-                      type="text"
-                      id="dob"
-                      name="dob"
-                      required
-                      defaultValue="12/12/1990"
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
-                    />
+                    <div className="flex-1 relative">
+                        {/* Hidden date input for actual date selection */}
+                        <input
+                            type="date"
+                            id="dob-hidden"
+                            name="dob"
+                            value={rawDob}
+                            onChange={handleDateChange}
+                            className="absolute opacity-0 w-0 h-0"
+                            required
+                        />
+                        {/* Visible formatted date input */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                id="dob"
+                                value={formattedDob}
+                                readOnly
+                                onClick={() => document.getElementById('dob-hidden')?.click()}
+                                className="flex-1 w-full p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm cursor-pointer"
+                                placeholder="MMM/DD/YYYY"
+                            />
+                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Format: MMM/DD/YYYY (e.g., Dec/12/1990)</p>
+                    </div>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
@@ -328,7 +339,7 @@ export default function CSVPharmacy() {
                       name="email"
                       required
                       defaultValue="jacobwilliam@gmail.com"
-                      className="flex-1 p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-sm"
+                      className="flex-1 p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -345,7 +356,7 @@ export default function CSVPharmacy() {
                       required
                       defaultValue="99 BE-99-9E09"
                       readOnly
-                      className="flex-1 p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-sm"
+                      className="flex-1 p-1 sm:p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-xs sm:text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -362,7 +373,7 @@ export default function CSVPharmacy() {
                       required
                       defaultValue="116 Dogwood Rd, Lancaster, Kentucky(KY), 40444"
                       readOnly
-                      className="flex-1 p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-sm"
+                      className="flex-1 p-1 sm:p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-xs sm:text-sm"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -380,16 +391,16 @@ export default function CSVPharmacy() {
                         required
                         defaultValue="2707111234"
                         readOnly
-                        className="flex-1 p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-sm"
+                        className="flex-1 p-1 sm:p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-xs sm:text-sm"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center mt-8 mb-4">
+              <div className="flex justify-center mt-6 mb-4">
                 <button
                   type="submit"
-                  className="px-12 py-3.5 bg-black text-yellow-300 text-lg rounded-full hover:bg-gray-800 transition-colors font-bold"
+                  className="px-8 sm:px-12 py-3 sm:py-3.5 bg-black text-yellow-300 text-base sm:text-lg rounded-full hover:bg-gray-800 transition-colors font-bold shadow-md"
                 >
                   {getTranslatedText("Submit", "Enviar")}
                 </button>
@@ -421,257 +432,209 @@ export default function CSVPharmacy() {
       )}
 
       {/* Top Navigation Bar */}
-      <header className="bg-white flex-shrink-0">
-        {/* Main Navigation */}
-        <div className="bg-[#fff] border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-8">
-                <img src="/csvLogo.png" alt="CSV Pharmacy" className="h-[55px] w-auto" />
-                <nav className="hidden md:flex space-x-8">
-                  <div className="relative group">
-                    <button className="flex items-center text-gray-800 font-medium hover:text-[#004B87] transition-colors">
-                      Prescriptions
-                      <svg
-                        className="ml-1 w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="relative group">
-                    <button className="flex items-center text-gray-800 font-medium hover:text-[#004B87] transition-colors">
-                      Health
-                      <svg
-                        className="ml-1 w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="relative group">
-                    <button className="flex items-center text-gray-800 font-medium hover:text-[#004B87] transition-colors">
-                      Shop
-                      <svg
-                        className="ml-1 w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="relative group">
-                    <button className="flex items-center text-gray-800 font-medium hover:text-[#004B87] transition-colors">
-                      Savings & Memberships
-                      <svg
-                        className="ml-1 w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </nav>
-              </div>
-              <div className="flex items-center">
-                <button className="flex items-center text-gray-800 font-medium hover:text-[#004B87] transition-colors">
-                  <svg
-                    className="w-6 h-6 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    ></path>
-                  </svg>
-                  Sign in
-                  <svg
-                    className="ml-1 w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
+      <nav className="w-full bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Navigation Row */}
+          <div className="flex items-center h-16">
+            {/* Logo and Main Navigation */}
+            <div className="flex items-left space-x-6 mr-auto">
+              {/* Logo */}
+              <img src="/csvLogo.png" alt="CVS" className="h-16 w-auto" />
+
+              {/* Main Navigation */}
+              <div className="hidden md:flex items-center space-x-6">
+                <div className="relative">
+                  <button className="flex items-center text-gray-800 font-medium hover:text-red-600">
+                    Prescriptions
+                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <button className="flex items-center text-gray-800 font-medium hover:text-red-600">
+                    Health
+                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <button className="flex items-center text-gray-800 font-medium hover:text-red-600">
+                    Shop
+                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <button className="flex items-center text-gray-800 font-medium hover:text-red-600">
+                    Savings & Memberships
+                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Secondary Navigation */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 py-2 text-sm">
-              <a
-                href="/schedule-vaccine"
-                className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors"
-              >
-                Schedule a vaccine
-              </a>
-              <a
-                href="/manage-prescriptions"
-                className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors"
-              >
-                Manage prescriptions
-              </a>
-              <a
-                href="/photo"
-                className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors flex items-center"
-              >
-                Photo
-                <svg
-                  className="ml-1 w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+            {/* User Sign In */}
+            <div className="flex items-center">
+              <button className="flex items-center text-gray-800 font-medium hover:text-red-600">
+                <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   ></path>
                 </svg>
-              </a>
-              <a href="/minuteclinic" className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors">
-                MinuteClinic Services
-              </a>
-              <a href="/extracare" className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors">
-                ExtraCare savings
-              </a>
-              <a href="/deals" className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors">
-                Deals of the Week
-              </a>
-              <a href="/weekly-ad" className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors">
-                Weekly ad
-              </a>
-              <a href="/primary-care" className="text-gray-800 hover:text-[#004B87] hover:underline transition-colors">
-                Primary care for older adults
-              </a>
+                Sign in
+                <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
             </div>
           </div>
+
+          {/* Secondary Navigation Row */}
+          <div className="flex flex-nowrap items-center justify-start overflow-x-auto py-3 text-sm whitespace-nowrap space-x-6">
+            <a href="/schedule-vaccine" className="text-gray-800 hover:text-red-600 hover:underline">
+              Schedule a vaccine
+            </a>
+            <a href="/manage-prescriptions" className="text-gray-800 hover:text-red-600 hover:underline">
+              Manage prescriptions
+            </a>
+            <a href="/photo" className="text-gray-800 hover:text-red-600 hover:underline flex items-center">
+              Photo
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                ></path>
+              </svg>
+            </a>
+            <a href="/minuteclinic" className="text-gray-800 hover:text-red-600 hover:underline">
+              MinuteClinic Services
+            </a>
+            <a href="/extracare" className="text-gray-800 hover:text-red-600 hover:underline">
+              ExtraCare savings
+            </a>
+            <a href="/deals" className="text-gray-800 hover:text-red-600 hover:underline">
+              Deals of the Week
+            </a>
+            <a href="/weekly-ad" className="text-gray-800 hover:text-red-600 hover:underline">
+              Weekly ad
+            </a>
+            <a href="/primary-care" className="text-gray-800 hover:text-red-600 hover:underline">
+              Primary care for older adults
+            </a>
+          </div>
         </div>
-      </header>
+      </nav>
 
       {/* Hero Section with Overlapping Verification Panel */}
       <div className="flex-grow flex flex-col min-h-0">
         {/* Hero Background */}
-        <div className="w-full bg-[#004B87] h-[50vh]">
+        <div className="w-full bg-[#004B87] h-[30vh] sm:h-[40vh] md:h-[50vh]">
           <img src="/CSV_hero.png" alt="Hero" className="w-full h-full object-cover object-center" />
         </div>
 
         {/* Verification Panel and Call Button - Positioned to overlap hero section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-grow flex flex-col">
-          <div className="flex flex-col md:flex-row gap-12 -mt-12 relative z-10 mb-auto md:pl-8">
-            {/* Verification Panel */}
-            <div className="bg-white rounded-lg shadow-lg p-4 max-w-xl w-full md:w-3/5 border-2 border-[#004B87]">
-              <h3 className="text-[#004B87] text-xl font-bold mb-2 border-b-2 border-[#004B87] pb-1">
-                Verification Information
-              </h3>
-              <div className="space-y-0">
-                <div className="py-1 border-b border-[#004B87]">
-                  <div className="flex items-center">
-                    <HeartIcon />
-                    <div className="ml-2 flex-1">
-                      <span className="text-[#004B87] font-bold mr-2">Member ID:</span>
-                      <span className="text-gray-700">{userDetails.memberId}</span>
-                    </div>
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 -mt-8 sm:-mt-10 md:-mt-12 relative z-10 mb-auto md:pl-4 lg:pl-18">
+          {/* Verification Panel */}
+          <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 max-w-xl w-full md:w-2/5 border-2 border-[#004B87]">
+            <h3 className="text-[#004B87] text-xl font-bold mb-2 border-b-2 border-[#004B87] pb-1">
+              Verification Information
+            </h3>
+            <div className="space-y-0">
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <HeartIcon />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Member ID:</span>
+                    <span className="text-gray-700 break-words">{userDetails.memberId}</span>
                   </div>
                 </div>
-                <div className="py-1 border-b border-[#004B87]">
-                  <div className="flex items-center">
-                    <HeartIcon />
-                    <div className="ml-2 flex-1">
-                      <span className="text-[#004B87] font-bold mr-2">Full Name:</span>
-                      <span className="text-gray-700">{userDetails.name}</span>
-                    </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <HeartIcon />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Full Name:</span>
+                    <span className="text-gray-700 break-words">{userDetails.name}</span>
                   </div>
                 </div>
-                <div className="py-1 border-b border-[#004B87]">
-                  <div className="flex items-center">
-                    <HeartIcon />
-                    <div className="ml-2 flex-1">
-                      <span className="text-[#004B87] font-bold mr-2">DOB:</span>
-                      <span className="text-gray-700">{userDetails.dob}</span>
-                    </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <HeartIcon />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">DOB:</span>
+                    <span className="text-gray-700 break-words">{userDetails.dob}</span>
                   </div>
                 </div>
-                <div className="py-1 border-b border-[#004B87]">
-                  <div className="flex items-center">
-                    <HeartIcon />
-                    <div className="ml-2 flex-1">
-                      <span className="text-[#004B87] font-bold mr-2">Address:</span>
-                      <span className="text-gray-700">{userDetails.address}</span>
-                    </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <HeartIcon />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Address:</span>
+                    <span className="text-gray-700 break-words">{userDetails.address}</span>
                   </div>
                 </div>
-                <div className="py-1 border-b border-[#004B87]">
-                  <div className="flex items-center">
-                    <HeartIcon />
-                    <div className="ml-2 flex-1">
-                      <span className="text-[#004B87] font-bold mr-2">Phone No:</span>
-                      <span className="text-gray-700">{userDetails.phone}</span>
-                    </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <HeartIcon />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Phone No:</span>
+                    <span className="text-gray-700 break-words">{userDetails.phone}</span>
                   </div>
                 </div>
-                <div className="py-1 border-b border-[#004B87]">
-                  <div className="flex items-center">
-                    <HeartIcon />
-                    <div className="ml-2 flex-1">
-                      <span className="text-[#004B87] font-bold mr-2">Email ID:</span>
-                      <span className="text-gray-700">{userDetails.email}</span>
-                    </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <HeartIcon />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Email ID:</span>
+                    <span className="text-gray-700 break-words">{userDetails.email}</span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Call Button - With text to the side */}
-            <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-6">
-              <div className="flex flex-col md:flex-row items-center gap-6 my-4">
-                <button onClick={toggleConversation} className="group">
-                  <div
-                    className={`p-10 ${callStatus === "active" ? "bg-[#E31837]" : "bg-[#004B87]"} rounded-full transition-all duration-300 group-hover:scale-105 ${
-                      callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                    }`}
-                  >
-                    <Mic className={`w-24 h-24 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
-                  </div>
-                </button>
-                <span className="text-3xl font-bold text-[#E31837] whitespace-nowrap mt-4 md:mt-0">
-                  {callStatus === "active" ? "Click to Stop Call" : "Click to Start Call"}
-                </span>
-              </div>
+          {/* Call Button - With text to the side */}
+          <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 my-2 sm:my-4">
+              <button onClick={toggleConversation} className="group">
+                <div
+                  className={`p-6 sm:p-8 md:p-10 ${callStatus === "active" ? "bg-[#E31837]" : "bg-[#004B87]"} rounded-full transition-all duration-300 group-hover:scale-105 ${
+                    callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                  } shadow-lg`}
+                >
+                  <Mic
+                    className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-white ${callStatus === "active" ? "animate-bounce" : ""}`}
+                  />
+                </div>
+              </button>
+              <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#E31837] whitespace-nowrap mt-4 md:mt-0">
+                {callStatus === "active" ? "Click to Stop Call" : "Click to Start Call"}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <footer className="bg-white py-3 border-t border-gray-300 flex-shrink-0 mt-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-gray-600 mb-2">
+      <footer className="bg-white py-2 sm:py-3 border-t border-gray-300 flex-shrink-0 mt-2 w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-1 sm:gap-y-2 text-[10px] xs:text-xs text-gray-600 mb-2">
             <a href="/terms" className="hover:text-[#004B87] hover:underline transition-colors">
               Terms of use
             </a>
@@ -744,4 +707,3 @@ export default function CSVPharmacy() {
     </div>
   )
 }
-
