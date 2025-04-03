@@ -1,10 +1,11 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import "./App.css"
 import { Mic } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
+
 
 
 interface RegisterCallResponse {
@@ -40,6 +41,7 @@ export default function CSVPharmacy() {
   const [callInProgress, setCallInProgress] = useState(false)
   const [formattedDob, setFormattedDob] = useState("Dec/12/1990")
   const [rawDob, setRawDob] = useState("1990-12-12")
+  const dateInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -121,25 +123,36 @@ export default function CSVPharmacy() {
   const formatDate = (dateString: string) => {
     if (!dateString) return
 
-    const date = new Date(dateString)
-    // Format as MMM/DD/YYYY (e.g., Dec/12/1990)
-    const formattedDate = date
-      .toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-      })
-      .replace(/\s/g, "/")
-      .replace(/,/g, "") // Remove any commas
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        console.error("Invalid date:", dateString)
+        return
+      }
 
-    setFormattedDob(formattedDate)
-    setRawDob(dateString)
+      // Format as MMM/DD/YYYY (e.g., Dec/12/1990)
+      const formattedDate = date
+        .toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })
+        .replace(/\s/g, "/")
+        .replace(/,/g, "") // Remove any commas
+
+      setFormattedDob(formattedDate)
+      setRawDob(dateString)
+    } catch (error) {
+      console.error("Error formatting date:", error)
+    }
   }
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateValue = e.target.value
     formatDate(dateValue)
   }
+
+  
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -298,36 +311,42 @@ export default function CSVPharmacy() {
                       {getTranslatedText("DOB:", "Fecha de nacimiento:")}
                     </label>
                     <div className="flex-1 relative">
-                      {/* Hidden date input for actual date selection */}
-                      <input
-                        type="date"
-                        id="dob-hidden"
-                        name="dob"
-                        value={rawDob}
-                        onChange={handleDateChange}
-                        className="absolute opacity-0 w-0 h-0"
-                        required
-                      />
-                      {/* Visible formatted date input */}
-                      <div className="relative">
+                      <div className="flex items-center">
                         <input
-                          type="text"
-                          id="dob"
-                          value={formattedDob}
-                          readOnly
-                          onClick={() => document.getElementById("dob-hidden")?.click()}
-                          className="flex-1 w-full p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm cursor-pointer"
-                          placeholder="MMM/DD/YYYY"
+                          type="date"
+                          id="dob-hidden"
+                          name="dob"
+                          ref={dateInputRef}
+                          value={rawDob}
+                          onChange={handleDateChange}
+                          className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+                          required
                         />
-                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            id="dob"
+                            value={formattedDob}
+                            readOnly
+                            className="w-full p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm cursor-pointer"
+                            placeholder="MMM/DD/YYYY"
+                            onClick={() => dateInputRef.current?.click()}
+                          />
+                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <svg
+                              className="w-4 h-4 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">Format: MMM/DD/YYYY (e.g., Dec/12/1990)</p>
@@ -620,7 +639,7 @@ export default function CSVPharmacy() {
 
           {/* Call Button - With text to the side */}
           <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6 mt-6 md:mt-10">
-            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 w-full max-w-[100%] mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 w-full max-w-[90%] mx-auto">
               <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 my-2 sm:my-4">
                 <button onClick={toggleConversation} className="group">
                   <div
