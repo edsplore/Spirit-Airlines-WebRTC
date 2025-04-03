@@ -3,9 +3,8 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import "./App.css"
-import { Mic } from 'lucide-react'
+import { Mic } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
-
 
 
 interface RegisterCallResponse {
@@ -121,15 +120,17 @@ export default function CSVPharmacy() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return
-    
+
     const date = new Date(dateString)
     // Format as MMM/DD/YYYY (e.g., Dec/12/1990)
-    const formattedDate = date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-      year: 'numeric'
-    }).replace(/\s/g, '/')
-    
+    const formattedDate = date
+      .toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })
+      .replace(/\s/g, "/")
+
     setFormattedDob(formattedDate)
     setRawDob(dateString)
   }
@@ -142,15 +143,15 @@ export default function CSVPharmacy() {
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    
+
     const newUserDetails = {
-        name: formData.get("name") as string,
-        dob: formattedDob, // Use the formatted date
-        phone: formData.get("phone") as string,
-        email: formData.get("email") as string,
-        memberId: formData.get("memberId") as string,
-        address: formData.get("address") as string,
-        language: formData.get("language") as string,
+      name: formData.get("name") as string,
+      dob: formattedDob, // Use the formatted date
+      phone: formData.get("phone") as string,
+      email: formData.get("email") as string,
+      memberId: formData.get("memberId") as string,
+      address: formData.get("address") as string,
+      language: formData.get("language") as string,
     }
     setUserDetails(newUserDetails)
     setShowVerificationForm(false)
@@ -262,7 +263,7 @@ export default function CSVPharmacy() {
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-          <div className="bg-gray-100 rounded-[30px] sm:rounded-[40px] p-3 sm:p-6 w-full max-w-xl mx-auto border-2 border-gray-500 shadow-lg overflow-y-auto max-h-[90vh]">
+          <div className="bg-gray-100 rounded-[30px] sm:rounded-[40px] p-3 sm:p-6 w-full max-w-xl mx-auto border-2 border-gray-500 shadow-lg">
             <h2 className="text-sm sm:text-base md:text-xl font-bold text-center text-black mb-3 sm:mb-6">
               {getTranslatedText(
                 "Customer details are required for verification and authentication",
@@ -274,10 +275,10 @@ export default function CSVPharmacy() {
                 <div className="grid gap-4">
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
-                        htmlFor="name"
-                        className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      htmlFor="name"
+                      className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
-                        {getTranslatedText("Full Name:", "Nombre completo:")}
+                      {getTranslatedText("Full Name:", "Nombre completo:")}
                     </label>
                     <input
                       type="text"
@@ -290,40 +291,45 @@ export default function CSVPharmacy() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
-                        htmlFor="dob"
-                        className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      htmlFor="dob"
+                      className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
                     >
-                        {getTranslatedText("DOB:", "Fecha de nacimiento:")}
+                      {getTranslatedText("DOB:", "Fecha de nacimiento:")}
                     </label>
                     <div className="flex-1 relative">
-                        {/* Hidden date input for actual date selection */}
+                      {/* Hidden date input for actual date selection */}
+                      <input
+                        type="date"
+                        id="dob-hidden"
+                        name="dob"
+                        value={rawDob}
+                        onChange={handleDateChange}
+                        className="absolute opacity-0 w-0 h-0"
+                        required
+                      />
+                      {/* Visible formatted date input */}
+                      <div className="relative">
                         <input
-                            type="date"
-                            id="dob-hidden"
-                            name="dob"
-                            value={rawDob}
-                            onChange={handleDateChange}
-                            className="absolute opacity-0 w-0 h-0"
-                            required
+                          type="text"
+                          id="dob"
+                          value={formattedDob}
+                          readOnly
+                          onClick={() => document.getElementById("dob-hidden")?.click()}
+                          className="flex-1 w-full p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm cursor-pointer"
+                          placeholder="MMM/DD/YYYY"
                         />
-                        {/* Visible formatted date input */}
-                        <div className="relative">
-                            <input
-                                type="text"
-                                id="dob"
-                                value={formattedDob}
-                                readOnly
-                                onClick={() => document.getElementById('dob-hidden')?.click()}
-                                className="flex-1 w-full p-1 sm:p-1.5 rounded bg-white text-black border border-gray-300 font-bold text-xs sm:text-sm cursor-pointer"
-                                placeholder="MMM/DD/YYYY"
+                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                             />
-                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
+                          </svg>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Format: MMM/DD/YYYY (e.g., Dec/12/1990)</p>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Format: MMM/DD/YYYY (e.g., Dec/12/1990)</p>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
@@ -359,22 +365,23 @@ export default function CSVPharmacy() {
                       className="flex-1 p-1 sm:p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-xs sm:text-sm"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center">
+                  <div className="flex flex-col sm:flex-row sm:items-start">
                     <label
                       htmlFor="address"
-                      className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3"
+                      className="w-full sm:w-40 text-[#004B87] font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:text-right sm:pr-3 sm:pt-1"
                     >
                       {getTranslatedText("Address :", "Dirección :")}
                     </label>
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      required
-                      defaultValue="116 Dogwood Rd, Lancaster, Kentucky(KY), 40444"
-                      readOnly
-                      className="flex-1 p-1 sm:p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-xs sm:text-sm"
-                    />
+                    <div className="flex-1">
+                      <textarea
+                        id="address"
+                        name="address"
+                        required
+                        defaultValue="116 Dogwood Rd, Lancaster, Kentucky(KY), 40444"
+                        readOnly
+                        className="w-full p-1 sm:p-1.5 rounded bg-gray-200 text-black border border-gray-300 font-bold text-xs sm:text-sm resize-none h-20"
+                      />
+                    </div>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     <label
@@ -397,7 +404,7 @@ export default function CSVPharmacy() {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center mt-6 mb-4">
+              <div className="flex justify-center mt-16 mb-4">
                 <button
                   type="submit"
                   className="px-8 sm:px-12 py-3 sm:py-3.5 bg-black text-yellow-300 text-base sm:text-lg rounded-full hover:bg-gray-800 transition-colors font-bold shadow-md"
@@ -581,11 +588,11 @@ export default function CSVPharmacy() {
                 </div>
               </div>
               <div className="py-1 border-b border-[#004B87]">
-                <div className="flex items-center">
-                  <HeartIcon />
+                <div className="flex items-start">
+                  <HeartIcon className="mt-1" />
                   <div className="ml-2 flex-1 overflow-hidden">
                     <span className="text-[#004B87] font-bold mr-2">Address:</span>
-                    <span className="text-gray-700 break-words">{userDetails.address}</span>
+                    <span className="text-gray-700 break-words whitespace-pre-line">{userDetails.address}</span>
                   </div>
                 </div>
               </div>
@@ -611,7 +618,7 @@ export default function CSVPharmacy() {
           </div>
 
           {/* Call Button - With text to the side */}
-          <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6">
+          <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6 mt-10">
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 my-2 sm:my-4">
               <button onClick={toggleConversation} className="group">
                 <div
@@ -707,3 +714,4 @@ export default function CSVPharmacy() {
     </div>
   )
 }
+
