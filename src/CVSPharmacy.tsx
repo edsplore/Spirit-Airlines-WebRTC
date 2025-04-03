@@ -130,6 +130,7 @@ export default function CSVPharmacy() {
         year: "numeric",
       })
       .replace(/\s/g, "/")
+      .replace(/,/g, "") // Remove any commas
 
     setFormattedDob(formattedDate)
     setRawDob(dateString)
@@ -440,13 +441,13 @@ export default function CSVPharmacy() {
 
       {/* Top Navigation Bar */}
       <nav className="w-full bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4">
           {/* Top Navigation Row */}
-          <div className="flex items-center h-16">
+          <div className="flex items-center justify-between h-16">
             {/* Logo and Main Navigation */}
-            <div className="flex items-left space-x-6 mr-auto">
+            <div className="flex items-left space-x-1">
               {/* Logo */}
-              <img src="/csvLogo.png" alt="CVS" className="h-16 w-auto" />
+              <img src="/csvLogo.png" alt="CVS" className="h-16 w-auto -mt-10" />
 
               {/* Main Navigation */}
               <div className="hidden md:flex items-center space-x-6">
@@ -488,7 +489,7 @@ export default function CSVPharmacy() {
               </div>
             </div>
 
-            {/* User Sign In */}
+            {/* User Sign In - Push to extreme right */}
             <div className="flex items-center">
               <button className="flex items-center text-gray-800 font-medium hover:text-red-600">
                 <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -508,7 +509,7 @@ export default function CSVPharmacy() {
           </div>
 
           {/* Secondary Navigation Row */}
-          <div className="flex flex-nowrap items-center justify-start overflow-x-auto py-3 text-sm whitespace-nowrap space-x-6">
+          <div className="flex flex-nowrap items-center justify-start pl-0 overflow-x-auto py-3 text-sm whitespace-nowrap space-x-6">
             <a href="/schedule-vaccine" className="text-gray-800 hover:text-red-600 hover:underline">
               Schedule a vaccine
             </a>
@@ -549,11 +550,11 @@ export default function CSVPharmacy() {
       <div className="flex-grow flex flex-col min-h-0">
         {/* Hero Background */}
         <div className="w-full bg-[#004B87] h-[30vh] sm:h-[40vh] md:h-[50vh]">
-          <img src="/CSV_hero.png" alt="Hero" className="w-full h-full object-cover object-center" />
+          <img src="/CSV_hero.png" alt="Hero" className="w-full h-full object-fit object-center" />
         </div>
 
-        {/* Verification Panel and Call Button - Positioned to overlap hero section */}
-        <div className="flex flex-col md:flex-row gap-6 md:gap-12 -mt-8 sm:-mt-10 md:-mt-12 relative z-10 mb-auto md:pl-4 lg:pl-18">
+        {/* Verification Panel and Call Button - Positioned higher to overlap more of the hero section */}
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 -mt-16 sm:-mt-24 md:-mt-32 relative z-10 mb-auto md:pl-4 lg:pl-18">
           {/* Verification Panel */}
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 max-w-xl w-full md:w-2/5 border-2 border-[#004B87]">
             <h3 className="text-[#004B87] text-xl font-bold mb-2 border-b-2 border-[#004B87] pb-1">
@@ -618,30 +619,34 @@ export default function CSVPharmacy() {
           </div>
 
           {/* Call Button - With text to the side */}
-          <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6 mt-10">
-            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 my-2 sm:my-4">
-              <button onClick={toggleConversation} className="group">
-                <div
-                  className={`p-6 sm:p-8 md:p-10 ${callStatus === "active" ? "bg-[#E31837]" : "bg-[#004B87]"} rounded-full transition-all duration-300 group-hover:scale-105 ${
-                    callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                  } shadow-lg`}
+          <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6 mt-6 md:mt-10">
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 w-full max-w-[100%] mx-auto">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 my-2 sm:my-4">
+                <button onClick={toggleConversation} className="group">
+                  <div
+                    className={`p-6 sm:p-8 md:p-10 ${callStatus === "active" ? "bg-[#E31837]" : "bg-[#004B87]"} rounded-full transition-all duration-300 group-hover:scale-105 ${
+                      callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                    } shadow-lg`}
+                  >
+                    <Mic
+                      className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-white ${callStatus === "active" ? "animate-bounce" : ""}`}
+                    />
+                  </div>
+                </button>
+                <span
+                  className={`text-xl sm:text-2xl md:text-3xl font-bold ${callStatus === "active" ? "text-[#E31837]" : "text-[#004B87]"} whitespace-nowrap mt-4 md:mt-0`}
                 >
-                  <Mic
-                    className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-white ${callStatus === "active" ? "animate-bounce" : ""}`}
-                  />
-                </div>
-              </button>
-              <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#E31837] whitespace-nowrap mt-4 md:mt-0">
-                {callStatus === "active" ? "Click to Stop Call" : "Click to Start Call"}
-              </span>
+                  {callStatus === "active" ? "Click to Stop Call" : "Click to Start Call"}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <footer className="bg-white py-2 sm:py-3 border-t border-gray-300 flex-shrink-0 mt-2 w-full">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-1 sm:gap-y-2 text-[10px] xs:text-xs text-gray-600 mb-2">
+        <div className="w-full px-4">
+          <div className="flex flex-wrap justify-start gap-x-4 sm:gap-x-6 gap-y-1 sm:gap-y-2 text-[10px] xs:text-xs text-gray-600 mb-2">
             <a href="/terms" className="hover:text-[#004B87] hover:underline transition-colors">
               Terms of use
             </a>
@@ -708,7 +713,7 @@ export default function CSVPharmacy() {
               </a>
             </div>
           </div>
-          <div className="text-xs text-gray-500 text-center">© Copyright 1999-2025 CSV.com</div>
+          <div className="text-xs text-gray-500 text-left">© Copyright 1999-2025 CSV.com</div>
         </div>
       </footer>
     </div>
