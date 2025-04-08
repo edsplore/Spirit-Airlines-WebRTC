@@ -152,7 +152,7 @@ export default function CSVPharmacy() {
     formatDate(dateValue)
   }
 
-  
+
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -264,7 +264,7 @@ export default function CSVPharmacy() {
     return userDetails.language === "Spanish" ? spanishText : englishText
   }
 
- 
+
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
@@ -566,69 +566,69 @@ export default function CSVPharmacy() {
         </div>
 
         {/* Verification Panel and Call Button - Positioned higher to overlap more of the hero section */}
-        <div className="flex flex-col md:flex-row gap-6 md:gap-12 -mt-16 sm:-mt-24 md:-mt-32 relative z-10 mb-auto md:pl-4 lg:pl-18">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 -mt-16 sm:-mt-20 md:-mt-22 relative z-10 mb-auto md:pl-4 lg:pl-18">
           {/* Verification Panel */}
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 max-w-xl w-full md:w-2/5 border-2 border-[#004B87]">
-  <h3 className="text-[#004B87] text-xl font-bold mb-2 border-b-2 border-[#004B87] pb-1">
-    Verification Information
-  </h3>
-  <div className="space-y-0">
-    <div className="py-1 border-b border-[#004B87]">
-      <div className="flex items-center">
-        <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
-        <div className="ml-2 flex-1 overflow-hidden">
-          <span className="text-[#004B87] font-bold mr-2">Member ID:</span>
-          <span className="text-gray-700 break-words">{userDetails.memberId}</span>
-        </div>
-      </div>
-    </div>
-    <div className="py-1 border-b border-[#004B87]">
-      <div className="flex items-center">
-        <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
-        <div className="ml-2 flex-1 overflow-hidden">
-          <span className="text-[#004B87] font-bold mr-2">Full Name:</span>
-          <span className="text-gray-700 break-words">{userDetails.name}</span>
-        </div>
-      </div>
-    </div>
-    <div className="py-1 border-b border-[#004B87]">
-      <div className="flex items-center">
-        <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
-        <div className="ml-2 flex-1 overflow-hidden">
-          <span className="text-[#004B87] font-bold mr-2">DOB:</span>
-          <span className="text-gray-700 break-words">{userDetails.dob}</span>
-        </div>
-      </div>
-    </div>
-    <div className="py-1 border-b border-[#004B87]">
-      <div className="flex items-start">
-        <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5 mt-1" />
-        <div className="ml-2 flex-1 overflow-hidden">
-          <span className="text-[#004B87] font-bold mr-2">Address:</span>
-          <span className="text-gray-700 break-words whitespace-pre-line">{userDetails.address}</span>
-        </div>
-      </div>
-    </div>
-    <div className="py-1 border-b border-[#004B87]">
-      <div className="flex items-center">
-        <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
-        <div className="ml-2 flex-1 overflow-hidden">
-          <span className="text-[#004B87] font-bold mr-2">Phone No:</span>
-          <span className="text-gray-700 break-words">{userDetails.phone}</span>
-        </div>
-      </div>
-    </div>
-    <div className="py-1 border-b border-[#004B87]">
-      <div className="flex items-center">
-        <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
-        <div className="ml-2 flex-1 overflow-hidden">
-          <span className="text-[#004B87] font-bold mr-2">Email ID:</span>
-          <span className="text-gray-700 break-words">{userDetails.email}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+            <h3 className="text-[#004B87] text-xl font-bold mb-2 border-b-2 border-[#004B87] pb-1">
+              Verification Information
+            </h3>
+            <div className="space-y-0">
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Member ID:</span>
+                    <span className="text-gray-700 break-words">{userDetails.memberId}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Full Name:</span>
+                    <span className="text-gray-700 break-words">{userDetails.name}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">DOB:</span>
+                    <span className="text-gray-700 break-words">{userDetails.dob}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-start">
+                  <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5 mt-1" />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Address:</span>
+                    <span className="text-gray-700 break-words whitespace-pre-line">{userDetails.address}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Phone No:</span>
+                    <span className="text-gray-700 break-words">{userDetails.phone}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="py-1 border-b border-[#004B87]">
+                <div className="flex items-center">
+                  <img src="/tabelHearts.png" alt="Bullet" className="w-5 h-5" />
+                  <div className="ml-2 flex-1 overflow-hidden">
+                    <span className="text-[#004B87] font-bold mr-2">Email ID:</span>
+                    <span className="text-gray-700 break-words">{userDetails.email}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Call Button - With text to the side */}
           <div className="flex flex-col items-center justify-center w-full md:w-2/5 py-3 sm:py-6 mt-6 md:mt-10">
@@ -636,9 +636,8 @@ export default function CSVPharmacy() {
               <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 my-2 sm:my-4">
                 <button onClick={toggleConversation} className="group">
                   <div
-                    className={`p-6 sm:p-8 md:p-10 ${callStatus === "active" ? "bg-[#E31837]" : "bg-[#004B87]"} rounded-full transition-all duration-300 group-hover:scale-105 ${
-                      callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
-                    } shadow-lg`}
+                    className={`p-6 sm:p-8 md:p-10 ${callStatus === "active" ? "bg-[#E31837]" : "bg-[#004B87]"} rounded-full transition-all duration-300 group-hover:scale-105 ${callStatus === "active" ? "ring-4 ring-[#ffdc00] animate-pulse" : ""
+                      } shadow-lg`}
                   >
                     <Mic
                       className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-white ${callStatus === "active" ? "animate-bounce" : ""}`}
