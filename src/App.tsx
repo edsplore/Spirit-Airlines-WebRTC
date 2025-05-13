@@ -12,6 +12,7 @@ import Lumicera from "./Lumicera.tsx";
 import Centene2 from "./Centene2.tsx";
 import Experian from "./Experian.tsx";
 import CVSPharmacy from "./CVSPharmacy.tsx";
+import Independence from "./Independence.tsx";
 
 export default function App() {
   return (
@@ -34,6 +35,9 @@ export default function App() {
       <Route path="/demo/security/mcafee" element={<McAfeeDemo />} />
       <Route path="/demo/riskmanagement/aon" element={<AON />} />
       <Route path="/demo/carrental/sixt" element={<SixtHomepage />} />
+
+      <Route path="/demo/healthcare/independence" element={<Independence />} />
+
       <Route path="*" element={<div>Coming Soon</div>} />
     </Routes>
   );
