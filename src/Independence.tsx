@@ -12,6 +12,14 @@ interface RegisterCallResponse {
   sampleRate: number
 }
 
+interface Agent {
+  _id: string
+  name: string
+  agentId?: string // Make agentId optional since it might not be present in all responses
+  callIds: string[]
+  __v: number
+}
+
 // Initialize the RetellWebClient outside the component
 const webClient = new RetellWebClient()
 
@@ -25,6 +33,19 @@ export default function Independence() {
   const [showBehaviorDropdown, setShowBehaviorDropdown] = useState(false)
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
+
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [selectedAgent, setSelectedAgent] = useState<string>("")
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedAgentId, setSelectedAgentId] = useState<string>("") // Store the _id of the selected agent
+  const [showAgentDropdown, setShowAgentDropdown] = useState(false)
+  const [isLoadingAgents, setIsLoadingAgents] = useState(false)
+
+  // Track the current call information
+  const [currentCallId, setCurrentCallId] = useState<string>("")
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [currentAgentId, setCurrentAgentId] = useState<string>("")
+  const [isUpdatingCallRecord, setIsUpdatingCallRecord] = useState(false)
 
   // Customer details from the table
   const customerDetails = {
@@ -48,6 +69,7 @@ export default function Independence() {
       console.log("Conversation ended with code:", code, "reason:", reason)
       setCallStatus("inactive")
       setCallInProgress(false)
+      // No need to update call record here as per requirements
     })
 
     webClient.on("error", (error) => {
@@ -59,6 +81,9 @@ export default function Independence() {
     webClient.on("update", (update) => {
       console.log("Update received", update)
     })
+
+    // Fetch agents when component mounts
+    fetchAgents()
 
     // Cleanup function
     return () => {
@@ -79,48 +104,195 @@ export default function Independence() {
     setActiveView(view)
   }
 
-  const handlePracticeSubmit = () => {
-    handleViewChange("startCall")
+  const handlePracticeSubmit = async () => {
+    try {
+      // Determine the agentId based on selected scenario
+      const agentId =
+        selectedScenario === "Coverage & Benefits"
+          ? "agent_516f9ab713ddc59c08c698ed96" // Coverage & Benefits agent ID
+          : "agent_fd6cfc5cffacc3c89ea5ad0374" // Medical Card Replacement agent ID
+
+      // Store the current agent ID for later use
+      setCurrentAgentId(agentId)
+      console.log("Set current agent ID to:", agentId)
+
+      // Make API call to create agent with the required format
+      const response = await fetch(
+        "https://2c22596f-490a-4a85-9a3a-89df77f5877a-00-2pljzg5zocmuf.sisko.replit.dev/api/agents/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: userName,
+            agentId: agentId,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log("Agent created successfully:", data)
+
+      // Continue with the original flow
+      handleViewChange("startCall")
+    } catch (error) {
+      console.error("Error creating agent:", error)
+      // Still navigate to the next view even if there's an error
+      handleViewChange("startCall")
+    }
   }
 
-  // Replace with a toggle function that handles both starting and ending calls
-  const toggleCall = async () => {
-    if (callInProgress) return
-
-    setCallInProgress(true)
-
+  const fetchAgents = async () => {
+    setIsLoadingAgents(true)
     try {
-      if (callStatus === "active") {
-        // End the call if it's active
-        await webClient.stopCall()
-        setCallStatus("inactive")
-      } else {
-        // Start a new call if no call is active
-        // Request microphone permission
-        await navigator.mediaDevices.getUserMedia({ audio: true })
+      // Get all agents
+      const response = await fetch(
+        "https://2c22596f-490a-4a85-9a3a-89df77f5877a-00-2pljzg5zocmuf.sisko.replit.dev/api/agents/list",
+      )
 
-        // Register the call and get the necessary tokens
-        const registerCallResponse = await registerCall()
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
 
-        if (registerCallResponse.callId && registerCallResponse.access_token) {
-          // Start the call with the obtained tokens
-          await webClient.startCall({
-            accessToken: registerCallResponse.access_token,
-            callId: registerCallResponse.callId,
-            sampleRate: registerCallResponse.sampleRate,
-            enableUpdate: true,
-          })
+      const data = await response.json()
+      console.log("All agents response:", data)
+      setAgents(data)
 
-          setCallStatus("active")
-          handleViewChange("endCall")
-        } else {
-          throw new Error("Failed to get valid call ID or access token")
+      // Set the first agent as selected if available and no agent is currently selected
+      if (data.length > 0 && !selectedAgent) {
+        setSelectedAgent(data[0].name)
+        setSelectedAgentId(data[0]._id) // Store the _id
+        if (data[0].agentId) {
+          setCurrentAgentId(data[0].agentId)
         }
       }
     } catch (error) {
-      console.error("Error handling call:", error)
+      console.error("Error fetching agents:", error)
     } finally {
-      setCallInProgress(false)
+      setIsLoadingAgents(false)
+    }
+  }
+
+  // Function to handle clicking "Submit" after selecting an agent
+  const handleRecordingsSubmit = async () => {
+    try {
+      // Find the selected agent to get its _id
+      const agent = agents.find((a) => a.name === selectedAgent)
+      if (!agent) {
+        console.error("No agent selected")
+        return
+      }
+
+      console.log("Fetching details for agent _id:", agent._id)
+
+      // Call the agent details API with _id
+      const response = await fetch(
+        `https://2c22596f-490a-4a85-9a3a-89df77f5877a-00-2pljzg5zocmuf.sisko.replit.dev/api/agents/details/${agent._id}`,
+      )
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log("Agent details response:", data)
+
+      // Update the agents state with the detailed data
+      // The API might return a single object or an array, handle both cases
+      if (Array.isArray(data)) {
+        setAgents(data)
+      } else {
+        // If it's a single object, create an array with just that object
+        setAgents([data])
+        // Also update the selected agent and IDs
+        setSelectedAgent(data.name)
+        setSelectedAgentId(data._id) // Store the _id
+        if (data.agentId) {
+          setCurrentAgentId(data.agentId)
+        }
+      }
+
+      // Navigate to recordings view
+      handleViewChange("recordings")
+    } catch (error) {
+      console.error("Error fetching agent details:", error)
+      // Still navigate to recordings view even if there's an error
+      handleViewChange("recordings")
+    }
+  }
+
+  // Function to handle clicking "Listen to call recording"
+  const handleListenToRecording = async () => {
+    console.log("handleListenToRecording called")
+
+    // For testing, create a dummy call ID if none exists
+    if (!currentCallId) {
+      const dummyCallId = `Call${Date.now().toString().slice(-5)}`
+      console.log("No current call ID, using dummy ID:", dummyCallId)
+      setCurrentCallId(dummyCallId)
+    }
+
+    // Find the selected agent to get its _id
+    const agent = agents.find((a) => a.name === selectedAgent)
+
+    if (!agent || !agent._id) {
+      console.error("No valid agent found")
+      alert("No valid agent found. Please select an agent first.")
+      return
+    }
+
+    try {
+      setIsUpdatingCallRecord(true)
+      const callIdToUse = currentCallId || `Call${Date.now().toString().slice(-5)}`
+
+      console.log("Updating call record with:", {
+        agentId: agent._id, // Use _id directly
+        callId: callIdToUse,
+      })
+
+      // Call the update API with _id
+      const response = await fetch(
+        `https://2c22596f-490a-4a85-9a3a-89df77f5877a-00-2pljzg5zocmuf.sisko.replit.dev/api/agents/calls/add/${agent._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            callId: callIdToUse,
+          }),
+        },
+      )
+
+      const responseText = await response.text()
+      console.log("Response status:", response.status)
+      console.log("Raw response text:", responseText)
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} - ${responseText}`)
+      }
+
+      let data
+      try {
+        data = JSON.parse(responseText)
+        console.log("Call record updated successfully:", data)
+      } catch (e) {
+        console.warn("Could not parse response as JSON:", e)
+        data = { message: responseText }
+      }
+
+      // Refresh agent details to show updated call records
+      await handleRecordingsSubmit()
+    } catch (error) {
+      console.error("Error updating call record:", error)
+      alert("Failed to update call record. Please try again.")
+    } finally {
+      setIsUpdatingCallRecord(false)
     }
   }
 
@@ -128,8 +300,12 @@ export default function Independence() {
     // Choose agent ID based on selected scenario
     const agentId =
       selectedScenario === "Coverage & Benefits"
-        ? "agent_516f9ab713ddc59c08c698ed96" // Replace with your Coverage & Benefits agent ID
-        : "agent_fd6cfc5cffacc3c89ea5ad0374" // Replace with your Medical Card Replacement agent ID
+        ? "agent_516f9ab713ddc59c08c698ed96"
+        : "agent_fd6cfc5cffacc3c89ea5ad0374"
+
+    // Store the current agent ID for later use
+    setCurrentAgentId(agentId)
+    console.log("Set current agent ID in registerCall to:", agentId)
 
     try {
       // Format the date of birth to match expected format if needed
@@ -164,14 +340,125 @@ export default function Independence() {
       const data = await response.json()
       console.log("Call registered successfully:", data)
 
+      // Extract the call_id from the response
+      const callId = data.call_id
+      console.log("Extracted call ID from response:", callId)
+
       return {
         access_token: data.access_token,
-        callId: data.call_id,
+        callId: callId,
         sampleRate: 16000,
       }
     } catch (error) {
       console.error("Error registering call:", error)
       throw error
+    }
+  }
+
+  // Add this function to render call records in the recordings view
+  const renderCallRecords = () => {
+    if (!selectedAgent || agents.length === 0) {
+      return [...Array(10)].map((_, index) => (
+        <tr key={index} className="border-b border-gray-300">
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+        </tr>
+      ))
+    }
+
+    // Find the selected agent
+    const agent = agents.find((a) => a.name === selectedAgent)
+    console.log("Agent found for rendering call records:", agent)
+
+    if (!agent) {
+      console.error("Selected agent not found in agents list")
+      return [...Array(10)].map((_, index) => (
+        <tr key={index} className="border-b border-gray-300">
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+        </tr>
+      ))
+    }
+
+    if (!agent.callIds || agent.callIds.length === 0) {
+      console.log("No call IDs found for agent:", agent.name)
+      return [...Array(10)].map((_, index) => (
+        <tr key={index} className="border-b border-gray-300">
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+          <td className="p-2">&nbsp;</td>
+        </tr>
+      ))
+    }
+
+    // Display the call records
+    return agent.callIds.map((callId, index) => (
+      <tr key={index} className="border-b border-gray-300">
+        <td className="p-2">{callId}</td>
+        <td className="p-2">{new Date().toLocaleTimeString()}</td>
+        <td className="p-2">{new Date().toLocaleTimeString()}</td>
+        <td className="p-2">Call summary not available</td>
+        <td className="p-2">Neutral</td>
+        <td className="p-2">
+          <button className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs">Play</button>
+        </td>
+      </tr>
+    ))
+  }
+
+  // Toggle function that handles both starting and ending calls
+  const toggleCall = async () => {
+    if (callInProgress) return
+
+    setCallInProgress(true)
+
+    try {
+      if (callStatus === "active") {
+        // End the call if it's active
+        await webClient.stopCall()
+        setCallStatus("inactive")
+      } else {
+        // Start a new call if no call is active
+        // Request microphone permission
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+
+        // Register the call and get the necessary tokens
+        const registerCallResponse = await registerCall()
+
+        if (registerCallResponse.callId && registerCallResponse.access_token) {
+          // Store the call ID from the response
+          setCurrentCallId(registerCallResponse.callId)
+          console.log("Set current call ID to:", registerCallResponse.callId)
+
+          // Start the call with the obtained tokens
+          await webClient.startCall({
+            accessToken: registerCallResponse.access_token,
+            callId: registerCallResponse.callId,
+            sampleRate: registerCallResponse.sampleRate,
+            enableUpdate: true,
+          })
+
+          setCallStatus("active")
+          handleViewChange("endCall")
+        } else {
+          throw new Error("Failed to get valid call ID or access token")
+        }
+      }
+    } catch (error) {
+      console.error("Error handling call:", error)
+    } finally {
+      setCallInProgress(false)
     }
   }
 
@@ -181,14 +468,14 @@ export default function Independence() {
         <div className="text-[#4a90e2] flex items-center">
           {/* Independence logo */}
           <div className="flex items-center">
-            <img src="/independence-logo.png" alt="Independence Logo" style={{ width: "180px", height: "auto" }} />
+            <img src="/independence_logo.png" alt="Independence Logo" style={{ width: "180px", height: "auto" }} />
           </div>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-lg font-bold">Welcome, {userName}</span>
           {/* VI Labs logo */}
           <div className="flex items-center">
-            <img src="/vilabs-logo.png" alt="VI Labs Logo" style={{ width: "130px", height: "auto" }} />
+            <img src="/vi-labs.png" alt="VI Labs Logo" style={{ width: "130px", height: "auto" }} />
           </div>
         </div>
       </header>
@@ -218,7 +505,7 @@ export default function Independence() {
           {/* Person image with IBX overlay */}
           <div className="relative h-64 bg-[#3a7bc8] flex items-center">
             <img
-              src="/person-image.jpg"
+              src="/independence_home.png"
               alt="Person with coffee"
               style={{
                 width: "100%",
@@ -329,17 +616,50 @@ export default function Independence() {
                   <div className="space-y-3">
                     <div className="flex items-center border-b border-gray-300 pb-2">
                       <div className="w-64 text-[#4a90e2]">Your Name:</div>
-                      <div className="flex-1 flex justify-between items-center">
-                        <span>{userName}</span>
-                        <div className="bg-gray-200 w-6 h-6 flex items-center justify-center">
-                          <ChevronDown className="w-4 h-4" />
+                      <div className="flex-1 relative">
+                        <div
+                          className="flex justify-between items-center cursor-pointer"
+                          onClick={() => setShowAgentDropdown(!showAgentDropdown)}
+                        >
+                          <span>{selectedAgent || "Select an agent"}</span>
+                          <div className="bg-gray-200 w-6 h-6 flex items-center justify-center">
+                            {isLoadingAgents ? (
+                              <div className="animate-spin h-4 w-4 border-2 border-[#4a90e2] border-t-transparent rounded-full"></div>
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </div>
                         </div>
+                        {showAgentDropdown && agents.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 z-10 max-h-40 overflow-y-auto">
+                            {agents.map((agent) => (
+                              <div
+                                key={agent._id}
+                                className="p-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => {
+                                  setSelectedAgent(agent.name)
+                                  setSelectedAgentId(agent._id) // Store the _id
+                                  if (agent.agentId) {
+                                    setCurrentAgentId(agent.agentId)
+                                  }
+                                  setShowAgentDropdown(false)
+                                }}
+                              >
+                                {agent.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {agents.length === 0 && !isLoadingAgents && (
+                          <div className="text-sm text-gray-500 mt-1">No agents available</div>
+                        )}
                       </div>
                     </div>
                     <div className="mt-3">
                       <button
                         className="w-full bg-[#d35400] text-white py-2 rounded-md"
-                        onClick={() => handleViewChange("recordings")}
+                        onClick={handleRecordingsSubmit}
+                        disabled={!selectedAgent || isLoadingAgents}
                       >
                         Click to Submit
                       </button>
@@ -505,6 +825,12 @@ export default function Independence() {
                         </svg>
                       </div>
                       <div className="text-[#005b96] text-3xl font-bold mt-2">Click to End Call</div>
+                      {isUpdatingCallRecord && (
+                        <div className="mt-2 text-gray-500 flex items-center">
+                          <div className="animate-spin h-4 w-4 border-2 border-[#4a90e2] border-t-transparent rounded-full mr-2"></div>
+                          Updating call record...
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
@@ -555,7 +881,7 @@ export default function Independence() {
                       {/* Listen to recording button */}
                       <button
                         className="mt-4 bg-[#4a90e2] text-white py-2 px-8 rounded-md w-64"
-                        onClick={() => handleViewChange("recordings")}
+                        onClick={handleListenToRecording}
                       >
                         Click to Listen to call recording
                       </button>
@@ -627,7 +953,7 @@ export default function Independence() {
                       <div className="text-[#005b96] text-4xl font-bold mb-4">Click to Start Call</div>
                       <button
                         className="bg-[#4a90e2] text-white py-3 px-8 rounded-md w-96"
-                        onClick={() => handleViewChange("recordings")}
+                        onClick={handleListenToRecording}
                       >
                         Click to Listen to call recording
                       </button>
@@ -637,8 +963,13 @@ export default function Independence() {
 
                 {/* Call Recordings table */}
                 <div className="bg-gray-200 p-2 flex justify-between items-center">
-                  <span className="font-bold">Call Recordings</span>
-                  <button className="bg-[#d35400] text-white px-3 py-1 rounded">Refresh</button>
+                  <span className="font-bold">Call Recordings for {selectedAgent}</span>
+                  <button
+                    className="bg-[#d35400] text-white px-3 py-1 rounded"
+                    onClick={() => handleRecordingsSubmit()}
+                  >
+                    Refresh
+                  </button>
                 </div>
                 <div className="overflow-auto flex-1">
                   <table className="w-full border-collapse">
@@ -652,19 +983,7 @@ export default function Independence() {
                         <th className="p-2 text-left">Call recording</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {/* Empty rows for call recordings */}
-                      {[...Array(10)].map((_, index) => (
-                        <tr key={index} className="border-b border-gray-300">
-                          <td className="p-2">&nbsp;</td>
-                          <td className="p-2">&nbsp;</td>
-                          <td className="p-2">&nbsp;</td>
-                          <td className="p-2">&nbsp;</td>
-                          <td className="p-2">&nbsp;</td>
-                          <td className="p-2">&nbsp;</td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    <tbody>{renderCallRecords()}</tbody>
                   </table>
                 </div>
               </div>
