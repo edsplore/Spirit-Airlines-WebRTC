@@ -28,7 +28,7 @@ export default function Independence() {
     "practiceCall" | "startCall" | "endCall" | "recordings"
   >("practiceCall");
 
-  const [userName, setUserName] = useState("Jon Smith");
+  const [userName, setUserName] = useState(" ");
   const [namesList, setNamesList] = useState<string[]>([]);
   const [filteredNames, setFilteredNames] = useState<string[]>([]);
   const [showNameSuggestions, setShowNameSuggestions] = useState(false);
@@ -519,7 +519,7 @@ export default function Independence() {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
+    <div className="flex px-12 flex-col w-full h-screen bg-white overflow-hidden">
       <header className="flex justify-between items-center p-4">
         <div className="text-[#4a90e2] flex items-center">
           {/* Independence logo */}
@@ -527,7 +527,7 @@ export default function Independence() {
             <img
               src="/independence_logo.png"
               alt="Independence Logo"
-              style={{ width: "180px", height: "auto" }}
+              style={{ width: "420px", height: "auto", marginLeft: "-70px" }}
             />
           </div>
         </div>
@@ -538,7 +538,7 @@ export default function Independence() {
             <img
               src="/vi-labs.png"
               alt="VI Labs Logo"
-              style={{ width: "130px", height: "auto" }}
+              style={{ width: "200px", height: "auto" }}
             />
           </div>
         </div>
@@ -548,54 +548,38 @@ export default function Independence() {
         {activeView !== "recordings" ? (
           <>
             {/* Left sidebar */}
-            <div className="w-[30%] bg-white">
-              <div className="bg-[#4a90e2] text-white p-4">
-                <h1 className="text-4xl font-bold mb-3">
+            <div className="w-[23%] bg-white flex flex-col">
+              {/* Blue Section with Centered Text */}
+              <div className="bg-[#4a90e2] text-white px-6 py-12 flex flex-col justify-center text-left">
+                <h1 className="text-3xl font-bold mb-6 leading-tight">
                   Driving health
                   <br />
                   care forward
                 </h1>
-                <p className="text-lg" style={{ lineHeight: "1.4" }}>
-                  With you at the center of
-                  <br />
-                  everything we do, we are
-                  <br />
-                  building the healthcare
-                  <br />
-                  company of the future by
-                  <br />
-                  redefining what to expect from
-                  <br />a health insurer.
+                <p className="text-base leading-relaxed">
+                  With you at the center of everything we do, we are building
+                  the healthcare company of the future by redefining what to
+                  expect from a health insurer.
                 </p>
               </div>
+
               {/* Person image with IBX overlay */}
-              <div className="relative h-64 bg-[#3a7bc8] flex items-center">
+              <div className="relative h-74 bg-[#3a7bc8] flex items-center">
                 <img
                   src="/independence_home.png"
                   alt="Person with coffee"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    position: "absolute",
-                  }}
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute right-4 text-[#87CEFA] text-6xl font-bold z-10">
-                  IBX
-                </div>
-                <div className="absolute right-0 bottom-1/2 transform translate-y-1/2 z-10">
-                  <ChevronRight className="w-8 h-8 text-white" />
-                </div>
               </div>
             </div>
 
             {/* Right content area */}
-            <div className="flex-1 ml-4 flex flex-col overflow-hidden">
+            <div className="flex-1 mt-2 ml-4 flex flex-col overflow-hidden">
               <div className="flex-1 overflow-auto">
                 {activeView === "practiceCall" && (
-                  <div className="w-full">
+                  <div className="w-full ">
                     <div
-                      className="border border-[#4a90e2] rounded-lg p-4 mb-4"
+                      className="border border-[#4a90e2] rounded-lg p-8 mb-4"
                       style={{ borderRadius: "16px" }}
                     >
                       <div className="bg-gray-200 p-2 mb-3">
@@ -699,13 +683,22 @@ export default function Independence() {
                                 >
                                   Normal
                                 </div>
+                                <div
+                                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setCustomerBehavior("Aggressive");
+                                    setShowBehaviorDropdown(false);
+                                  }}
+                                >
+                                  Aggressive
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
-                        <div className="mt-3">
+                        <div className="mt-3 flex justify-center">
                           <button
-                            className="w-full bg-[#d35400] text-white py-2 rounded-md"
+                            className="bg-[#d35400] text-white py-2 px-24 rounded-md"
                             onClick={handlePracticeSubmit}
                           >
                             Click to Submit
@@ -715,7 +708,7 @@ export default function Independence() {
                     </div>
 
                     <div
-                      className="border border-[#4a90e2] rounded-lg p-4"
+                      className="border border-[#4a90e2] mt-10 rounded-lg p-8"
                       style={{ borderRadius: "16px" }}
                     >
                       <div className="bg-gray-200 p-2 mb-3">
@@ -767,9 +760,9 @@ export default function Independence() {
                             )}
                           </div>
                         </div>
-                        <div className="mt-3">
+                        <div className="mt-3 flex justify-center">
                           <button
-                            className="w-full bg-[#d35400] text-white py-2 rounded-md"
+                            className=" bg-[#d35400] text-white py-2 px-24 rounded-md"
                             onClick={handleRecordingsSubmit}
                             disabled={!selectedAgent || isLoadingAgents}
                           >
@@ -1068,12 +1061,7 @@ export default function Independence() {
                   alt="Person with coffee"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute right-4 top-1/4 text-[#87CEFA] text-5xl font-bold z-10">
-                  IBX
-                </div>
-                <div className="absolute right-0 top-1/4 transform translate-y-1/2 z-10">
-                  <ChevronRight className="w-8 h-8 text-white" />
-                </div>
+               
               </div>
             </div>
 
