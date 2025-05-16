@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 
-import { useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown, ChevronRight, X } from "lucide-react";
 import { RetellWebClient } from "retell-client-js-sdk";
 
 // Define interface for RegisterCallResponse
@@ -28,6 +28,18 @@ interface CustomerDetails {
   dob: string;
   accountNumber: string;
   behavior: string;
+}
+
+// Call details interface
+interface CallDetails {
+  call_id: string;
+  transcript: string;
+  recording_url: string;
+  duration_ms: number;
+  call_analysis: {
+    call_summary: string;
+    user_sentiment: string;
+  };
 }
 
 // Array of customer details for randomization
@@ -146,7 +158,7 @@ export default function Independence() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedAgentId, setSelectedAgentId] = useState<string>(""); // Store the _id of the selected agent
+  const [selectedAgentId, setSelectedAgentId] = useState<string>("");
   const [showAgentDropdown, setShowAgentDropdown] = useState(false);
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
 
@@ -163,6 +175,13 @@ export default function Independence() {
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>(
     getRandomCustomer()
   );
+
+  // Call details and popup state
+  const [callDetails, setCallDetails] = useState<CallDetails | null>(null);
+  const [showCallSummary, setShowCallSummary] = useState(false);
+  const [isLoadingCallDetails, setIsLoadingCallDetails] = useState(false);
+  const [currentPlayingCallId, setCurrentPlayingCallId] = useState<string>("");
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     // Set up event listeners for the webClient
@@ -228,6 +247,44 @@ export default function Independence() {
 
     fetchNamesList();
   }, []);
+
+  // Function to fetch call details from Retell API
+  const fetchCallDetails = async (callId: string) => {
+    setIsLoadingCallDetails(true);
+    try {
+      const response = await fetch(
+        `https://api.retellai.com/v2/get-call/${callId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`, // Use the same API key as in registerCall
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error fetching call details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Call details fetched successfully:", data);
+      setCallDetails(data);
+      setCurrentPlayingCallId(callId);
+      setShowCallSummary(true);
+
+      // If there's a recording URL, set it to the audio element
+      if (data.recording_url && audioRef.current) {
+        audioRef.current.src = data.recording_url;
+        audioRef.current.load();
+      }
+    } catch (error) {
+      console.error("Error fetching call details:", error);
+      alert("Failed to fetch call details. Please try again.");
+    } finally {
+      setIsLoadingCallDetails(false);
+    }
+  };
 
   // Add this function to handle name input changes
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -329,13 +386,13 @@ export default function Independence() {
       setAgents(data);
 
       // Set the first agent as selected if available and no agent is currently selected
-      if (data.length > 0 && !selectedAgent) {
-        setSelectedAgent(data[0].name);
-        setSelectedAgentId(data[0]._id); // Store the _id
-        if (data[0].agentId) {
-          setCurrentAgentId(data[0].agentId);
-        }
-      }
+      // if (data.length > 0 && !selectedAgent) {
+      //   setSelectedAgent(data[0].name);
+      //   setSelectedAgentId(data[0]._id); // Store the _id
+      //   if (data[0].agentId) {
+      //     setCurrentAgentId(data[0].agentId);
+      //   }
+      // }
     } catch (error) {
       console.error("Error fetching agents:", error);
     } finally {
@@ -561,13 +618,17 @@ export default function Independence() {
     }
   };
 
+  // Function to handle playing a call recording
+  const handlePlayRecording = (callId: string) => {
+    console.log("Playing recording for call ID:", callId);
+    fetchCallDetails(callId);
+  };
+
   // Add this function to render call records in the recordings view
   const renderCallRecords = () => {
     if (!selectedAgent || agents.length === 0) {
       return [...Array(10)].map((_, index) => (
         <tr key={index} className="border-b border-gray-300">
-          <td className="p-2">&nbsp;</td>
-          <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
@@ -588,8 +649,6 @@ export default function Independence() {
           <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
-          <td className="p-2">&nbsp;</td>
-          <td className="p-2">&nbsp;</td>
         </tr>
       ));
     }
@@ -598,8 +657,6 @@ export default function Independence() {
       console.log("No call IDs found for agent:", agent.name);
       return [...Array(10)].map((_, index) => (
         <tr key={index} className="border-b border-gray-300">
-          <td className="p-2">&nbsp;</td>
-          <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
           <td className="p-2">&nbsp;</td>
@@ -614,11 +671,15 @@ export default function Independence() {
         <td className="p-2">{callId}</td>
         <td className="p-2">{new Date().toLocaleTimeString()}</td>
         <td className="p-2">{new Date().toLocaleTimeString()}</td>
-        <td className="p-2">Call summary not available</td>
-        <td className="p-2">Neutral</td>
         <td className="p-2">
-          <button className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs">
-            Play
+          <button
+            className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
+            onClick={() => handlePlayRecording(callId)}
+            disabled={isLoadingCallDetails}
+          >
+            {isLoadingCallDetails && currentPlayingCallId === callId
+              ? "Loading..."
+              : "View Call Details"}
           </button>
         </td>
       </tr>
@@ -700,28 +761,44 @@ export default function Independence() {
         {activeView !== "recordings" ? (
           <>
             {/* Left sidebar */}
-            <div className="w-[23%] bg-white flex flex-col h-[80%]">
-              {/* Blue Section with Centered Text */}
-              <div className="bg-[#4a90e2] text-white px-8 py-8 flex flex-col justify-center text-left">
-                <h1 className="text-3xl font-bold mb-6 leading-tight">
+            <div className="w-[30%] bg-white">
+              <div className="bg-[#4a90e2] text-white p-4">
+                <h1 className="text-4xl font-bold mb-3">
                   Driving health
                   <br />
                   care forward
                 </h1>
-                <p className="text-base leading-relaxed">
-                  With you at the center of everything we do, we are building
-                  the healthcare company of the future by redefining what to
-                  expect from a health insurer.
+                <p className="text-lg" style={{ lineHeight: "1.4" }}>
+                  With you at the center of
+                  <br />
+                  everything we do, we are
+                  <br />
+                  building the healthcare
+                  <br />
+                  company of the future by
+                  <br />
+                  redefining what to expect from
+                  <br />a health insurer.
                 </p>
               </div>
-
               {/* Person image with IBX overlay */}
-              <div className="relative h-94 bg-[#3a7bc8] flex items-center">
+              <div className="relative h-64 bg-[#3a7bc8] flex items-center">
                 <img
                   src="/independence_home.png"
                   alt="Person with coffee"
-                  className="w-full h-full object-cover"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    position: "absolute",
+                  }}
                 />
+                <div className="absolute right-4 text-[#87CEFA] text-6xl font-bold z-10">
+                  IBX
+                </div>
+                <div className="absolute right-0 bottom-1/2 transform translate-y-1/2 z-10">
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </div>
               </div>
             </div>
 
@@ -731,7 +808,7 @@ export default function Independence() {
                 {activeView === "practiceCall" && (
                   <div className="w-full">
                     <div
-                      className="border border-[#4a90e2] rounded-lg p-8 mb-4 mt-4"
+                      className="border border-[#4a90e2] rounded-lg p-4 mb-4"
                       style={{ borderRadius: "16px" }}
                     >
                       <div className="bg-gray-200 p-2 mb-3">
@@ -835,15 +912,6 @@ export default function Independence() {
                                 >
                                   Normal
                                 </div>
-                                <div
-                                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setCustomerBehavior("Aggressive");
-                                    setShowBehaviorDropdown(false);
-                                  }}
-                                >
-                                  Aggressive
-                                </div>
                               </div>
                             )}
                           </div>
@@ -861,7 +929,7 @@ export default function Independence() {
                     </div>
 
                     <div
-                      className="border border-[#4a90e2] rounded-lg p-8  mt-9"
+                      className="border border-[#4a90e2] rounded-lg p-4"
                       style={{ borderRadius: "16px" }}
                     >
                       <div className="bg-gray-200 p-2 mb-3">
@@ -877,7 +945,13 @@ export default function Independence() {
                                 setShowAgentDropdown(!showAgentDropdown)
                               }
                             >
-                              <span>{selectedAgent || "Select an agent"}</span>
+                              <span
+                                className={
+                                  selectedAgent ? "text-black" : "text-gray-400"
+                                }
+                              >
+                                {selectedAgent || "Select an agent"}
+                              </span>
                               <div className="bg-gray-200 w-6 h-6 flex items-center justify-center">
                                 {isLoadingAgents ? (
                                   <div className="animate-spin h-4 w-4 border-2 border-[#4a90e2] border-t-transparent rounded-full"></div>
@@ -915,7 +989,7 @@ export default function Independence() {
                         </div>
                         <div className="mt-3 flex justify-center">
                           <button
-                            className="bg-[#d35400] text-white py-2 px-24 rounded-md"
+                            className="bg-[#d35400] text-white py-2 px-24 rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
                             onClick={handleRecordingsSubmit}
                             disabled={!selectedAgent || isLoadingAgents}
                           >
@@ -1212,8 +1286,14 @@ export default function Independence() {
                 <img
                   src="/independence_home.png"
                   alt="Person with coffee"
-                  className="w-full h-full "
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute right-4 top-1/4 text-[#87CEFA] text-5xl font-bold z-10">
+                  IBX
+                </div>
+                <div className="absolute right-0 top-1/4 transform translate-y-1/2 z-10">
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </div>
               </div>
             </div>
 
@@ -1252,6 +1332,70 @@ export default function Independence() {
           </div>
         )}
       </div>
+
+      {/* Call Summary Popup */}
+      {showCallSummary && callDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Call Summary</h2>
+              <button
+                onClick={() => setShowCallSummary(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="font-semibold text-lg mb-2">Summary</h3>
+              <p className="text-gray-700">
+                {callDetails.call_analysis?.call_summary ||
+                  "No summary available"}
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="font-semibold text-lg mb-2">Customer Sentiment</h3>
+              <p className="text-gray-700">
+                {callDetails.call_analysis?.user_sentiment || "Not available"}
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="font-semibold text-lg mb-2">Call Duration</h3>
+              <p className="text-gray-700">
+                {callDetails.duration_ms
+                  ? `${Math.round(callDetails.duration_ms / 1000)} seconds`
+                  : "Not available"}
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="font-semibold text-lg mb-2">Transcript</h3>
+              <div className="bg-gray-100 p-3 rounded-md max-h-40 overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-sm">
+                  {callDetails.transcript || "No transcript available"}
+                </pre>
+              </div>
+            </div>
+
+            {callDetails.recording_url && (
+              <div className="mt-4">
+                <h3 className="font-semibold text-lg mb-2">Recording</h3>
+                <audio
+                  ref={audioRef}
+                  controls
+                  className="w-full"
+                  src={callDetails.recording_url}
+                >
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
