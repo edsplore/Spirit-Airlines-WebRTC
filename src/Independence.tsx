@@ -4,7 +4,7 @@ import React from "react";
 
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronDown, ChevronRight, X } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
 // Define interface for RegisterCallResponse
