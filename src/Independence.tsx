@@ -2,7 +2,7 @@
 import React from "react";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { RetellWebClient } from "retell-client-js-sdk";
 
 // Define interface for RegisterCallResponse
@@ -145,12 +145,14 @@ export default function Independence() {
 
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedAgentId, setSelectedAgentId] = useState<string>(""); // Store the _id of the selected agent
   const [showAgentDropdown, setShowAgentDropdown] = useState(false);
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
 
   // Track the current call information
   const [currentCallId, setCurrentCallId] = useState<string>("");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentAgentId, setCurrentAgentId] = useState<string>("");
   const [isUpdatingCallRecord, setIsUpdatingCallRecord] = useState(false);
 
