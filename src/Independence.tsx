@@ -1321,8 +1321,6 @@ export default function Independence() {
                       <th className="p-2 text-left">Start time</th>
                       <th className="p-2 text-left">End Time</th>
                       <th className="p-2 text-left">Call Summary</th>
-                      <th className="p-2 text-left">Customer Sentiment</th>
-                      <th className="p-2 text-left">Call recording</th>
                     </tr>
                   </thead>
                   <tbody>{renderCallRecords()}</tbody>
