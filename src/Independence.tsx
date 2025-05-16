@@ -912,6 +912,15 @@ export default function Independence() {
                                 >
                                   Normal
                                 </div>
+                                <div
+                                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setCustomerBehavior("Aggressive");
+                                    setShowBehaviorDropdown(false);
+                                  }}
+                                >
+                                  Aggressive
+                                </div>
                               </div>
                             )}
                           </div>
