@@ -128,7 +128,7 @@ export default function Independence() {
     "practiceCall" | "startCall" | "endCall" | "recordings"
   >("practiceCall");
 
-  const [userName, setUserName] = useState("Jon Smith");
+  const [userName, setUserName] = useState(" ");
   const [namesList, setNamesList] = useState<string[]>([]);
   const [filteredNames, setFilteredNames] = useState<string[]>([]);
   const [showNameSuggestions, setShowNameSuggestions] = useState(false);
@@ -145,14 +145,14 @@ export default function Independence() {
 
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedAgentId, setSelectedAgentId] = useState<string>(""); // Store the _id of the selected agent
   const [showAgentDropdown, setShowAgentDropdown] = useState(false);
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
 
   // Track the current call information
   const [currentCallId, setCurrentCallId] = useState<string>("");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentAgentId, setCurrentAgentId] = useState<string>("");
   const [isUpdatingCallRecord, setIsUpdatingCallRecord] = useState(false);
 
@@ -835,14 +835,24 @@ export default function Independence() {
                                 >
                                   Normal
                                 </div>
+                                <div
+                                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setCustomerBehavior("Aggressive");
+                                    setShowBehaviorDropdown(false);
+                                  }}
+                                >
+                                  Aggressive
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
                         <div className="mt-3 flex justify-center">
                           <button
-                            className="bg-[#d35400] text-white py-2 px-24 rounded-md"
+                            className="bg-[#d35400] text-white py-2 px-24 rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
                             onClick={handlePracticeSubmit}
+                            disabled={!userName || userName.trim() === ""}
                           >
                             Click to Submit
                           </button>
@@ -903,7 +913,7 @@ export default function Independence() {
                             )}
                           </div>
                         </div>
-                       <div className="mt-3 flex justify-center">
+                        <div className="mt-3 flex justify-center">
                           <button
                             className="bg-[#d35400] text-white py-2 px-24 rounded-md"
                             onClick={handleRecordingsSubmit}
