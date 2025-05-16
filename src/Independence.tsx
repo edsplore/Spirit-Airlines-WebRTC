@@ -2,9 +2,8 @@
 import React from "react";
 
 
-
 import { useState, useEffect, useRef } from "react"
-import { ChevronDown, X } from "lucide-react"
+import { ChevronDown, ChevronRight, X } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
 // Define interface for RegisterCallResponse
@@ -38,9 +37,19 @@ interface CallDetails {
   transcript: string
   recording_url: string
   duration_ms: number
+  start_timestamp?: number
+  end_timestamp?: number
   call_analysis: {
     call_summary: string
     user_sentiment: string
+  }
+}
+
+// Interface to store call times
+interface CallTimes {
+  [callId: string]: {
+    startTime: string
+    endTime: string
   }
 }
 
@@ -134,6 +143,26 @@ function getRandomCustomer(): CustomerDetails {
   return customerDataList[randomIndex]
 }
 
+// Function to format timestamp to Indian time format
+function formatTimestampToIndianTime(timestamp: number): string {
+  if (!timestamp) return "N/A"
+
+  // Create a date object with the timestamp (milliseconds)
+  const date = new Date(timestamp)
+
+  // Format to Indian time (IST is UTC+5:30)
+  return date.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour12: true,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+}
+
 // Initialize the RetellWebClient outside the component
 const webClient = new RetellWebClient()
 
@@ -176,6 +205,10 @@ export default function Independence() {
   const [isLoadingCallDetails, setIsLoadingCallDetails] = useState(false)
   const [currentPlayingCallId, setCurrentPlayingCallId] = useState<string>("")
   const audioRef = useRef<HTMLAudioElement>(null)
+
+  // Store call times for all calls
+  const [callTimes, setCallTimes] = useState<CallTimes>({})
+  const [isLoadingCallTimes, setIsLoadingCallTimes] = useState(false)
 
   useEffect(() => {
     // Set up event listeners for the webClient
@@ -241,8 +274,11 @@ export default function Independence() {
   }, [])
 
   // Function to fetch call details from Retell API
-  const fetchCallDetails = async (callId: string) => {
-    setIsLoadingCallDetails(true)
+  const fetchCallDetails = async (callId: string, updateCallTimes = false): Promise<CallDetails | null> => {
+    if (!updateCallTimes) {
+      setIsLoadingCallDetails(true)
+    }
+
     try {
       const response = await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
         method: "GET",
@@ -258,20 +294,73 @@ export default function Independence() {
 
       const data = await response.json()
       console.log("Call details fetched successfully:", data)
-      setCallDetails(data)
-      setCurrentPlayingCallId(callId)
-      setShowCallSummary(true)
 
-      // If there's a recording URL, set it to the audio element
-      if (data.recording_url && audioRef.current) {
-        audioRef.current.src = data.recording_url
-        audioRef.current.load()
+      if (!updateCallTimes) {
+        setCallDetails(data)
+        setCurrentPlayingCallId(callId)
+        setShowCallSummary(true)
+
+        // If there's a recording URL, set it to the audio element
+        if (data.recording_url && audioRef.current) {
+          audioRef.current.src = data.recording_url
+          audioRef.current.load()
+        }
       }
+
+      return data
     } catch (error) {
       console.error("Error fetching call details:", error)
-      alert("Failed to fetch call details. Please try again.")
+      if (!updateCallTimes) {
+        alert("Failed to fetch call details. Please try again.")
+      }
+      return null
     } finally {
-      setIsLoadingCallDetails(false)
+      if (!updateCallTimes) {
+        setIsLoadingCallDetails(false)
+      }
+    }
+  }
+
+  // Function to fetch call times for all call IDs
+  const fetchAllCallTimes = async (callIds: string[]) => {
+    if (!callIds || callIds.length === 0) return
+
+    setIsLoadingCallTimes(true)
+    const newCallTimes: CallTimes = {}
+
+    try {
+      // Create an array of promises for all API calls
+      const promises = callIds.map((callId) => fetchCallDetails(callId, true))
+
+      // Wait for all promises to resolve
+      const results = await Promise.allSettled(promises)
+
+      // Process the results
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled" && result.value) {
+          const callData = result.value
+          const callId = callIds[index]
+
+          newCallTimes[callId] = {
+            startTime: formatTimestampToIndianTime(callData.start_timestamp || 0),
+            endTime: formatTimestampToIndianTime(callData.end_timestamp || 0),
+          }
+        } else {
+          // If the API call failed, use placeholder values
+          const callId = callIds[index]
+          newCallTimes[callId] = {
+            startTime: "N/A",
+            endTime: "N/A",
+          }
+        }
+      })
+
+      // Update the state with all call times
+      setCallTimes(newCallTimes)
+    } catch (error) {
+      console.error("Error fetching call times:", error)
+    } finally {
+      setIsLoadingCallTimes(false)
     }
   }
 
@@ -428,6 +517,12 @@ export default function Independence() {
       // The API might return a single object or an array, handle both cases
       if (Array.isArray(data)) {
         setAgents(data)
+
+        // Fetch call times for all call IDs if there are any
+        const allCallIds = data.flatMap((agent) => agent.callIds || [])
+        if (allCallIds.length > 0) {
+          fetchAllCallTimes(allCallIds)
+        }
       } else {
         // If it's a single object, create an array with just that object
         setAgents([data])
@@ -436,6 +531,11 @@ export default function Independence() {
         setSelectedAgentId(data._id) // Store the _id
         if (data.agentId) {
           setCurrentAgentId(data.agentId)
+        }
+
+        // Fetch call times for all call IDs if there are any
+        if (data.callIds && data.callIds.length > 0) {
+          fetchAllCallTimes(data.callIds)
         }
       }
 
@@ -527,9 +627,20 @@ export default function Independence() {
             // Update the agents state with the detailed data
             if (Array.isArray(detailsData)) {
               setAgents(detailsData)
+
+              // Fetch call times for all call IDs
+              const allCallIds = detailsData.flatMap((agent) => agent.callIds || [])
+              if (allCallIds.length > 0) {
+                fetchAllCallTimes(allCallIds)
+              }
             } else {
               setAgents([detailsData])
               setSelectedAgent(detailsData.name)
+
+              // Fetch call times for all call IDs
+              if (detailsData.callIds && detailsData.callIds.length > 0) {
+                fetchAllCallTimes(detailsData.callIds)
+              }
             }
           }
         } catch (error) {
@@ -660,8 +771,20 @@ export default function Independence() {
     return agent.callIds.map((callId, index) => (
       <tr key={index} className="border-b border-gray-300">
         <td className="p-2">{callId}</td>
-        <td className="p-2">{new Date().toLocaleTimeString()}</td>
-        <td className="p-2">{new Date().toLocaleTimeString()}</td>
+        <td className="p-2">
+          {isLoadingCallTimes ? (
+            <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
+          ) : (
+            callTimes[callId]?.startTime || "Loading..."
+          )}
+        </td>
+        <td className="p-2">
+          {isLoadingCallTimes ? (
+            <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
+          ) : (
+            callTimes[callId]?.endTime || "Loading..."
+          )}
+        </td>
         <td className="p-2">
           <button
             className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
@@ -774,10 +897,14 @@ export default function Independence() {
                   style={{
                     width: "100%",
                     height: "100%",
+                    objectFit: "cover",
                     position: "absolute",
                   }}
                 />
-              
+                <div className="absolute right-4 text-[#87CEFA] text-6xl font-bold z-10">IBX</div>
+                <div className="absolute right-0 bottom-1/2 transform translate-y-1/2 z-10">
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </div>
               </div>
             </div>
 
@@ -1223,8 +1350,11 @@ export default function Independence() {
 
               {/* Right image section */}
               <div className="w-[50%] relative h-full">
-                <img src="/independence_home.png" alt="Person with coffee" className="w-full h-full " />
-               
+                <img src="/independence_home.png" alt="Person with coffee" className="w-full h-full object-cover" />
+                <div className="absolute right-4 top-1/4 text-[#87CEFA] text-5xl font-bold z-10">IBX</div>
+                <div className="absolute right-0 top-1/4 transform translate-y-1/2 z-10">
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </div>
               </div>
             </div>
 
