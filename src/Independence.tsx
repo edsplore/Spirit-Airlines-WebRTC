@@ -3,7 +3,7 @@ import React from "react";
 
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronDown, ChevronRight, X } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
 // Define interface for RegisterCallResponse
@@ -901,10 +901,7 @@ export default function Independence() {
                     position: "absolute",
                   }}
                 />
-                <div className="absolute right-4 text-[#87CEFA] text-6xl font-bold z-10">IBX</div>
-                <div className="absolute right-0 bottom-1/2 transform translate-y-1/2 z-10">
-                  <ChevronRight className="w-8 h-8 text-white" />
-                </div>
+               
               </div>
             </div>
 
@@ -1351,10 +1348,7 @@ export default function Independence() {
               {/* Right image section */}
               <div className="w-[50%] relative h-full">
                 <img src="/independence_home.png" alt="Person with coffee" className="w-full h-full object-cover" />
-                <div className="absolute right-4 top-1/4 text-[#87CEFA] text-5xl font-bold z-10">IBX</div>
-                <div className="absolute right-0 top-1/4 transform translate-y-1/2 z-10">
-                  <ChevronRight className="w-8 h-8 text-white" />
-                </div>
+              
               </div>
             </div>
 
