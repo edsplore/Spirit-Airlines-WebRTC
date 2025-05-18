@@ -36,7 +36,7 @@ export default function App() {
       <Route path="/demo/riskmanagement/aon" element={<AON />} />
       <Route path="/demo/carrental/sixt" element={<SixtHomepage />} />
 
-      <Route path="/demo/healthcare/independence" element={<Independence />} />
+      <Route path="/demo/healthcare/IBX" element={<Independence />} />
 
       <Route path="*" element={<div>Coming Soon</div>} />
     </Routes>
