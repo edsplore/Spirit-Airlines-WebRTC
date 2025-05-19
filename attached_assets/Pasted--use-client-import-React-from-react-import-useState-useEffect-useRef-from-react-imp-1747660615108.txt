@@ -1,0 +1,529 @@
+"use client";
+import React from "react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown, X } from "lucide-react";
+import { RetellWebClient } from "retell-client-js-sdk";
+
+// Define interface for RegisterCallResponse
+interface RegisterCallResponse {
+  access_token?: string;
+  callId?: string;
+  sampleRate: number;
+}
+
+interface Agent {
+  _id: string;
+  name: string;
+  agentId?: string; // Make agentId optional
+  callIds: string[];
+  __v: number;
+}
+
+// Customer details interface
+interface CustomerDetails {
+  name: string;
+  phone: string;
+  address: string;
+  dob: string;
+  accountNumber: string;
+  behavior: string;
+  gender: string;
+}
+
+// Call details interface
+interface CallDetails {
+  call_id: string;
+  transcript: string;
+  recording_url: string;
+  duration_ms: number;
+  start_timestamp?: number;
+  end_timestamp?: number;
+  call_analysis: {
+    call_summary: string;
+    user_sentiment: string;
+  };
+}
+
+// Interface to store call times
+interface CallTimes {
+  [callId: string]: {
+    startTime: string;
+    endTime: string;
+    duration?: string;
+    sentiment?: string;
+  };
+}
+
+// Sample customer data
+const maleCustomerDataList: CustomerDetails[] = [
+  { name: "John Davis", phone: "2345678901", address: "567 Pine Street, Boston, MA", dob: "15 March 1975", accountNumber: "876543210", behavior: "Normal", gender: "Male" },
+  { name: "Michael Wilson", phone: "4567890123", address: "123 Maple Drive, Seattle, WA", dob: "10 January 1978", accountNumber: "654321098", behavior: "Normal", gender: "Male" },
+  { name: "Robert Martinez", phone: "6789012345", address: "789 Birch Road, Phoenix, AZ", dob: "18 April 1973", accountNumber: "432109876", behavior: "Normal", gender: "Male" },
+  { name: "David Rodriguez", phone: "8901234567", address: "567 Walnut Avenue, Dallas, TX", dob: "14 February 1981", accountNumber: "210987654", behavior: "Normal", gender: "Male" },
+  { name: "James Miller", phone: "0123456789", address: "123 Aspen Court, New York, NY", dob: "25 October 1983", accountNumber: "098765432", behavior: "Normal", gender: "Male" },
+];
+const femaleCustomerDataList: CustomerDetails[] = [
+  { name: "Mary Carpenter", phone: "1234567890", address: "1234 University Avenue, Miami, FL", dob: "06 June 1980", accountNumber: "987654321", behavior: "Normal", gender: "Female" },
+  { name: "Sarah Johnson",  phone: "3456789012", address: "890 Oak Avenue, Chicago, IL", dob: "22 September 1982", accountNumber: "765432109", behavior: "Normal", gender: "Female" },
+  { name: "Emily Thompson", phone: "5678901234", address: "456 Cedar Lane, Denver, CO", dob: "03 July 1985", accountNumber: "543210987", behavior: "Normal", gender: "Female" },
+  { name: "Jennifer Garcia", phone: "7890123456", address: "234 Elm Street, Atlanta, GA", dob: "29 November 1979", accountNumber: "321098765", behavior: "Normal", gender: "Female" },
+  { name: "Lisa Brown", phone: "9012345678", address: "890 Spruce Boulevard, San Francisco, CA", dob: "07 August 1976", accountNumber: "109876543", behavior: "Normal", gender: "Female" },
+];
+
+// Helper functions
+function getRandomCustomer(gender: string): CustomerDetails {
+  const list = gender === "Male" ? maleCustomerDataList : femaleCustomerDataList;
+  return list[Math.floor(Math.random() * list.length)];
+}
+function formatTimestampToIndianTime(ts: number): string {
+  if (!ts) return "N/A";
+  return new Date(ts).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit",
+    day: "2-digit", month: "2-digit", year: "numeric",
+  });
+}
+
+const webClient = new RetellWebClient();
+
+export default function Independence() {
+  // View & form
+  const [activeView, setActiveView] = useState<"practiceCall"|"startCall"|"endCall"|"recordings">("practiceCall");
+  const [userName, setUserName] = useState("");
+  const [namesList, setNamesList] = useState<string[]>([]);
+  const [filteredNames, setFilteredNames] = useState<string[]>([]);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+  const [selectedScenario, setSelectedScenario] = useState("Coverage & Benefits (Male)");
+  const [customerBehavior, setCustomerBehavior] = useState("Normal");
+  const [showScenarioDropdown, setShowScenarioDropdown] = useState(false);
+  const [showBehaviorDropdown, setShowBehaviorDropdown] = useState(false);
+
+  // Call control
+  const [callStatus, setCallStatus] = useState<"not-started"|"active"|"inactive">("not-started");
+  const [callInProgress, setCallInProgress] = useState(false);
+
+  // Agents & recordings
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState("");
+  const [selectedAgentId, setSelectedAgentId] = useState("");
+  const [showAgentDropdown, setShowAgentDropdown] = useState(false);
+  const [isLoadingAgents, setIsLoadingAgents] = useState(false);
+
+  // Session
+  const [currentCallId, setCurrentCallId] = useState("");
+  const [currentAgentId, setCurrentAgentId] = useState("");
+  const [createdAgentId, setCreatedAgentId] = useState("");
+  const [isUpdatingCallRecord, setIsUpdatingCallRecord] = useState(false);
+
+  // Customer & call details
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails>(getRandomCustomer("Male"));
+  const [callDetails, setCallDetails] = useState<CallDetails|null>(null);
+  const [showCallSummary, setShowCallSummary] = useState(false);
+  const [isLoadingCallDetails, setIsLoadingCallDetails] = useState(false);
+  const [currentPlayingCallId, setCurrentPlayingCallId] = useState("");
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Call times
+  const [callTimes, setCallTimes] = useState<CallTimes>({});
+  const [isLoadingCallTimes, setIsLoadingCallTimes] = useState(false);
+
+  // Preserve form
+  const [formData, setFormData] = useState({ userName:"", selectedScenario:"Coverage & Benefits (Male)", customerBehavior:"Normal" });
+
+  // --- New filter state ---
+  const [filterSentiment, setFilterSentiment] = useState("All");
+  const [filterStartAfter, setFilterStartAfter] = useState("");
+  const [filterStartBefore, setFilterStartBefore] = useState("");
+
+  // Effects
+  useEffect(()=>{
+    webClient.on("conversationStarted",()=>{ setCallStatus("active"); setCallInProgress(false); });
+    webClient.on("conversationEnded",()=>{ setCallStatus("inactive"); setCallInProgress(false); });
+    webClient.on("error",()=>{ setCallStatus("inactive"); setCallInProgress(false); });
+    webClient.on("update",u=>console.log("Update:",u));
+    fetchAgents();
+    return ()=>{
+      if(callStatus==="active") webClient.stopCall();
+      webClient.off("conversationStarted");
+      webClient.off("conversationEnded");
+      webClient.off("error");
+      webClient.off("update");
+    };
+  },[]);
+
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const res=await fetch("https://ibx-backend.replit.app/api/agents/list");
+        if(res.ok){
+          const data:Agent[]=await res.json();
+          setNamesList(data.map(a=>a.name));
+        }
+      }catch{}
+    })();
+  },[]);
+
+  // Fetch functions
+  const fetchAgents = async()=> {
+    setIsLoadingAgents(true);
+    try{
+      const res=await fetch("https://ibx-backend.replit.app/api/agents/list");
+      if(!res.ok) throw new Error();
+      setAgents(await res.json());
+    }catch{ console.error("fetchAgents error"); }
+    finally{ setIsLoadingAgents(false); }
+  };
+
+  const fetchCallDetails = async(callId:string, updating=false):Promise<CallDetails|null>=>{
+    if(!updating) setIsLoadingCallDetails(true);
+    try{
+      const res=await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
+        headers:{ "Content-Type":"application/json", Authorization:`Bearer key_6d2f13875c4b0cdb80c6f031c6c4` }
+      });
+      if(!res.ok) throw new Error();
+      const data:CallDetails=await res.json();
+      if(!updating){
+        setCallDetails(data);
+        setCurrentPlayingCallId(callId);
+        setShowCallSummary(true);
+        if(data.recording_url && audioRef.current){
+          audioRef.current.src=data.recording_url;
+          audioRef.current.load();
+        }
+      }
+      return data;
+    }catch{ if(!updating) alert("Failed to fetch call details."); return null; }
+    finally{ if(!updating) setIsLoadingCallDetails(false); }
+  };
+
+  const fetchAllCallTimes = async(callIds:string[])=>{
+    if(!callIds.length) return;
+    setIsLoadingCallTimes(true);
+    const newTimes:CallTimes={};
+    const results = await Promise.allSettled(callIds.map(id=>fetchCallDetails(id,true)));
+    results.forEach((r,i)=>{
+      const id=callIds[i];
+      if(r.status==="fulfilled"&&r.value){
+        newTimes[id]={
+          startTime: formatTimestampToIndianTime(r.value.start_timestamp||0),
+          endTime:   formatTimestampToIndianTime(r.value.end_timestamp||0),
+          duration:  r.value.duration_ms?`${Math.round(r.value.duration_ms/1000)}s`:"N/A",
+          sentiment: r.value.call_analysis.user_sentiment||"N/A"
+        };
+      } else {
+        newTimes[id]={ startTime:"N/A",endTime:"N/A",duration:"N/A",sentiment:"N/A" };
+      }
+    });
+    setCallTimes(newTimes);
+    setIsLoadingCallTimes(false);
+  };
+
+  // Handlers...
+  const handleNameChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const v=e.target.value; setUserName(v);
+    if(v.trim()){
+      const f=namesList.filter(n=>n.toLowerCase().includes(v.toLowerCase()));
+      setFilteredNames(f); setShowNameSuggestions(!!f.length);
+    } else setShowNameSuggestions(false);
+  };
+
+  const resetFormFields=()=>{
+    if(formData.userName){
+      setUserName(formData.userName);
+      setSelectedScenario(formData.selectedScenario);
+      setCustomerBehavior(formData.customerBehavior);
+    } else {
+      setUserName("");
+      setSelectedScenario("Coverage & Benefits (Male)");
+      setCustomerBehavior("Normal");
+    }
+    setSelectedAgent(""); setSelectedAgentId("");
+    setShowNameSuggestions(false);
+    setShowScenarioDropdown(false);
+    setShowBehaviorDropdown(false);
+    setShowAgentDropdown(false);
+  };
+
+  const handleViewChange=(view:"practiceCall"|"startCall"|"endCall"|"recordings")=>{
+    setActiveView(view);
+    if(view==="practiceCall") resetFormFields();
+  };
+
+  const handlePracticeSubmit=async()=>{
+    setFormData({ userName, selectedScenario, customerBehavior });
+    let agentId:string;
+    if(selectedScenario==="Coverage & Benefits (Male)") agentId="agent_829b55de186580e2ae4046a3d4";
+    else if(selectedScenario==="Coverage & Benefits (Female)") agentId="agent_516f9ab713ddc59c08c698ed96";
+    else if(selectedScenario==="Medical Card Replacement (Male)") agentId="agent_8510c8572ac35e4d17ed73d68b";
+    else agentId="agent_fd6cfc5cffacc3c89ea5ad0374";
+    setCurrentAgentId(agentId);
+    try{
+      const res=await fetch("https://ibx-backend.replit.app/api/agents/create",{
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ name:userName, agentId })
+      });
+      if(res.ok){
+        const data=await res.json();
+        if(data._id){
+          setCreatedAgentId(data._id);
+          setSelectedAgentId(data._id);
+          setSelectedAgent(userName);
+        }
+      }
+    }catch{}
+    const gender = selectedScenario.includes("(Male)")?"Male":"Female";
+    const newCust=getRandomCustomer(gender);
+    newCust.behavior=customerBehavior;
+    setCustomerDetails(newCust);
+    handleViewChange("startCall");
+  };
+
+  const registerCall=async():Promise<RegisterCallResponse>=>{
+    let agentId:string;
+    if(selectedScenario==="Coverage & Benefits (Male)") agentId="agent_829b55de186580e2ae4046a3d4";
+    else if(selectedScenario==="Coverage & Benefits (Female)") agentId="agent_516f9ab713ddc59c08c698ed96";
+    else if(selectedScenario==="Medical Card Replacement (Male)") agentId="agent_8510c8572ac35e4d17ed73d68b";
+    else agentId="agent_fd6cfc5cffacc3c89ea5ad0374";
+    setCurrentAgentId(agentId);
+    const [day,month,year]=customerDetails.dob.split(" ");
+    const formattedDob=`${day} ${month} ${year}`;
+    const res=await fetch("https://api.retellai.com/v2/create-web-call",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:`Bearer key_6d2f13875c4b0cdb80c6f031c6c4`
+      },
+      body:JSON.stringify({
+        agent_id:agentId,
+        retell_llm_dynamic_variables:{
+          first_name:customerDetails.name,
+          phone_number:customerDetails.phone,
+          address:customerDetails.address,
+          dob:formattedDob,
+          account_number:customerDetails.accountNumber,
+          customer_behavior:customerBehavior,
+          scenario:selectedScenario,
+        }
+      })
+    });
+    if(!res.ok) throw new Error();
+    const d=await res.json();
+    return { access_token:d.access_token, callId:d.call_id, sampleRate:d.sampleRate||16000 };
+  };
+
+  const toggleCall=async()=>{
+    if(callInProgress) return;
+    setCallInProgress(true);
+    try{
+      if(callStatus==="active"){
+        await webClient.stopCall();
+        setCallStatus("inactive");
+      } else {
+        await navigator.mediaDevices.getUserMedia({audio:true});
+        const {access_token,callId,sampleRate}=await registerCall();
+        setCurrentCallId(callId!);
+        await webClient.startCall({accessToken:access_token!,callId:callId!,sampleRate,enableUpdate:true});
+        setCallStatus("active");
+        handleViewChange("endCall");
+      }
+    } catch{} finally{ setCallInProgress(false); }
+  };
+
+  const handleRecordingsSubmit=async()=>{
+    try{
+      const agent=agents.find(a=>a.name===selectedAgent);
+      if(!agent) throw new Error();
+      const res=await fetch(`https://ibx-backend.replit.app/api/agents/details/${agent._id}`);
+      if(!res.ok) throw new Error();
+      const data=await res.json();
+      const list=Array.isArray(data)?data:[data];
+      setAgents(list);
+      await fetchAllCallTimes(list.flatMap(a=>a.callIds||[]));
+    }catch{} finally{ handleViewChange("recordings"); }
+  };
+
+  const handleListenToRecording=async()=>{
+    if(!currentCallId) setCurrentCallId(`Call${Date.now().toString().slice(-5)}`);
+    const aid=createdAgentId||selectedAgentId;
+    if(!aid){ alert("Select agent first"); return; }
+    setIsUpdatingCallRecord(true);
+    try{
+      const res=await fetch(`https://ibx-backend.replit.app/api/agents/calls/add/${aid}`,{
+        method:"PATCH", headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({callId:currentCallId})
+      });
+      if(!res.ok) throw new Error();
+      await handleRecordingsSubmit();
+    }catch{ alert("Failed update call record"); }
+    finally{ setIsUpdatingCallRecord(false); }
+  };
+
+  const handlePlayRecording=(id:string)=>{
+    fetchCallDetails(id);
+  };
+
+  // --- sorting + filtering logic ---
+  const callsWithMeta = (agents.find(a=>a.name===selectedAgent)?.callIds||[]).map(id=>({
+    id,
+    startTime:callTimes[id]?.startTime||"",
+    endTime:callTimes[id]?.endTime||"",
+    duration:callTimes[id]?.duration||"",
+    sentiment:callTimes[id]?.sentiment||"",
+  }));
+  const sortedCalls = [...callsWithMeta].sort((a,b)=>
+    new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+  );
+  const displayedCalls = sortedCalls.filter(c=>{
+    if(filterSentiment!=="All" && c.sentiment!==filterSentiment) return false;
+    if(filterStartAfter && new Date(c.startTime).getTime()<new Date(filterStartAfter).getTime()) return false;
+    if(filterStartBefore && new Date(c.startTime).getTime()>new Date(filterStartBefore).getTime()) return false;
+    return true;
+  });
+
+  return (
+    <div className="flex flex-col w-full h-screen bg-white overflow-hidden">
+      {/* header */}
+      <header className="flex justify-between items-center p-4">
+        <img src="/independence_logo.png" alt="Logo" style={{width:200}}/>
+        <div className="flex items-center gap-4">
+          <span className="font-bold">Welcome, {userName||"User"}</span>
+          <img src="/vi-labs.png" alt="VI Labs" style={{width:120}}/>
+        </div>
+      </header>
+
+      <div className="flex flex-1 px-4 pb-4 overflow-hidden">
+        {activeView!=="recordings"?(
+          <>
+            {/* sidebar */}
+            <div className="w-1/3">
+              <img src="/independence_home.jpeg" alt="Coffee" className="w-full h-full object-cover"/>
+            </div>
+            {/* main */}
+            <div className="flex-1 ml-4 flex flex-col overflow-hidden">
+              <div className="flex-1 overflow-auto">
+                {activeView==="practiceCall"&&(
+                  <div> {/* practise UI unchanged */}…</div>
+                )}
+                {activeView==="startCall"&&(<div> {/* start UI */}…</div>)}
+                {activeView==="endCall"&&(<div> {/* end UI */}…</div>)}
+              </div>
+            </div>
+          </>
+        ):(
+          <div className="w-full h-full flex flex-col">
+            {/* recordings header */}
+            <div className="bg-gray-200 p-2 flex justify-between items-center mb-4">
+              <span className="font-bold">Call Recordings for {selectedAgent}</span>
+              <button className="bg-[#d35400] text-white px-3 py-1 rounded"
+                      onClick={()=>handleViewChange("practiceCall")}>
+                Home
+              </button>
+            </div>
+            {/* filters */}
+            <div className="flex gap-4 p-4 mb-4 items-end">
+              <div>
+                <label className="block text-sm">Sentiment</label>
+                <select value={filterSentiment}
+                        onChange={e=>setFilterSentiment(e.target.value)}
+                        className="border px-2 py-1 rounded">
+                  <option>All</option>
+                  <option>Positive</option>
+                  <option>Neutral</option>
+                  <option>Negative</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm">Start After</label>
+                <input type="datetime-local"
+                       value={filterStartAfter}
+                       onChange={e=>setFilterStartAfter(e.target.value)}
+                       className="border px-2 py-1 rounded"/>
+              </div>
+              <div>
+                <label className="block text-sm">Start Before</label>
+                <input type="datetime-local"
+                       value={filterStartBefore}
+                       onChange={e=>setFilterStartBefore(e.target.value)}
+                       className="border px-2 py-1 rounded"/>
+              </div>
+              <button className="text-[#4a90e2] hover:underline"
+                      onClick={()=>{
+                        setFilterSentiment("All");
+                        setFilterStartAfter("");
+                        setFilterStartBefore("");
+                      }}>
+                Reset Filters
+              </button>
+            </div>
+            {/* table */}
+            <div className="flex-1 bg-white p-4 overflow-y-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-300">
+                    <th className="p-2 text-left">Call ID</th>
+                    <th className="p-2 text-left">Start Time</th>
+                    <th className="p-2 text-left">End Time</th>
+                    <th className="p-2 text-left">Duration</th>
+                    <th className="p-2 text-left">Sentiment</th>
+                    <th className="p-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedCalls.map((c,i)=>(
+                    <tr key={i} className="border-b border-gray-300">
+                      <td className="p-2">{c.id}</td>
+                      <td className="p-2">{c.startTime}</td>
+                      <td className="p-2">{c.endTime}</td>
+                      <td className="p-2">{c.duration}</td>
+                      <td className="p-2">{c.sentiment}</td>
+                      <td className="p-2">
+                        <button className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
+                                onClick={()=>handlePlayRecording(c.id)}>
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {displayedCalls.length===0&&(
+                    <tr><td colSpan={6} className="p-4 text-center">
+                      No call records match your filters.
+                    </td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* call summary */}
+      {showCallSummary&&callDetails&&(
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Call Summary</h2>
+              <button onClick={()=>setShowCallSummary(false)}><X size={24}/></button>
+            </div>
+            <div className="mb-4">
+              <h3 className="font-semibold">Summary</h3>
+              <p>{callDetails.call_analysis.call_summary||"No summary"}</p>
+            </div>
+            <div className="mb-4">
+              <h3 className="font-semibold">Transcript</h3>
+              <pre className="bg-gray-100 p-3 rounded max-h-40 overflow-y-auto whitespace-pre-wrap">
+                {callDetails.transcript||"No transcript"}
+              </pre>
+            </div>
+            {callDetails.recording_url&&(
+              <div>
+                <h3 className="font-semibold">Recording</h3>
+                <audio ref={audioRef} controls className="w-full"
+                       src={callDetails.recording_url}/>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
