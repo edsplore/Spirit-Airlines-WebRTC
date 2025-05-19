@@ -243,6 +243,11 @@ export default function Independence() {
     customerBehavior: "Normal",
   });
 
+  // Sorting and Filtering states
+  const [sortColumn, setSortColumn] = useState<string | null>("startTime");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   useEffect(() => {
     // Set up event listeners for the webClient
     webClient.on("conversationStarted", () => {
@@ -882,51 +887,68 @@ export default function Independence() {
       ));
     }
 
+    // Prepare call records for sorting and filtering
+    let callRecords = agent.callIds.map((callId) => ({
+      id: callId,
+      startTime: callTimes[callId]?.startTime || "N/A",
+      endTime: callTimes[callId]?.endTime || "N/A",
+      duration: callTimes[callId]?.duration || "N/A",
+      sentiment: callTimes[callId]?.sentiment || "N/A",
+    }));
+
+    // Apply search filter
+    if (searchTerm) {
+      callRecords = callRecords.filter((call) =>
+        Object.values(call).some((value) =>
+          value.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+
+    // Apply sorting
+    if (sortColumn) {
+      callRecords.sort((a, b) => {
+        let aValue = a[sortColumn] || "";
+        let bValue = b[sortColumn] || "";
+
+        if (typeof aValue === "string") aValue = aValue.toLowerCase();
+        if (typeof bValue === "string") bValue = bValue.toLowerCase();
+
+        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
     // Display the call records
-    return agent.callIds.map((callId, index) => (
-      <tr key={index} className="border-b border-gray-300">
-        <td className="p-2">{callId}</td>
-        <td className="p-2">
-          {isLoadingCallTimes ? (
-            <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-          ) : (
-            callTimes[callId]?.startTime || "Loading..."
-          )}
-        </td>
-        <td className="p-2">
-          {isLoadingCallTimes ? (
-            <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-          ) : (
-            callTimes[callId]?.endTime || "Loading..."
-          )}
-        </td>
-        <td className="p-2">
-          {isLoadingCallTimes ? (
-            <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-          ) : (
-            callTimes[callId]?.duration || "Loading..."
-          )}
-        </td>
-        <td className="p-2">
-          {isLoadingCallTimes ? (
-            <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-          ) : (
-            callTimes[callId]?.sentiment || "Loading..."
-          )}
-        </td>
-        <td className="p-2">
-          <button
-            className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
-            onClick={() => handlePlayRecording(callId)}
-            disabled={isLoadingCallDetails}
-          >
-            {isLoadingCallDetails && currentPlayingCallId === callId
-              ? "Loading..."
-              : "View Call Details"}
-          </button>
-        </td>
-      </tr>
-    ));
+    return (callRecords.length > 0) ? callRecords.map((call, index) => (
+                      
+<tr key={index} className="border-b border-gray-300">
+                          <td className="p-2">{call.id}</td>
+                          <td className="p-2">{call.startTime}</td>
+                          <td className="p-2">{call.endTime}</td>
+                          <td className="p-2">{call.duration}</td>
+                          <td className="p-2">{call.sentiment}</td>
+                          <td className="p-2">
+                            <button
+                              className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
+                              onClick={() => handlePlayRecording(call.id)}
+                              disabled={isLoadingCallDetails}
+                            >
+                              {isLoadingCallDetails && currentPlayingCallId === call.id
+                                ? "Loading..."
+                                : "View Call Details"}
+                            </button>
+                          </td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan={6} className="p-4 text-center">
+                            {isLoadingCallTimes ? "Loading..." : "No call records match your filters."}
+                          </td>
+                        </tr>
+                      );
+                  
   };
 
   // Toggle function that handles both starting and ending calls
@@ -1533,6 +1555,43 @@ export default function Independence() {
                 Home Page
               </button>
             </div>
+            {/* Search and Sort Controls */}
+            <div className="p-4 flex items-center justify-between">
+              <input
+                type="text"
+                placeholder="Search call records..."
+                className="p-2 border border-gray-300 rounded w-1/3"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <div className="flex items-center">
+                <label htmlFor="sortColumn" className="mr-2">Sort by:</label>
+                <select
+                  id="sortColumn"
+                  className="p-2 border border-gray-300 rounded"
+                  value={sortColumn || ""}
+                  onChange={(e) => {
+                    const column = e.target.value;
+                    setSortColumn(column === "" ? null : column);
+                    setSortOrder(column === sortColumn ? (sortOrder === "asc" ? "desc" : "asc") : "asc");
+                  }}
+                >
+                  <option value="">None</option>
+                  <option value="startTime">Start Time</option>
+                  <option value="endTime">End Time</option>
+                  <option value="duration">Duration</option>
+                  <option value="sentiment">Sentiment</option>
+                </select>
+                {sortColumn && (
+                  <button
+                    className="ml-2 px-3 py-1 bg-gray-200 rounded"
+                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  >
+                    {sortOrder === "asc" ? "Asc" : "Desc"}
+                  </button>
+                )}
+              </div>
+            </div>
 
             {/* Main content with table only - no banner */}
             <div className="flex-1 bg-white p-4 overflow-y-auto">
@@ -1548,65 +1607,8 @@ export default function Independence() {
                   </tr>
                 </thead>
                 <tbody>
-                  {agents.length > 0 &&
-                    selectedAgent &&
-                    agents
-                      .find((a) => a.name === selectedAgent)
-                      ?.callIds?.map((callId, index) => (
-                        <tr key={index} className="border-b border-gray-300">
-                          <td className="p-2">{callId}</td>
-                          <td className="p-2">
-                            {isLoadingCallTimes ? (
-                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                            ) : (
-                              callTimes[callId]?.startTime || "Loading..."
-                            )}
-                          </td>
-                          <td className="p-2">
-                            {isLoadingCallTimes ? (
-                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                            ) : (
-                              callTimes[callId]?.endTime || "Loading..."
-                            )}
-                          </td>
-                          <td className="p-2">
-                            {isLoadingCallTimes ? (
-                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                            ) : (
-                              callTimes[callId]?.duration || "Loading..."
-                            )}
-                          </td>
-                          <td className="p-2">
-                            {isLoadingCallTimes ? (
-                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                            ) : (
-                              callTimes[callId]?.sentiment || "Loading..."
-                            )}
-                          </td>
-                          <td className="p-2">
-                            <button
-                              className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
-                              onClick={() => handlePlayRecording(callId)}
-                              disabled={isLoadingCallDetails}
-                            >
-                              {isLoadingCallDetails &&
-                              currentPlayingCallId === callId
-                                ? "Loading..."
-                                : "View Call Details"}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                  {(!agents.length ||
-                    !selectedAgent ||
-                    !agents.find((a) => a.name === selectedAgent)?.callIds
-                      ?.length) && (
-                    <tr className="border-b border-gray-300">
-                      <td colSpan={6} className="p-2 text-center">
-                        No call records available
-                      </td>
-                    </tr>
-                  )}
+                  {renderCallRecords()}
+                  
                 </tbody>
               </table>
             </div>
