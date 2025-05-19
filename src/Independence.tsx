@@ -194,13 +194,11 @@ export default function Independence() {
   const [filteredNames, setFilteredNames] = useState<string[]>([]);
   const [showNameSuggestions, setShowNameSuggestions] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState(
-    "Coverage & Benefits"
+    "Coverage & Benefits (Male)"
   );
   const [customerBehavior, setCustomerBehavior] = useState("Normal");
-  const [agentVoice, setAgentVoice] = useState("Male"); // Added agent voice state
   const [showScenarioDropdown, setShowScenarioDropdown] = useState(false);
   const [showBehaviorDropdown, setShowBehaviorDropdown] = useState(false);
-  const [showAgentVoiceDropdown, setShowAgentVoiceDropdown] = useState(false); // Added agent voice dropdown state
   const [callStatus, setCallStatus] = useState<
     "not-started" | "active" | "inactive"
   >("not-started");
@@ -241,9 +239,8 @@ export default function Independence() {
   // Store form data for back button
   const [formData, setFormData] = useState({
     userName: "",
-    selectedScenario: "Coverage & Benefits",
+    selectedScenario: "Coverage & Benefits (Male)",
     customerBehavior: "Normal",
-    agentVoice: "Male",
   });
 
   useEffect(() => {
@@ -440,12 +437,10 @@ export default function Independence() {
       setUserName(formData.userName);
       setSelectedScenario(formData.selectedScenario);
       setCustomerBehavior(formData.customerBehavior);
-      setAgentVoice(formData.agentVoice);
     } else {
       setUserName("");
-      setSelectedScenario("Coverage & Benefits");
+      setSelectedScenario("Coverage & Benefits (Male)");
       setCustomerBehavior("Normal");
-      setAgentVoice("Male");
     }
 
     setSelectedAgent("");
@@ -454,7 +449,6 @@ export default function Independence() {
     setShowScenarioDropdown(false);
     setShowBehaviorDropdown(false);
     setShowAgentDropdown(false);
-    setShowAgentVoiceDropdown(false);
   };
 
   // Modify the handleViewChange function to reset form fields when going back to the practice call screen
@@ -470,8 +464,10 @@ export default function Independence() {
   };
 
   // Add this function to get a new random customer
+  // eslint-disable-next-line
   const refreshCustomerDetails = () => {
-    const newCustomer = getRandomCustomer(agentVoice);
+    const gender = selectedScenario.includes("(Male)") ? "Male" : "Female";
+    const newCustomer = getRandomCustomer(gender);
     // Update the behavior to match the selected behavior
     newCustomer.behavior = customerBehavior;
     setCustomerDetails(newCustomer);
@@ -484,14 +480,20 @@ export default function Independence() {
         userName,
         selectedScenario,
         customerBehavior,
-        agentVoice,
       });
 
       // Determine the agentId based on selected scenario
-      const agentId =
-        selectedScenario === "Coverage & Benefits"
-          ? "agent_516f9ab713ddc59c08c698ed96" // Coverage & Benefits agent ID
-          : "agent_fd6cfc5cffacc3c89ea5ad0374"; // Medical Card Replacement agent ID
+      let agentId;
+      if (selectedScenario === "Coverage & Benefits (Male)") {
+        agentId = "agent_829b55de186580e2ae4046a3d4";
+      } else if (selectedScenario === "Coverage & Benefits (Female)") {
+        agentId = "agent_516f9ab713ddc59c08c698ed96";
+      } else if (selectedScenario === "Medical Card Replacement (Male)") {
+        agentId = "agent_8510c8572ac35e4d17ed73d68b";
+      } else {
+        // Medical Card Replacement (Female)
+        agentId = "agent_fd6cfc5cffacc3c89ea5ad0374";
+      }
 
       // Store the current agent ID for later use
       setCurrentAgentId(agentId);
@@ -527,15 +529,21 @@ export default function Independence() {
         setSelectedAgent(userName); // Set the selected agent name to the current user
       }
 
-      // Get a new random customer based on selected agent voice
-      refreshCustomerDetails();
+      // Get a new random customer based on gender in the selected scenario
+      const gender = selectedScenario.includes("(Male)") ? "Male" : "Female";
+      const newCustomer = getRandomCustomer(gender);
+      newCustomer.behavior = customerBehavior;
+      setCustomerDetails(newCustomer);
 
       // Continue with the original flow
       handleViewChange("startCall");
     } catch (error) {
       console.error("Error creating agent:", error);
       // Still navigate to the next view even if there's an error
-      refreshCustomerDetails();
+      const gender = selectedScenario.includes("(Male)") ? "Male" : "Female";
+      const newCustomer = getRandomCustomer(gender);
+      newCustomer.behavior = customerBehavior;
+      setCustomerDetails(newCustomer);
       handleViewChange("startCall");
     }
   };
@@ -753,10 +761,17 @@ export default function Independence() {
 
   const registerCall = async (): Promise<RegisterCallResponse> => {
     // Choose agent ID based on selected scenario
-    const agentId =
-      selectedScenario === "Coverage & Benefits"
-        ? "agent_516f9ab713ddc59c08c698ed96"
-        : "agent_fd6cfc5cffacc3c89ea5ad0374";
+    let agentId;
+    if (selectedScenario === "Coverage & Benefits (Male)") {
+      agentId = "agent_829b55de186580e2ae4046a3d4";
+    } else if (selectedScenario === "Coverage & Benefits (Female)") {
+      agentId = "agent_516f9ab713ddc59c08c698ed96";
+    } else if (selectedScenario === "Medical Card Replacement (Male)") {
+      agentId = "agent_8510c8572ac35e4d17ed73d68b";
+    } else {
+      // Medical Card Replacement (Female)
+      agentId = "agent_fd6cfc5cffacc3c89ea5ad0374";
+    }
 
     // Store the current agent ID for later use
     setCurrentAgentId(agentId);
@@ -820,6 +835,7 @@ export default function Independence() {
   };
 
   // Add this function to render call records in the recordings view
+  // eslint-disable-next-line
   const renderCallRecords = () => {
     if (!selectedAgent || agents.length === 0) {
       return [...Array(10)].map((_, index) => (
@@ -990,13 +1006,14 @@ export default function Independence() {
         {activeView !== "recordings" ? (
           <>
             {/* Left sidebar */}
+            {/* Left sidebar */}
             <div className="w-[30%] h-full">
               <img
                 src="/independence_home.jpeg"
                 alt="Person with coffee"
                 style={{
                   width: "100%",
-                  height: "100%",
+                  height: "90%",
                   objectFit: "cover",
                 }}
               />
@@ -1064,22 +1081,46 @@ export default function Independence() {
                                 <div
                                   className="p-2 hover:bg-gray-100 cursor-pointer"
                                   onClick={() => {
-                                    setSelectedScenario("Coverage & Benefits");
+                                    setSelectedScenario(
+                                      "Coverage & Benefits (Male)"
+                                    );
                                     setShowScenarioDropdown(false);
                                   }}
                                 >
-                                  Coverage & Benefits
+                                  Coverage & Benefits (Male)
                                 </div>
                                 <div
                                   className="p-2 hover:bg-gray-100 cursor-pointer"
                                   onClick={() => {
                                     setSelectedScenario(
-                                      "Medical Card Replacement"
+                                      "Coverage & Benefits (Female)"
                                     );
                                     setShowScenarioDropdown(false);
                                   }}
                                 >
-                                  Medical Card Replacement
+                                  Coverage & Benefits (Female)
+                                </div>
+                                <div
+                                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedScenario(
+                                      "Medical Card Replacement (Male)"
+                                    );
+                                    setShowScenarioDropdown(false);
+                                  }}
+                                >
+                                  Medical Card Replacement (Male)
+                                </div>
+                                <div
+                                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedScenario(
+                                      "Medical Card Replacement (Female)"
+                                    );
+                                    setShowScenarioDropdown(false);
+                                  }}
+                                >
+                                  Medical Card Replacement (Female)
                                 </div>
                               </div>
                             )}
@@ -1120,47 +1161,6 @@ export default function Independence() {
                                   }}
                                 >
                                   Aggressive
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {/* New Agent Voice field */}
-                        <div className="flex items-center border-b border-gray-300 pb-2">
-                          <div className="w-64 text-[#4a90e2]">Agent Voice</div>
-                          <div className="flex-1 relative">
-                            <div
-                              className="flex justify-between items-center cursor-pointer"
-                              onClick={() =>
-                                setShowAgentVoiceDropdown(
-                                  !showAgentVoiceDropdown
-                                )
-                              }
-                            >
-                              <span>{agentVoice}</span>
-                              <div className="bg-gray-200 w-6 h-6 flex items-center justify-center">
-                                <ChevronDown className="w-4 h-4" />
-                              </div>
-                            </div>
-                            {showAgentVoiceDropdown && (
-                              <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 z-10">
-                                <div
-                                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setAgentVoice("Male");
-                                    setShowAgentVoiceDropdown(false);
-                                  }}
-                                >
-                                  Male
-                                </div>
-                                <div
-                                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setAgentVoice("Female");
-                                    setShowAgentVoiceDropdown(false);
-                                  }}
-                                >
-                                  Female
                                 </div>
                               </div>
                             )}
@@ -1534,105 +1534,81 @@ export default function Independence() {
               </button>
             </div>
 
-            {/* Main content with banner and table */}
-            <div className="flex flex-1 overflow-hidden">
-              {/* Left banner - narrower */}
-              <div className="w-[20%] bg-[#4a90e2] text-white p-4">
-                <h1 className="text-4xl font-bold mb-6 leading-tight">
-                  Driving health
-                  <br />
-                  care forward
-                </h1>
-                <p className="text-xl leading-snug">
-                  With you at the center of
-                  <br />
-                  everything we do, we are
-                  <br />
-                  building the healthcare
-                  <br />
-                  company of the future by
-                  <br />
-                  redefining what to expect from
-                  <br />a health insurer.
-                </p>
-              </div>
-
-              {/* Right table section - wider */}
-              <div className="w-[80%] bg-white p-4 overflow-y-auto">
-                <table className="w-full border-collapse">
-                  <thead>
+            {/* Main content with table only - no banner */}
+            <div className="flex-1 bg-white p-4 overflow-y-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-300">
+                    <th className="p-2 text-left">Call ID</th>
+                    <th className="p-2 text-left">Start time</th>
+                    <th className="p-2 text-left">End Time</th>
+                    <th className="p-2 text-left">Call Duration</th>
+                    <th className="p-2 text-left">Customer Sentiment</th>
+                    <th className="p-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {agents.length > 0 &&
+                    selectedAgent &&
+                    agents
+                      .find((a) => a.name === selectedAgent)
+                      ?.callIds?.map((callId, index) => (
+                        <tr key={index} className="border-b border-gray-300">
+                          <td className="p-2">{callId}</td>
+                          <td className="p-2">
+                            {isLoadingCallTimes ? (
+                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
+                            ) : (
+                              callTimes[callId]?.startTime || "Loading..."
+                            )}
+                          </td>
+                          <td className="p-2">
+                            {isLoadingCallTimes ? (
+                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
+                            ) : (
+                              callTimes[callId]?.endTime || "Loading..."
+                            )}
+                          </td>
+                          <td className="p-2">
+                            {isLoadingCallTimes ? (
+                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
+                            ) : (
+                              callTimes[callId]?.duration || "Loading..."
+                            )}
+                          </td>
+                          <td className="p-2">
+                            {isLoadingCallTimes ? (
+                              <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
+                            ) : (
+                              callTimes[callId]?.sentiment || "Loading..."
+                            )}
+                          </td>
+                          <td className="p-2">
+                            <button
+                              className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
+                              onClick={() => handlePlayRecording(callId)}
+                              disabled={isLoadingCallDetails}
+                            >
+                              {isLoadingCallDetails &&
+                              currentPlayingCallId === callId
+                                ? "Loading..."
+                                : "View Call Details"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                  {(!agents.length ||
+                    !selectedAgent ||
+                    !agents.find((a) => a.name === selectedAgent)?.callIds
+                      ?.length) && (
                     <tr className="border-b border-gray-300">
-                      <th className="p-2 text-left">Call ID</th>
-                      <th className="p-2 text-left">Start time</th>
-                      <th className="p-2 text-left">End Time</th>
-                      <th className="p-2 text-left">Call Duration</th>
-                      <th className="p-2 text-left">Customer Sentiment</th>
-                      <th className="p-2 text-left">Actions</th>
+                      <td colSpan={6} className="p-2 text-center">
+                        No call records available
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {agents.length > 0 &&
-                      selectedAgent &&
-                      agents
-                        .find((a) => a.name === selectedAgent)
-                        ?.callIds?.map((callId, index) => (
-                          <tr key={index} className="border-b border-gray-300">
-                            <td className="p-2">{callId}</td>
-                            <td className="p-2">
-                              {isLoadingCallTimes ? (
-                                <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                              ) : (
-                                callTimes[callId]?.startTime || "Loading..."
-                              )}
-                            </td>
-                            <td className="p-2">
-                              {isLoadingCallTimes ? (
-                                <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                              ) : (
-                                callTimes[callId]?.endTime || "Loading..."
-                              )}
-                            </td>
-                            <td className="p-2">
-                              {isLoadingCallTimes ? (
-                                <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                              ) : (
-                                callTimes[callId]?.duration || "Loading..."
-                              )}
-                            </td>
-                            <td className="p-2">
-                              {isLoadingCallTimes ? (
-                                <div className="animate-pulse h-4 bg-gray-200 rounded w-24"></div>
-                              ) : (
-                                callTimes[callId]?.sentiment || "Loading..."
-                              )}
-                            </td>
-                            <td className="p-2">
-                              <button
-                                className="bg-[#4a90e2] text-white px-2 py-1 rounded text-xs"
-                                onClick={() => handlePlayRecording(callId)}
-                                disabled={isLoadingCallDetails}
-                              >
-                                {isLoadingCallDetails &&
-                                currentPlayingCallId === callId
-                                  ? "Loading..."
-                                  : "View Call Details"}
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                    {(!agents.length ||
-                      !selectedAgent ||
-                      !agents.find((a) => a.name === selectedAgent)?.callIds
-                        ?.length) && (
-                      <tr className="border-b border-gray-300">
-                        <td colSpan={6} className="p-2 text-center">
-                          No call records available
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
