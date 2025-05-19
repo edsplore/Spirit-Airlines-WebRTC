@@ -1,0 +1,112 @@
+To make the gender choice happen randomly (instead of having separate “(Male)” / “(Female)” entries in your scenario dropdown) you only need to:
+Shrink your dropdown to just the scenario types
+
+
+Pick a random gender in your submit handler
+
+
+Branch to the correct agent & data based on that random gender
+
+
+Here’s a minimal patch to show you exactly where and how to change it. (I’m only showing the edited sections for brevity—everything else stays exactly as you have it.)
+--- a/Independence.tsx
++++ b/Independence.tsx
+@@
+// replace this
+- const [selectedScenario, setSelectedScenario] = useState(
+-   "Coverage & Benefits (Male)"
+- );
++ // now only scenario types
++ const [selectedScenario, setSelectedScenario] = useState<"Coverage & Benefits"|"Medical Card Replacement">(
++   "Coverage & Benefits"
++ );
+
+@@ practiceCall dropdown render:
+- {showScenarioDropdown && (
+-   <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 z-10">
+-     <div onClick={() => { setSelectedScenario("Coverage & Benefits (Male)"); setShowScenarioDropdown(false); }}>Coverage & Benefits (Male)</div>
+-     <div onClick={() => { setSelectedScenario("Coverage & Benefits (Female)"); setShowScenarioDropdown(false); }}>Coverage & Benefits (Female)</div>
+-     <div onClick={() => { setSelectedScenario("Medical Card Replacement (Male)"); setShowScenarioDropdown(false); }}>Medical Card Replacement (Male)</div>
+-     <div onClick={() => { setSelectedScenario("Medical Card Replacement (Female)"); setShowScenarioDropdown(false); }}>Medical Card Replacement (Female)</div>
+-   </div>
+- )}
++ {showScenarioDropdown && (
++   <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 z-10">
++     <div
++       className="p-2 hover:bg-gray-100 cursor-pointer"
++       onClick={() => {
++         setSelectedScenario("Coverage & Benefits");
++         setShowScenarioDropdown(false);
++       }}
++     >
++       Coverage & Benefits
++     </div>
++     <div
++       className="p-2 hover:bg-gray-100 cursor-pointer"
++       onClick={() => {
++         setSelectedScenario("Medical Card Replacement");
++         setShowScenarioDropdown(false);
++       }}
++     >
++       Medical Card Replacement
++     </div>
++   </div>
++ )}
+
+@@ const handlePracticeSubmit = async () => {
+-   // Determine the agentId based on selected scenario
+-   let agentId;
+-   if (selectedScenario === "Coverage & Benefits (Male)") {
+-     agentId = "agent_829b55de186580e2ae4046a3d4";
+-   } else if (selectedScenario === "Coverage & Benefits (Female)") {
+-     agentId = "agent_516f9ab713ddc59c08c698ed96";
+-   } else if (selectedScenario === "Medical Card Replacement (Male)") {
+-     agentId = "agent_8510c8572ac35e4d17ed73d68b";
+-   } else {
+-     agentId = "agent_fd6cfc5cffacc3c89ea5ad0374";
+-   }
++   // pick gender at random
++   const gender = Math.random() < 0.5 ? "Male" : "Female";
+
++   // now branch by scenario + gender
++   let agentId: string;
++   if (selectedScenario === "Coverage & Benefits") {
++     agentId =
++       gender === "Male"
++         ? "agent_829b55de186580e2ae4046a3d4"
++         : "agent_516f9ab713ddc59c08c698ed96";
++   } else {
++     agentId =
++       gender === "Male"
++         ? "agent_8510c8572ac35e4d17ed73d68b"
++         : "agent_fd6cfc5cffacc3c89ea5ad0374";
++   }
++
++   // stash random gender into your customer flow
++   const newCust = getRandomCustomer(gender);
++   newCust.behavior = customerBehavior;
++   setCustomerDetails(newCust);
+
+@@
+-   // Get a new random customer based on gender in the selected scenario
+-   const gender = selectedScenario.includes("(Male)") ? "Male" : "Female";
+-   const newCustomer = getRandomCustomer(gender);
+-   newCustomer.behavior = customerBehavior;
+-   setCustomerDetails(newCustomer);
++   // -- already randomized above --
+
+   // Continue with the original flow
+   handleViewChange("startCall");
+
+With those three changes:
+Your dropdown no longer shows “(Male)” / “(Female)” suffixes, only the two scenario types.
+
+
+handlePracticeSubmit picks gender at random.
+
+
+Everything downstream—agent creation, call registration, customer data—uses that random gender.
+
+
+You can of course surface that random gender later if you like (e.g. display “Scenario: Coverage & Benefits (Male)” in the UI) by interpolating \${selectedScenario} (${gender})`` wherever you need. But the core “random instead of user-choice” behavior is in the snippet above.
+
