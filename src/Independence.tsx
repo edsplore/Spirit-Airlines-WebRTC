@@ -193,9 +193,7 @@ export default function Independence() {
   const [namesList, setNamesList] = useState<string[]>([]);
   const [filteredNames, setFilteredNames] = useState<string[]>([]);
   const [showNameSuggestions, setShowNameSuggestions] = useState(false);
-  const [selectedScenario, setSelectedScenario] = useState(
-    "Coverage & Benefits (Male)"
-  );
+  const [selectedScenario, setSelectedScenario] = useState<"Coverage & Benefits" | "Medical Card Replacement">("Coverage & Benefits");
   const [customerBehavior, setCustomerBehavior] = useState("Normal");
   const [showScenarioDropdown, setShowScenarioDropdown] = useState(false);
   const [showBehaviorDropdown, setShowBehaviorDropdown] = useState(false);
@@ -489,15 +487,13 @@ export default function Independence() {
 
       // Determine the agentId based on selected scenario
       let agentId;
-      if (selectedScenario === "Coverage & Benefits (Male)") {
-        agentId = "agent_829b55de186580e2ae4046a3d4";
-      } else if (selectedScenario === "Coverage & Benefits (Female)") {
-        agentId = "agent_516f9ab713ddc59c08c698ed96";
-      } else if (selectedScenario === "Medical Card Replacement (Male)") {
-        agentId = "agent_8510c8572ac35e4d17ed73d68b";
+      let gender;
+      if (selectedScenario === "Coverage & Benefits") {
+        gender = Math.random() < 0.5 ? "Male" : "Female";
+        agentId = gender === "Male" ? "agent_829b55de186580e2ae4046a3d4" : "agent_516f9ab713ddc59c08c698ed96";
       } else {
-        // Medical Card Replacement (Female)
-        agentId = "agent_fd6cfc5cffacc3c89ea5ad0374";
+        gender = Math.random() < 0.5 ? "Male" : "Female";
+        agentId = gender === "Male" ? "agent_8510c8572ac35e4d17ed73d68b" : "agent_fd6cfc5cffacc3c89ea5ad0374";
       }
 
       // Store the current agent ID for later use
@@ -535,7 +531,6 @@ export default function Independence() {
       }
 
       // Get a new random customer based on gender in the selected scenario
-      const gender = selectedScenario.includes("(Male)") ? "Male" : "Female";
       const newCustomer = getRandomCustomer(gender);
       newCustomer.behavior = customerBehavior;
       setCustomerDetails(newCustomer);
@@ -545,7 +540,12 @@ export default function Independence() {
     } catch (error) {
       console.error("Error creating agent:", error);
       // Still navigate to the next view even if there's an error
-      const gender = selectedScenario.includes("(Male)") ? "Male" : "Female";
+      let gender;
+      if (selectedScenario === "Coverage & Benefits") {
+          gender = Math.random() < 0.5 ? "Male" : "Female";
+      } else {
+          gender = Math.random() < 0.5 ? "Male" : "Female";
+      }
       const newCustomer = getRandomCustomer(gender);
       newCustomer.behavior = customerBehavior;
       setCustomerDetails(newCustomer);
@@ -767,15 +767,13 @@ export default function Independence() {
   const registerCall = async (): Promise<RegisterCallResponse> => {
     // Choose agent ID based on selected scenario
     let agentId;
-    if (selectedScenario === "Coverage & Benefits (Male)") {
-      agentId = "agent_829b55de186580e2ae4046a3d4";
-    } else if (selectedScenario === "Coverage & Benefits (Female)") {
-      agentId = "agent_516f9ab713ddc59c08c698ed96";
-    } else if (selectedScenario === "Medical Card Replacement (Male)") {
-      agentId = "agent_8510c8572ac35e4d17ed73d68b";
+    let gender;
+    if (selectedScenario === "Coverage & Benefits") {
+        gender = Math.random() < 0.5 ? "Male" : "Female";
+        agentId = gender === "Male" ? "agent_829b55de186580e2ae4046a3d4" : "agent_516f9ab713ddc59c08c698ed96";
     } else {
-      // Medical Card Replacement (Female)
-      agentId = "agent_fd6cfc5cffacc3c89ea5ad0374";
+        gender = Math.random() < 0.5 ? "Male" : "Female";
+        agentId = gender === "Male" ? "agent_8510c8572ac35e4d17ed73d68b" : "agent_fd6cfc5cffacc3c89ea5ad0374";
     }
 
     // Store the current agent ID for later use
@@ -900,8 +898,7 @@ export default function Independence() {
     if (searchTerm) {
       callRecords = callRecords.filter((call) =>
         Object.values(call).some((value) =>
-          value.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+          value.toLowerCase().includes(searchTerm.toLowerCase())        )
       );
     }
 
@@ -922,7 +919,7 @@ export default function Independence() {
 
     // Display the call records
     return (callRecords.length > 0) ? callRecords.map((call, index) => (
-                      
+
 <tr key={index} className="border-b border-gray-300">
                           <td className="p-2">{call.id}</td>
                           <td className="p-2">{call.startTime}</td>
@@ -948,7 +945,7 @@ export default function Independence() {
                           </td>
                         </tr>
                       );
-                  
+
   };
 
   // Toggle function that handles both starting and ending calls
@@ -1104,45 +1101,23 @@ export default function Independence() {
                                   className="p-2 hover:bg-gray-100 cursor-pointer"
                                   onClick={() => {
                                     setSelectedScenario(
-                                      "Coverage & Benefits (Male)"
+                                      "Coverage & Benefits"
                                     );
                                     setShowScenarioDropdown(false);
                                   }}
                                 >
-                                  Coverage & Benefits (Male)
+                                  Coverage & Benefits
                                 </div>
                                 <div
                                   className="p-2 hover:bg-gray-100 cursor-pointer"
                                   onClick={() => {
                                     setSelectedScenario(
-                                      "Coverage & Benefits (Female)"
+                                      "Medical Card Replacement"
                                     );
                                     setShowScenarioDropdown(false);
                                   }}
                                 >
-                                  Coverage & Benefits (Female)
-                                </div>
-                                <div
-                                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedScenario(
-                                      "Medical Card Replacement (Male)"
-                                    );
-                                    setShowScenarioDropdown(false);
-                                  }}
-                                >
-                                  Medical Card Replacement (Male)
-                                </div>
-                                <div
-                                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedScenario(
-                                      "Medical Card Replacement (Female)"
-                                    );
-                                    setShowScenarioDropdown(false);
-                                  }}
-                                >
-                                  Medical Card Replacement (Female)
+                                  Medical Card Replacement
                                 </div>
                               </div>
                             )}
@@ -1608,7 +1583,7 @@ export default function Independence() {
                 </thead>
                 <tbody>
                   {renderCallRecords()}
-                  
+
                 </tbody>
               </table>
             </div>
