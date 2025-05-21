@@ -12,7 +12,7 @@ import Lumicera from "./Lumicera.tsx";
 import Centene2 from "./Centene2.tsx";
 import Experian from "./Experian.tsx";
 import CVSPharmacy from "./CVSPharmacy.tsx";
-import Independence from "./Independence.tsx";
+import Independence from "./IBX/Independence.tsx";
 
 export default function App() {
   return (
