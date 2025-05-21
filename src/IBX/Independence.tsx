@@ -56,7 +56,7 @@ function formatTimestampToIndianTime(timestamp: number): string {
 
   // Format to Indian time (IST is UTC+5:30)
   return date.toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata",
+    timeZone: "America/New_York",
     hour12: true,
     hour: "2-digit",
     minute: "2-digit",
