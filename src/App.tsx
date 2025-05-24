@@ -13,6 +13,7 @@ import Centene2 from "./Centene2.tsx";
 import Experian from "./Experian.tsx";
 import CVSPharmacy from "./CVSPharmacy.tsx";
 import Independence from "./IBX/Independence.tsx";
+import SGSientificGames from "./SGGames/SGSientificGames.tsx";
 
 export default function App() {
   return (
@@ -37,6 +38,8 @@ export default function App() {
       <Route path="/demo/carrental/sixt" element={<SixtHomepage />} />
 
       <Route path="/demo/healthcare/IBX" element={<Independence />} />
+      <Route path="/demo/games/SGGames" element={<SGSientificGames />} />
+
 
       <Route path="*" element={<div>Coming Soon</div>} />
     </Routes>
