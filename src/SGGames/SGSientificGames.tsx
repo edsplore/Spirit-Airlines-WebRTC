@@ -17,6 +17,7 @@ const SGSientificGames = () => {
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started");
   const [callInProgress, setCallInProgress] = useState(false);
   const [callStarted, setCallStarted] = useState(false);
+   // eslint-disable-next-line
   const [callEnded, setCallEnded] = useState(false);
   const [currentCallId, setCurrentCallId] = useState<string>("");
 
