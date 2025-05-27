@@ -223,7 +223,7 @@ const SGSientificGames = () => {
             alt="About Our Company"
             className="w-full mb-6"
           />
-          <div className="flex flex-row justify-center items-center gap-16">
+          <div className="flex flex-row justify-center items-center gap-36">
             <div
               className="flex flex-col items-center cursor-pointer"
               onClick={toggleConversation}
