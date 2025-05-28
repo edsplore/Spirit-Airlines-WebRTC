@@ -39,13 +39,25 @@ const SGSientificGames = () => {
       (function(d, t) {
         var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
         v.onload = function() {
+          // -------------------------
+          // Voiceflow Webchat (widget-next)
+          // -------------------------
           window.voiceflow.chat.load({
             verify: { projectID: '${projectId}' },
             url: 'https://general-runtime.voiceflow.com',
             versionID: 'production',
-            voice: {
-              url: 'https://runtime-api.voiceflow.com'
+            // NEW ➜ pass pre‑filled variables directly
+            variables: {
+              member_name: '${formData.memberName}',
+              email: '${formData.email}',
+              account_number: '${formData.accountNumber}',
+              phone: '${formData.phone}',
+              dob: '${formData.dob}',
+              scenario: '${useCase}',
+              security_1: '${formData.maidenName || ""}',
+              security_2: '${formData.favTeam || ""}'
             },
+            // Still send a launch event for flows that rely on last_event
             launch: {
               event: {
                 type: 'launch',
@@ -60,7 +72,8 @@ const SGSientificGames = () => {
                   security_2: '${formData.favTeam || ""}'
                 }
               }
-            }
+            },
+            voice: { url: 'https://runtime-api.voiceflow.com' }
           });
         };
         v.src = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
@@ -372,5 +385,5 @@ const SGSientificGames = () => {
     </div>
   );
 };
-/*this si new*/
+
 export default SGSientificGames;
