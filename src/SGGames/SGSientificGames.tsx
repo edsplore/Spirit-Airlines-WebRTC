@@ -372,5 +372,5 @@ const SGSientificGames = () => {
     </div>
   );
 };
-
+/*this si new*/
 export default SGSientificGames;
