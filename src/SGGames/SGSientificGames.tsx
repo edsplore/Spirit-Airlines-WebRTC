@@ -18,16 +18,23 @@ const SGSientificGames = () => {
   const [callInProgress, setCallInProgress] = useState(false);
   // eslint-disable-next-line
   const [callStarted, setCallStarted] = useState(false);
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   const [callEnded, setCallEnded] = useState(false);
   // eslint-disable-next-line
   const [currentCallId, setCurrentCallId] = useState("");
   const [webClient, setWebClient] = useState(null);
 
+  /**
+   * Inject **new** Voiceflow widget (widget-next) each time the customer
+   * details or the selected use‑case changes. All existing variables and
+   * launch‑event payload stay exactly the same – only the widget bundle URL
+   * and the extra `voice` field were added to match the updated embed code.
+   */
   useEffect(() => {
     const script = document.createElement("script");
     const projectId = "6835e09800c7424ccd26da49";
     script.type = "text/javascript";
+
     script.innerHTML = `
       (function(d, t) {
         var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
@@ -36,28 +43,32 @@ const SGSientificGames = () => {
             verify: { projectID: '${projectId}' },
             url: 'https://general-runtime.voiceflow.com',
             versionID: 'production',
+            voice: {
+              url: 'https://runtime-api.voiceflow.com'
+            },
             launch: {
               event: {
-                type: "launch",
+                type: 'launch',
                 payload: {
-                  member_name: "${formData.memberName}",
-                  email: "${formData.email}",
-                  account_number: "${formData.accountNumber}",
-                  phone: "${formData.phone}",
-                  dob: "${formData.dob}",
-                  scenario: "${useCase}",
-                  security_1: "${formData.maidenName || ""}",
-                  security_2: "${formData.favTeam || ""}"
+                  member_name: '${formData.memberName}',
+                  email: '${formData.email}',
+                  account_number: '${formData.accountNumber}',
+                  phone: '${formData.phone}',
+                  dob: '${formData.dob}',
+                  scenario: '${useCase}',
+                  security_1: '${formData.maidenName || ""}',
+                  security_2: '${formData.favTeam || ""}'
                 }
               }
             }
           });
         };
-        v.src = "https://cdn.voiceflow.com/widget/bundle.mjs";
-        v.type = "text/javascript";
+        v.src = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
+        v.type = 'text/javascript';
         s.parentNode.insertBefore(v, s);
       })(document, 'script');
     `;
+
     document.body.appendChild(script);
 
     return () => {
@@ -66,7 +77,7 @@ const SGSientificGames = () => {
         script.parentNode.removeChild(script);
       }
     };
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, useCase]);
 
   const handleChange = (e) => {
@@ -162,6 +173,7 @@ const SGSientificGames = () => {
     <div className="min-h-screen bg-white font-sans">
       <img src="/sg-nav.png" alt="Navbar" className="w-full" />
       <div className="flex flex-col md:flex-row justify-between px-8 py-6 gap-6">
+        {/* --- Customer Details Table --- */}
         <div className="w-full md:w-1/2">
           <div className="border border-blue-500 bg-[#e6f2fb] text-black text-xl font-bold p-3 text-center mb-4">
             <span className="text-blue-700">Use Case:</span> {useCase}
@@ -176,6 +188,7 @@ const SGSientificGames = () => {
               </tr>
             </thead>
             <tbody>
+              {/* Core authentication fields */}
               {[
                 ["Account #", formData.accountNumber],
                 ["Member Name", formData.memberName],
@@ -192,11 +205,13 @@ const SGSientificGames = () => {
                   </td>
                 </tr>
               ))}
+              {/* Security Questions heading */}
               <tr className="bg-[#009fe3] text-white font-bold">
                 <td className="border border-blue-400 p-2" colSpan={2}>
                   Security Questions
                 </td>
               </tr>
+              {/* Security Questions values */}
               <tr>
                 <td className="border border-blue-400 font-bold p-2">
                   Mother’s Maiden Name
@@ -217,13 +232,11 @@ const SGSientificGames = () => {
           </table>
         </div>
 
+        {/* --- Voice and Chat controls --- */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
-          <img
-            src="/sg-about.png"
-            alt="About Our Company"
-            className="w-full mb-6"
-          />
+          <img src="/sg-about.png" alt="About Our Company" className="w-full mb-6" />
           <div className="flex flex-row justify-center items-center gap-36">
+            {/* Start / End voice call */}
             <div
               className="flex flex-col items-center cursor-pointer"
               onClick={toggleConversation}
@@ -240,6 +253,7 @@ const SGSientificGames = () => {
               </span>
             </div>
 
+            {/* Open Voiceflow chat */}
             <div
               className="flex flex-col items-center cursor-pointer"
               onClick={() => (window as any).voiceflow?.chat?.open()}
@@ -255,17 +269,14 @@ const SGSientificGames = () => {
         </div>
       </div>
 
+      {/* Popup for entering customer details */}
       {showPopup && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center p-6">
           <form
             onSubmit={handleSubmit}
             className="bg-white border-2 border-purple-800 p-6 pt-2 rounded shadow-lg max-w-md w-full"
           >
-            <img
-              src="/sg-logo.png"
-              alt="Game Gallery Logo"
-              className="h-24 mx-auto mb-2"
-            />
+            <img src="/sg-logo.png" alt="Game Gallery Logo" className="h-24 mx-auto mb-2" />
             <h2 className="text-center text-purple-800 font-bold text-md mb-2 border-b border-purple-800 pb-2">
               Customer details required for verification and authentication
             </h2>
