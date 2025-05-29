@@ -18,7 +18,7 @@ export const customers: Customer[] = [
     email: "johnsmith@gmail.com",
     phone: "2233866622",
     maidenName: "Williams",
-    favTeam: "Lakers",
+    favTeam: "Red",
   },
   {
     accountNumber: "ACC-002",
@@ -27,7 +27,7 @@ export const customers: Customer[] = [
     email: "kim.lee@mail.com",
     phone: "9876543210",
     maidenName: "Park",
-    favTeam: "LA Galaxy",
+    favTeam: "Yellow",
   },
   {
     accountNumber: "ACC-003",
@@ -36,7 +36,7 @@ export const customers: Customer[] = [
     email: "tim.roy@outlook.com",
     phone: "8765432109",
     maidenName: "Ray",
-    favTeam: "New York Red Bulls",
+    favTeam: "Green",
   },
   {
     accountNumber: "ACC-004",
@@ -45,7 +45,7 @@ export const customers: Customer[] = [
     email: "amy.lin@example.com",
     phone: "7654321098",
     maidenName: "Kim",
-    favTeam: "Seattle Sounders",
+    favTeam: "Pink",
   },
   {
     accountNumber: "ACC-005",
@@ -54,7 +54,7 @@ export const customers: Customer[] = [
     email: "tom.max@gmail.com",
     phone: "6543210987",
     maidenName: "Lee",
-    favTeam: "Chicago Fire",
+    favTeam: "Red",
   },
   {
     accountNumber: "ACC-006",
@@ -63,7 +63,7 @@ export const customers: Customer[] = [
     email: "lily.dan@mail.com",
     phone: "5432109876",
     maidenName: "Ran",
-    favTeam: "Atlanta United",
+    favTeam: "Blue",
   }
 ];
 
