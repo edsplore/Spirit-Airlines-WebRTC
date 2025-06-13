@@ -80,8 +80,9 @@ export default function Independence() {
   const [showNameSuggestions, setShowNameSuggestions] = useState(false);
   // Update the selectedScenario state to remove the gender suffix
   const [selectedScenario, setSelectedScenario] = useState<
-    "Coverage & Benefits" | "Medical Card Replacement"
-  >("Coverage & Benefits");
+  "Coverage & Benefits" | "Medical Card Replacement" | "Prescription Drug Coverage"
+>("Coverage & Benefits");
+
   const [customerBehavior, setCustomerBehavior] = useState("Normal");
   const [customerGender, setCustomerGender] = useState<"Male" | "Female">(
     "Male"
@@ -95,7 +96,7 @@ export default function Independence() {
 
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedAgentId, setSelectedAgentId] = useState<string>("");
 
@@ -675,6 +676,7 @@ export default function Independence() {
   const registerCall = async (): Promise<RegisterCallResponse> => {
     // Use the already set customerGender, selected scenario, and behavior
     let agentId;
+  
     if (selectedScenario === "Coverage & Benefits") {
       if (customerGender === "Male") {
         agentId =
@@ -688,8 +690,7 @@ export default function Independence() {
             ? "agent_9cb7f0e6409f7a855e5bebd451"
             : "agent_c7cb1579f542b18effe0968385";
       }
-    } else {
-      // Medical Card Replacement
+    } else if (selectedScenario === "Medical Card Replacement") {
       if (customerGender === "Male") {
         agentId =
           customerBehavior === "Normal"
@@ -701,6 +702,19 @@ export default function Independence() {
           customerBehavior === "Normal"
             ? "agent_6ac63093c84bd06926ec4d63aa"
             : "agent_202b46e07cedb67dcc3bfabdf8";
+      }
+    } else if (selectedScenario === "Prescription Drug Coverage") {
+      if (customerGender === "Male") {
+        agentId =
+          customerBehavior === "Normal"
+            ? "agent_dfe63bcd6ef1801648d2b23c54"
+            : "agent_c93d67cf74c1210a3bc3552dd5";
+      } else {
+        // Female
+        agentId =
+          customerBehavior === "Normal"
+            ? "agent_dfe63bcd6ef1801648d2b23c54"
+            : "agent_c93d67cf74c1210a3bc3552dd5";
       }
     }
 
@@ -1047,6 +1061,17 @@ export default function Independence() {
                                   }}
                                 >
                                   Medical Card Replacement
+                                </div>
+                                <div
+                                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedScenario(
+                                      "Prescription Drug Coverage"
+                                    );
+                                    setShowScenarioDropdown(false);
+                                  }}
+                                >
+                                  Prescription Drug Coverage
                                 </div>
                               </div>
                             )}
