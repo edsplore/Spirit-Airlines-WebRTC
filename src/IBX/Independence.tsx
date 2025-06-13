@@ -703,7 +703,11 @@ export default function Independence() {
             ? "agent_6ac63093c84bd06926ec4d63aa"
             : "agent_202b46e07cedb67dcc3bfabdf8";
       }
-    } else if (selectedScenario === "Prescription Drug Coverage") {
+    }
+  
+    // Commented out: Prescription Drug Coverage scenario
+    /*
+    else if (selectedScenario === "Prescription Drug Coverage") {
       if (customerGender === "Male") {
         agentId =
           customerBehavior === "Normal"
@@ -717,53 +721,49 @@ export default function Independence() {
             : "agent_c93d67cf74c1210a3bc3552dd5";
       }
     }
-
+    */
+  
     // Store the current agent ID for later use
     setCurrentAgentId(agentId);
     console.log("Set current agent ID in registerCall to:", agentId);
-
+  
     try {
       // Format the date of birth to match expected format
       const dob = customerDetails.dob;
-      // No need to reformat if it's already in the correct format
       const formattedDob = dob;
-
+  
       // Make API call to register the call
-      const response = await fetch(
-        "https://api.retellai.com/v2/create-web-call",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`, // Replace with your actual API key
+      const response = await fetch("https://api.retellai.com/v2/create-web-call", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`,
+        },
+        body: JSON.stringify({
+          agent_id: agentId,
+          retell_llm_dynamic_variables: {
+            first_name: customerDetails.name,
+            gender: customerDetails.gender,
+            phone_number: customerDetails.phone,
+            address: customerDetails.address,
+            dob: formattedDob,
+            account_number: customerDetails.accountNumber,
+            customer_behavior: customerBehavior,
+            scenario: selectedScenario,
           },
-          body: JSON.stringify({
-            agent_id: agentId,
-            retell_llm_dynamic_variables: {
-              first_name: customerDetails.name,
-              gender: customerDetails.gender,
-              phone_number: customerDetails.phone,
-              address: customerDetails.address,
-              dob: formattedDob,
-              account_number: customerDetails.accountNumber,
-              customer_behavior: customerBehavior,
-              scenario: selectedScenario,
-            },
-          }),
-        }
-      );
-
+        }),
+      });
+  
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
+  
       const data = await response.json();
       console.log("Call registered successfully:", data);
-
-      // Extract the call_id from the response
+  
       const callId = data.call_id;
       console.log("Extracted call ID from response:", callId);
-
+  
       return {
         access_token: data.access_token,
         callId: callId,
@@ -774,6 +774,7 @@ export default function Independence() {
       throw error;
     }
   };
+  
 
   // Function to handle playing a call recording
   const handlePlayRecording = (callId: string) => {
@@ -1062,7 +1063,7 @@ export default function Independence() {
                                 >
                                   Medical Card Replacement
                                 </div>
-                                <div
+                                {/* <div
                                   className="p-2 hover:bg-gray-100 cursor-pointer"
                                   onClick={() => {
                                     setSelectedScenario(
@@ -1072,7 +1073,7 @@ export default function Independence() {
                                   }}
                                 >
                                   Prescription Drug Coverage
-                                </div>
+                                </div> */}
                               </div>
                             )}
                           </div>
