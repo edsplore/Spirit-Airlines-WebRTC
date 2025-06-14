@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, Download, X } from "lucide-react";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { type CustomerDetails, getRandomCustomer } from "./data/customers.ts";
 
@@ -80,8 +80,10 @@ export default function Independence() {
   const [showNameSuggestions, setShowNameSuggestions] = useState(false);
   // Update the selectedScenario state to remove the gender suffix
   const [selectedScenario, setSelectedScenario] = useState<
-  "Coverage & Benefits" | "Medical Card Replacement" | "Prescription Drug Coverage"
->("Coverage & Benefits");
+    | "Coverage & Benefits"
+    | "Medical Card Replacement"
+    | "Prescription Drug Coverage"
+  >("Coverage & Benefits");
 
   const [customerBehavior, setCustomerBehavior] = useState("Normal");
   const [customerGender, setCustomerGender] = useState<"Male" | "Female">(
@@ -676,7 +678,7 @@ export default function Independence() {
   const registerCall = async (): Promise<RegisterCallResponse> => {
     // Use the already set customerGender, selected scenario, and behavior
     let agentId;
-  
+
     if (selectedScenario === "Coverage & Benefits") {
       if (customerGender === "Male") {
         agentId =
@@ -704,7 +706,7 @@ export default function Independence() {
             : "agent_202b46e07cedb67dcc3bfabdf8";
       }
     }
-  
+
     // Commented out: Prescription Drug Coverage scenario
     /*
     else if (selectedScenario === "Prescription Drug Coverage") {
@@ -722,48 +724,53 @@ export default function Independence() {
       }
     }
     */
-  
+
     // Store the current agent ID for later use
     setCurrentAgentId(agentId);
     console.log("Set current agent ID in registerCall to:", agentId);
-  
+
     try {
       // Format the date of birth to match expected format
       const dob = customerDetails.dob;
       const formattedDob = dob;
-  
+
       // Make API call to register the call
-      const response = await fetch("https://api.retellai.com/v2/create-web-call", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`,
-        },
-        body: JSON.stringify({
-          agent_id: agentId,
-          retell_llm_dynamic_variables: {
-            first_name: customerDetails.name,
-            gender: customerDetails.gender,
-            phone_number: customerDetails.phone,
-            address: customerDetails.address,
-            dob: formattedDob,
-            account_number: customerDetails.accountNumber,
-            customer_behavior: customerBehavior,
-            scenario: selectedScenario,
+      const response = await fetch(
+        "https://api.retellai.com/v2/create-web-call",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`,
           },
-        }),
-      });
-  
+          body: JSON.stringify({
+            agent_id: agentId,
+            retell_llm_dynamic_variables: {
+              first_name: customerDetails.name,
+              gender: customerDetails.gender,
+              phone_number: customerDetails.phone,
+              address: customerDetails.address,
+              dob: formattedDob,
+              member_id: customerDetails.memberId,
+              customer_behavior: customerBehavior,
+              authStatus: customerDetails.authStatus, // ✅ newly added
+              medicarePlan: customerDetails.medicarePlan, // ✅ newly added
+              scenario: selectedScenario,
+            },
+          }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-  
+
       const data = await response.json();
       console.log("Call registered successfully:", data);
-  
+
       const callId = data.call_id;
       console.log("Extracted call ID from response:", callId);
-  
+
       return {
         access_token: data.access_token,
         callId: callId,
@@ -774,7 +781,6 @@ export default function Independence() {
       throw error;
     }
   };
-  
 
   // Function to handle playing a call recording
   const handlePlayRecording = (callId: string) => {
@@ -1227,10 +1233,8 @@ export default function Independence() {
                           <td className="p-2">{customerDetails.dob}</td>
                         </tr>
                         <tr className="border-b border-gray-300">
-                          <td className="p-2 text-[#4a90e2]">Account#</td>
-                          <td className="p-2">
-                            {customerDetails.accountNumber}
-                          </td>
+                          <td className="p-2 text-[#4a90e2]">Member ID</td>
+                          <td className="p-2">{customerDetails.memberId}</td>
                         </tr>
                         <tr className="border-b border-gray-300">
                           <td className="p-2 text-[#4a90e2]">Gender</td>
@@ -1245,6 +1249,12 @@ export default function Independence() {
                         <tr className="border-b border-gray-300">
                           <td className="p-2">Practice Scenario</td>
                           <td className="p-2 font-bold">{selectedScenario}</td>
+                        </tr>
+                        <tr className="border-b border-gray-300">
+                          <td className="p-2">Plan Name</td>
+                          <td className="p-2 font-bold">
+                            {customerDetails.medicarePlan}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -1328,10 +1338,8 @@ export default function Independence() {
                           <td className="p-2">{customerDetails.dob}</td>
                         </tr>
                         <tr className="border-b border-gray-300">
-                          <td className="p-2 text-[#4a90e2]">Account#</td>
-                          <td className="p-2">
-                            {customerDetails.accountNumber}
-                          </td>
+                          <td className="p-2 text-[#4a90e2]">Member ID</td>
+                          <td className="p-2">{customerDetails.memberId}</td>
                         </tr>
                         <tr className="border-b border-gray-300">
                           <td className="p-2 text-[#4a90e2]">Gender</td>
@@ -1339,11 +1347,19 @@ export default function Independence() {
                         </tr>
                         <tr className="border-b border-gray-300">
                           <td className="p-2">Customer Behaviour</td>
-                          <td className="p-2">{customerDetails.behavior}</td>
+                          <td className="p-2 font-bold">
+                            {customerDetails.behavior}
+                          </td>
                         </tr>
                         <tr className="border-b border-gray-300">
                           <td className="p-2">Practice Scenario</td>
                           <td className="p-2 font-bold">{selectedScenario}</td>
+                        </tr>
+                        <tr className="border-b border-gray-300">
+                          <td className="p-2">Plan Name</td>
+                          <td className="p-2 font-bold">
+                            {customerDetails.medicarePlan}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -1594,7 +1610,25 @@ export default function Independence() {
 
             {callDetails.recording_url && (
               <div className="mt-4">
-                <h3 className="font-semibold text-lg mb-2">Recording</h3>
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-lg">Recording</h3>
+                  <button
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = callDetails.recording_url;
+                      link.download = `call-recording-${
+                        callDetails.call_id || "unknown"
+                      }.wav`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm flex items-center gap-1"
+                  >
+                    <Download size={16} />
+                    Download
+                  </button>
+                </div>
                 <audio
                   ref={audioRef}
                   controls
