@@ -1359,6 +1359,10 @@ export default function Independence() {
                           <td className="p-2">Plan Name</td>
                           <td className="p-2 font-bold">
                             {customerDetails.medicarePlan}
+<tr className="border-b border-gray-300">
+  <td className="p-2">Auth Status</td>
+  <td className="p-2 font-bold">{customerDetails.authStatus}</td>
+</tr>
                           </td>
                         </tr>
                       </tbody>
