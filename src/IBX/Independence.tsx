@@ -1255,12 +1255,12 @@ export default function Independence() {
                           <td className="p-2 font-bold">
                             {customerDetails.medicarePlan}
                           </td>
-                          <tr className="border-b border-gray-300">
-                            <td className="p-2">Auth Status</td>
-                            <td className="p-2 font-bold">
-                              {customerDetails.authStatus}
-                            </td>
-                          </tr>
+                        </tr>
+                        <tr className="border-b border-gray-300">
+                          <td className="p-2">Auth Status</td>
+                          <td className="p-2 font-bold">
+                            {customerDetails.authStatus}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -1365,15 +1365,13 @@ export default function Independence() {
                           <td className="p-2">Plan Name</td>
                           <td className="p-2 font-bold">
                             {customerDetails.medicarePlan}
-<tr className="border-b border-gray-300">
-  <td className="p-2">Auth Status</td>
-  <td className="p-2 font-bold">     {customerDetails.medicarePlan}
-    </td>
-    <tr className="border-b border-gray-300">
-      <td className="p-2">Auth Status</td>
-      <td className="p-2 font-bold">
-        {customerDetails.authStatus}
-      </td>
+                          </td>
+                        </tr>
+                        <tr className="border-b border-gray-300">
+                          <td className="p-2">Auth Status</td>
+                          <td className="p-2 font-bold">
+                            {customerDetails.authStatus}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
