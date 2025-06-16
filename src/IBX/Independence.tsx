@@ -683,8 +683,8 @@ export default function Independence() {
       if (customerGender === "Male") {
         agentId =
           customerBehavior === "Normal"
-            ? "agent_7352ccb9eec0070fb34dd210dd"
-            : "agent_829b55de186580e2ae4046a3d4";
+            ? "agent_ce23df8a154048fce2ec8b850c"
+            : "agent_ce23df8a154048fce2ec8b850c";
       } else {
         // Female
         agentId =
