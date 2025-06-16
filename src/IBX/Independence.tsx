@@ -689,8 +689,8 @@ export default function Independence() {
         // Female
         agentId =
           customerBehavior === "Normal"
-            ? "agent_9cb7f0e6409f7a855e5bebd451"
-            : "agent_c7cb1579f542b18effe0968385";
+            ? "agent_ce23df8a154048fce2ec8b850c"
+            : "agent_ce23df8a154048fce2ec8b850c";
       }
     } else if (selectedScenario === "Medical Card Replacement") {
       if (customerGender === "Male") {
