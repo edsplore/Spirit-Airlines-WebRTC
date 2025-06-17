@@ -228,7 +228,7 @@ export default function Independence() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`, // Use the same API key as in registerCall
+            Authorization: `Bearer 53b76c26-bd21-4509-98d7-c5cc62f93b59`, // Use the same API key as in registerCall
           },
         }
       );
@@ -683,27 +683,27 @@ export default function Independence() {
       if (customerGender === "Male") {
         agentId =
           customerBehavior === "Normal"
-            ? "agent_ce23df8a154048fce2ec8b850c"
-            : "agent_ce23df8a154048fce2ec8b850c";
+            ? "agent_86f582156aef296a4df5abbc07"
+            : "agent_daba87b4e98a3d4f857f36ee09";
       } else {
         // Female
         agentId =
           customerBehavior === "Normal"
-            ? "agent_ce23df8a154048fce2ec8b850c"
-            : "agent_ce23df8a154048fce2ec8b850c";
+            ? "agent_a448fcfcdc61e91f865e175c01"
+            : "agent_f41aeb86e38c7e6add943bc91d";
       }
     } else if (selectedScenario === "Medical Card Replacement") {
       if (customerGender === "Male") {
         agentId =
           customerBehavior === "Normal"
-            ? "agent_8510c8572ac35e4d17ed73d68b"
-            : "agent_fed9a6e428a58b2ef8efa86cfe";
+            ? "agent_30840e1346b38fac1d68f38aa6"
+            : "agent_264722906847c49df34b2a29d7";
       } else {
         // Female
         agentId =
           customerBehavior === "Normal"
-            ? "agent_6ac63093c84bd06926ec4d63aa"
-            : "agent_202b46e07cedb67dcc3bfabdf8";
+            ? "agent_71f7f555e857ec893be87883f5"
+            : "agent_ecb82d397828ed4289dab3e85f";
       }
     }
 
