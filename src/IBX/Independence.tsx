@@ -228,7 +228,7 @@ export default function Independence() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer 53b76c26-bd21-4509-98d7-c5cc62f93b59`, // Use the same API key as in registerCall
+            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`, // Use the same API key as in registerCall
           },
         }
       );
@@ -689,8 +689,8 @@ export default function Independence() {
         // Female
         agentId =
           customerBehavior === "Normal"
-            ? "agent_a448fcfcdc61e91f865e175c01"
-            : "agent_f41aeb86e38c7e6add943bc91d";
+            ? "agent_f41aeb86e38c7e6add943bc91d"
+            : "agent_ecb82d397828ed4289dab3e85f";
       }
     } else if (selectedScenario === "Medical Card Replacement") {
       if (customerGender === "Male") {
@@ -741,7 +741,7 @@ export default function Independence() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`,
+            Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
           },
           body: JSON.stringify({
             agent_id: agentId,
