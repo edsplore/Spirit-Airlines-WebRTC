@@ -387,28 +387,28 @@ export default function Independence() {
         if (randomGender === "Male") {
           agentId =
             customerBehavior === "Normal"
-              ? "agent_7352ccb9eec0070fb34dd210dd"
-              : "agent_829b55de186580e2ae4046a3d4";
+              ? "agent_86f582156aef296a4df5abbc07"
+              : "agent_daba87b4e98a3d4f857f36ee09";
         } else {
           // Female
           agentId =
             customerBehavior === "Normal"
-              ? "agent_9cb7f0e6409f7a855e5bebd451"
-              : "agent_c7cb1579f542b18effe0968385";
+              ? "agent_f41aeb86e38c7e6add943bc91d"
+              : "agent_a448fcfcdc61e91f865e175c01";
         }
       } else {
         // Medical Card Replacement
         if (randomGender === "Male") {
           agentId =
             customerBehavior === "Normal"
-              ? "agent_8510c8572ac35e4d17ed73d68b"
-              : "agent_fed9a6e428a58b2ef8efa86cfe";
+              ? "agent_30840e1346b38fac1d68f38aa6"
+              : "agent_264722906847c49df34b2a29d7";
         } else {
           // Female
           agentId =
             customerBehavior === "Normal"
-              ? "agent_6ac63093c84bd06926ec4d63aa"
-              : "agent_202b46e07cedb67dcc3bfabdf8";
+              ? "agent_ecb82d397828ed4289dab3e85f"
+              : "agent_71f7f555e857ec893be87883f5";
         }
       }
 
@@ -690,7 +690,7 @@ export default function Independence() {
         agentId =
           customerBehavior === "Normal"
             ? "agent_f41aeb86e38c7e6add943bc91d"
-            : "agent_ecb82d397828ed4289dab3e85f";
+            : "agent_a448fcfcdc61e91f865e175c01";
       }
     } else if (selectedScenario === "Medical Card Replacement") {
       if (customerGender === "Male") {
@@ -702,8 +702,8 @@ export default function Independence() {
         // Female
         agentId =
           customerBehavior === "Normal"
-            ? "agent_71f7f555e857ec893be87883f5"
-            : "agent_ecb82d397828ed4289dab3e85f";
+            ? "agent_ecb82d397828ed4289dab3e85f"
+            : "agent_71f7f555e857ec893be87883f5";
       }
     }
 
