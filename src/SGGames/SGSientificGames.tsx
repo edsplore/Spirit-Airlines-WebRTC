@@ -146,10 +146,10 @@ const SGSientificGames = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`,
+          Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
         },
         body: JSON.stringify({
-          agent_id: "agent_aee9a1021ad6778a34d0521f83",
+          agent_id: "agent_9d2b32b1018b4ecfc12adc67d3",
           retell_llm_dynamic_variables: {
             member_name: formData.memberName,
             email: formData.email,
