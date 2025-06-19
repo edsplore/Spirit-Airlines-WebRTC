@@ -228,7 +228,7 @@ export default function Independence() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer key_6d2f13875c4b0cdb80c6f031c6c4`, // Use the same API key as in registerCall
+            Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`, // Use the same API key as in registerCall
           },
         }
       );
