@@ -14,6 +14,7 @@ import Experian from "./Experian.tsx";
 import CVSPharmacy from "./CVSPharmacy.tsx";
 import Independence from "./IBX/Independence.tsx";
 import SGSientificGames from "./SGGames/SGSientificGames.tsx";
+import ArloDemo from "./Arlo/Arlo.tsx";
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
 
       <Route path="/demo/healthcare/IBX" element={<Independence />} />
       <Route path="/demo/games/SGGames" element={<SGSientificGames />} />
+      <Route path="/demo/security/arlo" element={<ArloDemo />} />
 
 
       <Route path="*" element={<div>Coming Soon</div>} />
