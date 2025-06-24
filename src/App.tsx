@@ -40,7 +40,7 @@ export default function App() {
 
       <Route path="/demo/healthcare/IBX" element={<Independence />} />
       <Route path="/demo/games/SGGames" element={<SGSientificGames />} />
-      <Route path="/demo/security/arlo" element={<ArloDemo />} />
+      <Route path="/demo/security/Arlo" element={<ArloDemo />} />
 
 
       <Route path="*" element={<div>Coming Soon</div>} />
