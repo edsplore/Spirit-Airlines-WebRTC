@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Mic, MessageCircle } from "lucide-react"
+import { Mic, MessageCircle, History, ArrowLeft, Calendar, Play } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface UserDetails {
@@ -11,6 +11,28 @@ interface UserDetails {
   orderDate: string
   email: string
   useCase: string
+}
+
+interface CallRecord {
+  call_id: string
+  call_status: string
+  start_timestamp: number
+  end_timestamp: number
+  duration_ms: number
+  transcript: string
+  retell_llm_dynamic_variables: {
+    customer_name?: string
+    order_number?: string
+    email?: string
+    use_case?: string
+  }
+  call_analysis?: {
+    call_summary?: string
+    user_sentiment?: string
+    call_successful?: boolean
+  }
+  recording_url?: string
+  disconnection_reason?: string
 }
 
 const webClient = new RetellWebClient()
@@ -43,11 +65,28 @@ const getOrderDate = () => {
   return `${day}${suffix} ${month}'${year}`
 }
 
+const formatTimestamp = (timestamp: number) => {
+  const date = new Date(timestamp)
+  return date.toLocaleString()
+}
+
+const formatDuration = (durationMs: number) => {
+  const seconds = Math.floor(durationMs / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
+}
+
 export default function ArloDemo() {
   const [showVerificationForm, setShowVerificationForm] = useState(true)
+  const [showHistory, setShowHistory] = useState(false)
+  const [callHistory, setCallHistory] = useState<CallRecord[]>([])
+  const [selectedCall, setSelectedCall] = useState<CallRecord | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [dateFilter, setDateFilter] = useState("")
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-    orderNumber: "1WA10S7270A28",
+    orderNumber: "100RUN23W5",
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "Installation help for the newly purchased camera",
@@ -151,6 +190,75 @@ export default function ArloDemo() {
     setShowVerificationForm(false)
   }
 
+  const fetchCallHistory = async (useFilter = false) => {
+    setLoading(true)
+    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
+    const agentId = "agent_f2c6614fdd0ac4727823d04a4a"
+
+    try {
+      // First API call - List calls
+      const listCallsResponse = await fetch("https://api.retellai.com/v2/list-calls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          filter_criteria: {
+            agent_id: [agentId],
+          },
+        }),
+      })
+
+      if (!listCallsResponse.ok) {
+        throw new Error(`Error fetching call list: ${listCallsResponse.status}`)
+      }
+
+      const callsList = await listCallsResponse.json()
+      console.log("Calls list:", callsList)
+
+      // Filter by date if provided and useFilter is true
+      let filteredCalls = callsList
+      if (useFilter && dateFilter) {
+        const filterDate = new Date(dateFilter)
+        filteredCalls = callsList.filter((call: any) => {
+          const callDate = new Date(call.start_timestamp)
+          return callDate.toDateString() === filterDate.toDateString()
+        })
+      }
+
+      setCallHistory(filteredCalls)
+    } catch (error) {
+      console.error("Error fetching call history:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCallDetails = async (callId: string) => {
+    const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
+
+    try {
+      // Second API call - Get specific call details
+      const callDetailsResponse = await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+      })
+
+      if (!callDetailsResponse.ok) {
+        throw new Error(`Error fetching call details: ${callDetailsResponse.status}`)
+      }
+
+      const callDetails = await callDetailsResponse.json()
+      console.log("Call details:", callDetails)
+      setSelectedCall(callDetails)
+    } catch (error) {
+      console.error("Error fetching call details:", error)
+    }
+  }
+
   const toggleConversation = async () => {
     if (callInProgress) return
 
@@ -178,7 +286,7 @@ export default function ArloDemo() {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_f2c6614fdd0ac4727823d04a4a"
+    const agentId = "agent_c53c273bda8beda64317da5bc9"
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -199,7 +307,7 @@ export default function ArloDemo() {
     console.log("Registering call for agent:", agentId)
     console.log("User details for call:", userDetails)
 
-    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
+    const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
     const sampleRate = Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
 
     const payload = {
@@ -243,6 +351,214 @@ export default function ArloDemo() {
     }
   }
 
+  // History Screen Component
+  if (showHistory) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm p-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => {
+                  setShowHistory(false)
+                  setSelectedCall(null)
+                }}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Back to Main
+              </button>
+              <h1 className="text-2xl font-bold text-gray-800">Call History</h1>
+            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto p-4 flex-grow">
+          {!selectedCall ? (
+            // Call History List
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-gray-500" />
+                  <input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="border border-gray-300 rounded px-3 py-2"
+                  />
+                </div>
+                <button
+                  onClick={() => fetchCallHistory(true)}
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {loading ? "Loading..." : "Filter Calls"}
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-300">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border border-gray-300 p-3 text-left">Call ID</th>
+                      <th className="border border-gray-300 p-3 text-left">Customer</th>
+                      <th className="border border-gray-300 p-3 text-left">Start Time</th>
+                      <th className="border border-gray-300 p-3 text-left">Duration</th>
+                      <th className="border border-gray-300 p-3 text-left">Status</th>
+                      <th className="border border-gray-300 p-3 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {callHistory.map((call) => (
+                      <tr key={call.call_id} className="hover:bg-gray-50">
+                        <td className="border border-gray-300 p-3 font-mono text-sm">
+                          {call.call_id.substring(0, 8)}...
+                        </td>
+                        <td className="border border-gray-300 p-3">
+                          {call.retell_llm_dynamic_variables?.customer_name || "Unknown"}
+                        </td>
+                        <td className="border border-gray-300 p-3">{formatTimestamp(call.start_timestamp)}</td>
+                        <td className="border border-gray-300 p-3">{formatDuration(call.duration_ms)}</td>
+                        <td className="border border-gray-300 p-3">
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${
+                              call.call_status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : call.call_status === "registered"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {call.call_status}
+                          </span>
+                        </td>
+                        <td className="border border-gray-300 p-3">
+                          <button
+                            onClick={() => fetchCallDetails(call.call_id)}
+                            className="text-blue-600 hover:text-blue-800 text-sm"
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {callHistory.length === 0 && !loading && (
+                  <div className="text-center py-8 text-gray-500">
+                    No calls found. Click "Filter Calls" to load call history.
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            // Call Details View
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <button
+                  onClick={() => setSelectedCall(null)}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to List
+                </button>
+                <h2 className="text-xl font-bold">Call Details</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Call Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Call Information</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <strong>Call ID:</strong> {selectedCall.call_id}
+                    </div>
+                    <div>
+                      <strong>Status:</strong> {selectedCall.call_status}
+                    </div>
+                    <div>
+                      <strong>Start Time:</strong> {formatTimestamp(selectedCall.start_timestamp)}
+                    </div>
+                    <div>
+                      <strong>End Time:</strong> {formatTimestamp(selectedCall.end_timestamp)}
+                    </div>
+                    <div>
+                      <strong>Duration:</strong> {formatDuration(selectedCall.duration_ms)}
+                    </div>
+                    <div>
+                      <strong>Disconnection Reason:</strong> {selectedCall.disconnection_reason || "N/A"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Customer Information</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <strong>Name:</strong> {selectedCall.retell_llm_dynamic_variables?.customer_name || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Email:</strong> {selectedCall.retell_llm_dynamic_variables?.email || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Order Number:</strong> {selectedCall.retell_llm_dynamic_variables?.order_number || "N/A"}
+                    </div>
+                    <div>
+                      <strong>Use Case:</strong> {selectedCall.retell_llm_dynamic_variables?.use_case || "N/A"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Call Analysis */}
+                {selectedCall.call_analysis && (
+                  <div className="space-y-4 md:col-span-2">
+                    <h3 className="text-lg font-semibold text-gray-800">Call Analysis</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <strong>Summary:</strong> {selectedCall.call_analysis.call_summary || "N/A"}
+                      </div>
+                      <div>
+                        <strong>User Sentiment:</strong> {selectedCall.call_analysis.user_sentiment || "N/A"}
+                      </div>
+                      <div>
+                        <strong>Call Successful:</strong> {selectedCall.call_analysis.call_successful ? "Yes" : "No"}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Transcript */}
+                <div className="space-y-4 md:col-span-2">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Transcript</h3>
+                    {selectedCall.recording_url && (
+                      <a
+                        href={selectedCall.recording_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
+                      >
+                        <Play className="w-4 h-4" />
+                        Play Recording
+                      </a>
+                    )}
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded border max-h-64 overflow-y-auto">
+                    <pre className="whitespace-pre-wrap text-sm">
+                      {selectedCall.transcript || "No transcript available"}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Popup Form */}
@@ -269,7 +585,7 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
-                  defaultValue="1WA10S7270A28"
+                  defaultValue="100RUN23W5"
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
@@ -394,7 +710,7 @@ export default function ArloDemo() {
 
           {/* Right Side - Action Buttons */}
           <div className="lg:w-1/2 flex justify-center items-center">
-            <div className="flex gap-16">
+            <div className="flex gap-8">
               {/* Start Call Button */}
               <button onClick={toggleConversation} className="flex flex-col items-center group">
                 <div
@@ -420,6 +736,20 @@ export default function ArloDemo() {
                   <MessageCircle className="w-8 h-8 text-blue-600" />
                 </div>
                 <span className="mt-3 text-blue-600 font-medium">Click to Chat</span>
+              </button>
+
+              {/* Watch History Button */}
+              <button
+                onClick={() => {
+                  setShowHistory(true)
+                  fetchCallHistory()
+                }}
+                className="flex flex-col items-center group"
+              >
+                <div className="w-24 h-24 rounded-full border-4 border-gray-300 bg-white flex items-center justify-center group-hover:border-blue-600 transition-all duration-300">
+                  <History className="w-8 h-8 text-blue-600" />
+                </div>
+                <span className="mt-3 text-blue-600 font-medium">Watch History</span>
               </button>
             </div>
           </div>
