@@ -269,7 +269,7 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
-                  defaultValue="1WA1057270A28"
+                  defaultValue="1WA10S7270A28"
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
