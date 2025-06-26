@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Mic, MessageCircle, History, ArrowLeft, Calendar, Play } from "lucide-react"
+import { Mic, MessageCircle, History, ArrowLeft, Calendar } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface UserDetails {
@@ -86,7 +86,7 @@ export default function ArloDemo() {
   const [dateFilter, setDateFilter] = useState("")
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-    orderNumber: "100RUN23W5",
+    orderNumber: "1WA1057270A28",
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "Installation help for the newly purchased camera",
@@ -236,7 +236,7 @@ export default function ArloDemo() {
   }
 
   const fetchCallDetails = async (callId: string) => {
-    const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
+    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
 
     try {
       // Second API call - Get specific call details
@@ -286,7 +286,7 @@ export default function ArloDemo() {
   }
 
   const initiateConversation = async () => {
-    const agentId = "agent_c53c273bda8beda64317da5bc9"
+    const agentId = "agent_f2c6614fdd0ac4727823d04a4a"
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
@@ -307,7 +307,7 @@ export default function ArloDemo() {
     console.log("Registering call for agent:", agentId)
     console.log("User details for call:", userDetails)
 
-    const apiKey = "53b76c26-bd21-4509-98d7-c5cc62f93b59"
+    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
     const sampleRate = Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10)
 
     const payload = {
@@ -405,6 +405,7 @@ export default function ArloDemo() {
                       <th className="border border-gray-300 p-3 text-left">Customer</th>
                       <th className="border border-gray-300 p-3 text-left">Start Time</th>
                       <th className="border border-gray-300 p-3 text-left">Duration</th>
+                      <th className="border border-gray-300 p-3 text-left">End Time</th>
                       <th className="border border-gray-300 p-3 text-left">Status</th>
                       <th className="border border-gray-300 p-3 text-left">Actions</th>
                     </tr>
@@ -420,6 +421,7 @@ export default function ArloDemo() {
                         </td>
                         <td className="border border-gray-300 p-3">{formatTimestamp(call.start_timestamp)}</td>
                         <td className="border border-gray-300 p-3">{formatDuration(call.duration_ms)}</td>
+                        <td className="border border-gray-300 p-3">{formatTimestamp(call.end_timestamp)}</td>
                         <td className="border border-gray-300 p-3">
                           <span
                             className={`px-2 py-1 rounded text-xs ${
@@ -453,102 +455,133 @@ export default function ArloDemo() {
               </div>
             </div>
           ) : (
-            // Call Details View
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <button
-                  onClick={() => setSelectedCall(null)}
-                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to List
-                </button>
-                <h2 className="text-xl font-bold">Call Details</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Call Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Call Information</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <strong>Call ID:</strong> {selectedCall.call_id}
-                    </div>
-                    <div>
-                      <strong>Status:</strong> {selectedCall.call_status}
-                    </div>
-                    <div>
-                      <strong>Start Time:</strong> {formatTimestamp(selectedCall.start_timestamp)}
-                    </div>
-                    <div>
-                      <strong>End Time:</strong> {formatTimestamp(selectedCall.end_timestamp)}
-                    </div>
-                    <div>
-                      <strong>Duration:</strong> {formatDuration(selectedCall.duration_ms)}
-                    </div>
-                    <div>
-                      <strong>Disconnection Reason:</strong> {selectedCall.disconnection_reason || "N/A"}
-                    </div>
-                  </div>
+            /* Call Details View */
+            /* Call Details Popup Modal */
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold">Call Details</h2>
+                  <button onClick={() => setSelectedCall(null)} className="text-gray-500 hover:text-gray-700 text-2xl">
+                    ×
+                  </button>
                 </div>
 
-                {/* Customer Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Customer Information</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <strong>Name:</strong> {selectedCall.retell_llm_dynamic_variables?.customer_name || "N/A"}
+                {/* Modal Content */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Call Information */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-800">Call Information</h3>
+                      <div className="space-y-2">
+                        <div>
+                          <strong>Call ID:</strong> {selectedCall.call_id}
+                        </div>
+                        <div>
+                          <strong>Status:</strong> {selectedCall.call_status}
+                        </div>
+                        <div>
+                          <strong>Start Time:</strong> {formatTimestamp(selectedCall.start_timestamp)}
+                        </div>
+                        <div>
+                          <strong>End Time:</strong> {formatTimestamp(selectedCall.end_timestamp)}
+                        </div>
+                        <div>
+                          <strong>Duration:</strong> {formatDuration(selectedCall.duration_ms)}
+                        </div>
+                        <div>
+                          <strong>Disconnection Reason:</strong> {selectedCall.disconnection_reason || "N/A"}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <strong>Email:</strong> {selectedCall.retell_llm_dynamic_variables?.email || "N/A"}
-                    </div>
-                    <div>
-                      <strong>Order Number:</strong> {selectedCall.retell_llm_dynamic_variables?.order_number || "N/A"}
-                    </div>
-                    <div>
-                      <strong>Use Case:</strong> {selectedCall.retell_llm_dynamic_variables?.use_case || "N/A"}
-                    </div>
-                  </div>
-                </div>
 
-                {/* Call Analysis */}
-                {selectedCall.call_analysis && (
-                  <div className="space-y-4 md:col-span-2">
-                    <h3 className="text-lg font-semibold text-gray-800">Call Analysis</h3>
-                    <div className="space-y-2">
-                      <div>
-                        <strong>Summary:</strong> {selectedCall.call_analysis.call_summary || "N/A"}
-                      </div>
-                      <div>
-                        <strong>User Sentiment:</strong> {selectedCall.call_analysis.user_sentiment || "N/A"}
-                      </div>
-                      <div>
-                        <strong>Call Successful:</strong> {selectedCall.call_analysis.call_successful ? "Yes" : "No"}
+                    {/* Customer Information */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-gray-800">Customer Information</h3>
+                      <div className="space-y-2">
+                        <div>
+                          <strong>Name:</strong> {selectedCall.retell_llm_dynamic_variables?.customer_name || "N/A"}
+                        </div>
+                        <div>
+                          <strong>Email:</strong> {selectedCall.retell_llm_dynamic_variables?.email || "N/A"}
+                        </div>
+                        <div>
+                          <strong>Order Number:</strong>{" "}
+                          {selectedCall.retell_llm_dynamic_variables?.order_number || "N/A"}
+                        </div>
+                        <div>
+                          <strong>Use Case:</strong> {selectedCall.retell_llm_dynamic_variables?.use_case || "N/A"}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
 
-                {/* Transcript */}
-                <div className="space-y-4 md:col-span-2">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-lg font-semibold text-gray-800">Transcript</h3>
-                    {selectedCall.recording_url && (
-                      <a
-                        href={selectedCall.recording_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
-                      >
-                        <Play className="w-4 h-4" />
-                        Play Recording
-                      </a>
+                    {/* Call Analysis */}
+                    {selectedCall.call_analysis && (
+                      <div className="space-y-4 md:col-span-2">
+                        <h3 className="text-lg font-semibold text-gray-800">Call Analysis</h3>
+                        <div className="space-y-2">
+                          <div>
+                            <strong>Summary:</strong> {selectedCall.call_analysis.call_summary || "N/A"}
+                          </div>
+                          <div>
+                            <strong>User Sentiment:</strong> {selectedCall.call_analysis.user_sentiment || "N/A"}
+                          </div>
+                          <div>
+                            <strong>Call Successful:</strong>{" "}
+                            {selectedCall.call_analysis.call_successful ? "Yes" : "No"}
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded border max-h-64 overflow-y-auto">
-                    <pre className="whitespace-pre-wrap text-sm">
-                      {selectedCall.transcript || "No transcript available"}
-                    </pre>
+
+                    {/* Audio Controls */}
+                    {selectedCall.recording_url && (
+                      <div className="space-y-4 md:col-span-2">
+                        <h3 className="text-lg font-semibold text-gray-800">Audio Recording</h3>
+                        <div className="flex items-center gap-4">
+                          <audio controls className="flex-1">
+                            <source src={selectedCall.recording_url} type="audio/wav" />
+                            Your browser does not support the audio element.
+                          </audio>
+                          <a
+                            href={selectedCall.recording_url}
+                            download={`call-${selectedCall.call_id}.wav`}
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                          >
+                            Download Audio
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Transcript */}
+                    <div className="space-y-4 md:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-800">Transcript</h3>
+                        <button
+                          onClick={() => {
+                            const transcript = selectedCall.transcript || "No transcript available"
+                            const blob = new Blob([transcript], { type: "text/plain" })
+                            const url = URL.createObjectURL(blob)
+                            const a = document.createElement("a")
+                            a.href = url
+                            a.download = `transcript-${selectedCall.call_id}.txt`
+                            document.body.appendChild(a)
+                            a.click()
+                            document.body.removeChild(a)
+                            URL.revokeObjectURL(url)
+                          }}
+                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+                        >
+                          Download Transcript
+                        </button>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded border max-h-64 overflow-y-auto">
+                        <pre className="whitespace-pre-wrap text-sm">
+                          {selectedCall.transcript || "No transcript available"}
+                        </pre>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -585,7 +618,7 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
-                  defaultValue="100RUN23W5"
+                  defaultValue="1WA1057270A28"
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
