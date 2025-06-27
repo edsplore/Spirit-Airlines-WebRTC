@@ -67,7 +67,11 @@ export default function ArloDemo() {
   const [currentCallId, setCurrentCallId] = useState<string | null>(null)
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
+<<<<<<< HEAD
     orderNumber: "100RUN23W5",
+=======
+    orderNumber: "100RUN27134F",
+>>>>>>> df1dfaa8c4acc4837fec7fcb2584b6197f15fd06
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "Installation help for the newly purchased camera",
@@ -80,7 +84,7 @@ export default function ArloDemo() {
     if (!showVerificationForm) {
       const addChatbotScript = () => {
         const script = document.createElement("script")
-        const projectId = "675e58a4bdfd5f757cea0976"
+        const projectId = "685e60329036e9e5b907027b"
         script.type = "text/javascript"
         script.innerHTML = `
           (function(d, t) {
@@ -90,6 +94,9 @@ export default function ArloDemo() {
                 verify: { projectID: '${projectId}' },
                 url: 'https://general-runtime.voiceflow.com',
                 versionID: 'production',
+                voice: {
+                  url: "https://runtime-api.voiceflow.com"
+                },
                 launch: {
                   event: {
                     type: "launch",
@@ -104,7 +111,7 @@ export default function ArloDemo() {
                 },
               });
             }
-            v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+            v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
           })(document, 'script');
         `
         document.body.appendChild(script)
@@ -341,7 +348,11 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
+<<<<<<< HEAD
                   defaultValue="100RUN23W5"
+=======
+                  defaultValue="100RUN27134F"
+>>>>>>> df1dfaa8c4acc4837fec7fcb2584b6197f15fd06
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
