@@ -99,7 +99,7 @@ export default function ArloDemo() {
     if (!showVerificationForm) {
       const addChatbotScript = () => {
         const script = document.createElement("script")
-        const projectId = "675e58a4bdfd5f757cea0976"
+        const projectId = "685e60329036e9e5b907027b"
         script.type = "text/javascript"
         script.innerHTML = `
           (function(d, t) {
@@ -618,7 +618,7 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
-                  defaultValue="1WA1057270A28"
+                  defaultValue="100RUN27134F"
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
