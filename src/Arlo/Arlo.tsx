@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Mic, MessageCircle, History, ArrowLeft, Calendar } from "lucide-react"
+import { MessageCircle, QrCode, X, Phone, MoreVertical } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface UserDetails {
@@ -13,34 +13,21 @@ interface UserDetails {
   useCase: string
 }
 
-interface CallRecord {
+interface CallSummary {
   call_id: string
-  call_status: string
-  start_timestamp: number
-  end_timestamp: number
-  duration_ms: number
-  transcript: string
-  retell_llm_dynamic_variables: {
-    customer_name?: string
-    order_number?: string
-    email?: string
-    use_case?: string
-  }
-  call_analysis?: {
-    call_summary?: string
-    user_sentiment?: string
-    call_successful?: boolean
-  }
-  recording_url?: string
-  disconnection_reason?: string
+  call_summary?: string
+  user_sentiment?: string
+  call_successful?: boolean
+  duration_ms?: number
+  transcript?: string
 }
 
 const webClient = new RetellWebClient()
 
 const useCaseOptions = [
-  "Enquired about the Order Delivery of Item Purchases Online",
-  "Installation help for the newly purchased camera",
-  "Jennifer is having internet connectivity issues",
+  "1. Tracked an online order",
+  "2. Requested help with camera setup",
+  "3. Reported internet issues",
 ]
 
 // Function to get current date - 7 days
@@ -65,28 +52,22 @@ const getOrderDate = () => {
   return `${day}${suffix} ${month}'${year}`
 }
 
-const formatTimestamp = (timestamp: number) => {
-  const date = new Date(timestamp)
-  return date.toLocaleString()
-}
-
-const formatDuration = (durationMs: number) => {
-  const seconds = Math.floor(durationMs / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
-}
+// const formatDuration = (durationMs: number) => {
+//   const seconds = Math.floor(durationMs / 1000)
+//   const minutes = Math.floor(seconds / 60)
+//   const remainingSeconds = seconds % 60
+//   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
+// }
 
 export default function ArloDemo() {
   const [showVerificationForm, setShowVerificationForm] = useState(true)
-  const [showHistory, setShowHistory] = useState(false)
-  const [callHistory, setCallHistory] = useState<CallRecord[]>([])
-  const [selectedCall, setSelectedCall] = useState<CallRecord | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [dateFilter, setDateFilter] = useState("")
+  const [showSupportWidget, setShowSupportWidget] = useState(false)
+  const [callSummary, setCallSummary] = useState<CallSummary | null>(null)
+  const [showCallSummary, setShowCallSummary] = useState(false)
+  const [currentCallId, setCurrentCallId] = useState<string | null>(null)
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-    orderNumber: "1WA1057270A28",
+    orderNumber: "100RUN23W5",
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "Installation help for the newly purchased camera",
@@ -151,6 +132,7 @@ export default function ArloDemo() {
       console.log("Conversation ended with code:", code, "reason:", reason)
       setCallStatus("inactive")
       setCallInProgress(false)
+      // Remove the automatic fetching - only fetch when user clicks
     })
 
     webClient.on("error", (error) => {
@@ -172,7 +154,7 @@ export default function ArloDemo() {
         window.voiceflow.chat.destroy()
       }
     }
-  }, [])
+  }, [currentCallId])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -190,56 +172,11 @@ export default function ArloDemo() {
     setShowVerificationForm(false)
   }
 
-  const fetchCallHistory = async (useFilter = false) => {
-    setLoading(true)
-    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
-    const agentId = "agent_f2c6614fdd0ac4727823d04a4a"
-
-    try {
-      // First API call - List calls
-      const listCallsResponse = await fetch("https://api.retellai.com/v2/list-calls", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          filter_criteria: {
-            agent_id: [agentId],
-          },
-        }),
-      })
-
-      if (!listCallsResponse.ok) {
-        throw new Error(`Error fetching call list: ${listCallsResponse.status}`)
-      }
-
-      const callsList = await listCallsResponse.json()
-      console.log("Calls list:", callsList)
-
-      // Filter by date if provided and useFilter is true
-      let filteredCalls = callsList
-      if (useFilter && dateFilter) {
-        const filterDate = new Date(dateFilter)
-        filteredCalls = callsList.filter((call: any) => {
-          const callDate = new Date(call.start_timestamp)
-          return callDate.toDateString() === filterDate.toDateString()
-        })
-      }
-
-      setCallHistory(filteredCalls)
-    } catch (error) {
-      console.error("Error fetching call history:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchCallDetails = async (callId: string) => {
+  const fetchCallSummary = async (callId: string) => {
     const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
 
     try {
-      // Second API call - Get specific call details
+      console.log("Fetching call summary for:", callId)
       const callDetailsResponse = await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
         method: "GET",
         headers: {
@@ -252,10 +189,30 @@ export default function ArloDemo() {
       }
 
       const callDetails = await callDetailsResponse.json()
-      console.log("Call details:", callDetails)
-      setSelectedCall(callDetails)
+      console.log("Call details received:", callDetails)
+
+      const summary = {
+        call_id: callDetails.call_id,
+        call_summary: callDetails.call_analysis?.call_summary,
+        user_sentiment: callDetails.call_analysis?.user_sentiment,
+        call_successful: callDetails.call_analysis?.call_successful,
+        duration_ms: callDetails.duration_ms,
+        transcript: callDetails.transcript,
+      }
+
+      console.log("Setting call summary:", summary)
+      setCallSummary(summary)
     } catch (error) {
-      console.error("Error fetching call details:", error)
+      console.error("Error fetching call summary:", error)
+      // Set a basic summary even if API fails
+      setCallSummary({
+        call_id: callId,
+        call_summary: "Call completed successfully",
+        user_sentiment: "Neutral",
+        call_successful: true,
+        duration_ms: 0,
+        transcript: "Transcript not available",
+      })
     }
   }
 
@@ -290,6 +247,11 @@ export default function ArloDemo() {
     try {
       const registerCallResponse = await registerCall(agentId)
       if (registerCallResponse.callId) {
+        setCurrentCallId(registerCallResponse.callId)
+        // Clear previous call summary data when starting a new call
+        setCallSummary(null)
+        setShowCallSummary(false)
+        console.log("Starting call with ID:", registerCallResponse.callId)
         await webClient.startCall({
           accessToken: registerCallResponse.access_token,
           callId: registerCallResponse.callId,
@@ -297,9 +259,11 @@ export default function ArloDemo() {
           enableUpdate: true,
         })
         setCallStatus("active")
+        setShowSupportWidget(false) // Close the menu when call starts
       }
     } catch (error) {
       console.error("Error in registering or starting the call:", error)
+      setCallInProgress(false)
     }
   }
 
@@ -351,249 +315,8 @@ export default function ArloDemo() {
     }
   }
 
-  // History Screen Component
-  if (showHistory) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        {/* Header */}
-        <div className="bg-white shadow-sm p-4">
-          <div className="container mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => {
-                  setShowHistory(false)
-                  setSelectedCall(null)
-                }}
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Back to Main
-              </button>
-              <h1 className="text-2xl font-bold text-gray-800">Call History</h1>
-            </div>
-          </div>
-        </div>
-
-        <div className="container mx-auto p-4 flex-grow">
-          {!selectedCall ? (
-            // Call History List
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-500" />
-                  <input
-                    type="date"
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    className="border border-gray-300 rounded px-3 py-2"
-                  />
-                </div>
-                <button
-                  onClick={() => fetchCallHistory(true)}
-                  disabled={loading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {loading ? "Loading..." : "Filter Calls"}
-                </button>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border border-gray-300 p-3 text-left">Call ID</th>
-                      <th className="border border-gray-300 p-3 text-left">Customer</th>
-                      <th className="border border-gray-300 p-3 text-left">Start Time</th>
-                      <th className="border border-gray-300 p-3 text-left">Duration</th>
-                      <th className="border border-gray-300 p-3 text-left">End Time</th>
-                      <th className="border border-gray-300 p-3 text-left">Status</th>
-                      <th className="border border-gray-300 p-3 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {callHistory.map((call) => (
-                      <tr key={call.call_id} className="hover:bg-gray-50">
-                        <td className="border border-gray-300 p-3 font-mono text-sm">
-                          {call.call_id.substring(0, 8)}...
-                        </td>
-                        <td className="border border-gray-300 p-3">
-                          {call.retell_llm_dynamic_variables?.customer_name || "Unknown"}
-                        </td>
-                        <td className="border border-gray-300 p-3">{formatTimestamp(call.start_timestamp)}</td>
-                        <td className="border border-gray-300 p-3">{formatDuration(call.duration_ms)}</td>
-                        <td className="border border-gray-300 p-3">{formatTimestamp(call.end_timestamp)}</td>
-                        <td className="border border-gray-300 p-3">
-                          <span
-                            className={`px-2 py-1 rounded text-xs ${
-                              call.call_status === "completed"
-                                ? "bg-green-100 text-green-800"
-                                : call.call_status === "registered"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {call.call_status}
-                          </span>
-                        </td>
-                        <td className="border border-gray-300 p-3">
-                          <button
-                            onClick={() => fetchCallDetails(call.call_id)}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {callHistory.length === 0 && !loading && (
-                  <div className="text-center py-8 text-gray-500">
-                    No calls found. Click "Filter Calls" to load call history.
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            /* Call Details View */
-            /* Call Details Popup Modal */
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                {/* Modal Header */}
-                <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
-                  <h2 className="text-xl font-bold">Call Details</h2>
-                  <button onClick={() => setSelectedCall(null)} className="text-gray-500 hover:text-gray-700 text-2xl">
-                    ×
-                  </button>
-                </div>
-
-                {/* Modal Content */}
-                <div className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Call Information */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-800">Call Information</h3>
-                      <div className="space-y-2">
-                        <div>
-                          <strong>Call ID:</strong> {selectedCall.call_id}
-                        </div>
-                        <div>
-                          <strong>Status:</strong> {selectedCall.call_status}
-                        </div>
-                        <div>
-                          <strong>Start Time:</strong> {formatTimestamp(selectedCall.start_timestamp)}
-                        </div>
-                        <div>
-                          <strong>End Time:</strong> {formatTimestamp(selectedCall.end_timestamp)}
-                        </div>
-                        <div>
-                          <strong>Duration:</strong> {formatDuration(selectedCall.duration_ms)}
-                        </div>
-                        <div>
-                          <strong>Disconnection Reason:</strong> {selectedCall.disconnection_reason || "N/A"}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Customer Information */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-800">Customer Information</h3>
-                      <div className="space-y-2">
-                        <div>
-                          <strong>Name:</strong> {selectedCall.retell_llm_dynamic_variables?.customer_name || "N/A"}
-                        </div>
-                        <div>
-                          <strong>Email:</strong> {selectedCall.retell_llm_dynamic_variables?.email || "N/A"}
-                        </div>
-                        <div>
-                          <strong>Order Number:</strong>{" "}
-                          {selectedCall.retell_llm_dynamic_variables?.order_number || "N/A"}
-                        </div>
-                        <div>
-                          <strong>Use Case:</strong> {selectedCall.retell_llm_dynamic_variables?.use_case || "N/A"}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Call Analysis */}
-                    {selectedCall.call_analysis && (
-                      <div className="space-y-4 md:col-span-2">
-                        <h3 className="text-lg font-semibold text-gray-800">Call Analysis</h3>
-                        <div className="space-y-2">
-                          <div>
-                            <strong>Summary:</strong> {selectedCall.call_analysis.call_summary || "N/A"}
-                          </div>
-                          <div>
-                            <strong>User Sentiment:</strong> {selectedCall.call_analysis.user_sentiment || "N/A"}
-                          </div>
-                          <div>
-                            <strong>Call Successful:</strong>{" "}
-                            {selectedCall.call_analysis.call_successful ? "Yes" : "No"}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Audio Controls */}
-                    {selectedCall.recording_url && (
-                      <div className="space-y-4 md:col-span-2">
-                        <h3 className="text-lg font-semibold text-gray-800">Audio Recording</h3>
-                        <div className="flex items-center gap-4">
-                          <audio controls className="flex-1">
-                            <source src={selectedCall.recording_url} type="audio/wav" />
-                            Your browser does not support the audio element.
-                          </audio>
-                          <a
-                            href={selectedCall.recording_url}
-                            download={`call-${selectedCall.call_id}.wav`}
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                          >
-                            Download Audio
-                          </a>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Transcript */}
-                    <div className="space-y-4 md:col-span-2">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800">Transcript</h3>
-                        <button
-                          onClick={() => {
-                            const transcript = selectedCall.transcript || "No transcript available"
-                            const blob = new Blob([transcript], { type: "text/plain" })
-                            const url = URL.createObjectURL(blob)
-                            const a = document.createElement("a")
-                            a.href = url
-                            a.download = `transcript-${selectedCall.call_id}.txt`
-                            document.body.appendChild(a)
-                            a.click()
-                            document.body.removeChild(a)
-                            URL.revokeObjectURL(url)
-                          }}
-                          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
-                        >
-                          Download Transcript
-                        </button>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded border max-h-64 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm">
-                          {selectedCall.transcript || "No transcript available"}
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
       {/* Popup Form */}
       {showVerificationForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -618,7 +341,7 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
-                  defaultValue="1WA1057270A28"
+                  defaultValue="100RUN23W5"
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
@@ -640,7 +363,7 @@ export default function ArloDemo() {
                 <div className="flex-1">
                   <select
                     name="useCase"
-                    defaultValue="Installation help for the newly purchased camera"
+                    defaultValue=" "
                     className="w-full p-2 border border-gray-300 rounded text-sm"
                     required
                   >
@@ -687,112 +410,251 @@ export default function ArloDemo() {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="w-full">
-        <img src="/arlo/nav.png" alt="Arlo Navigation" className="w-full h-auto" />
-      </div>
+      {/* Hero Section with Overlaid Table */}
+    <div className="w-full h-screen relative">
+  <img
+    src="/arlo/bkgArlo.png"
+    alt="Arlo Hero Section"
+    className="w-full h-full object-cover"
+  />
 
-      {/* Hero Section */}
-      <div className="relative">
-        <img src="/arlo/home.png" alt="Arlo Hero Section" className="w-full h-96 object-cover" />
-        {/* Vision Statement Overlay */}
-        <div className="absolute top-8 left-8">
-          <img src="/arlo/homeStyle.png" alt="Our vision statement" className="max-w-md h-auto" />
+  {/* Customer Details Table Overlay - Bottom Left/Middle */}
+  {!showVerificationForm && (
+    <div className="absolute bottom-3 left-1/4 -translate-x-[52%] w-[580px]">
+      <div className="bg-blue-50/95 backdrop-blur-sm border border-blue-200 rounded-lg p-4 shadow-lg">
+        <div className="text-lg font-medium text-blue-800 mb-3">
+          Use Case: {userDetails.useCase || "Not selected"}
         </div>
+        <table className="w-full text-base">
+          <tbody>
+            <tr className="border-b border-blue-200">
+              <td className="py-1 font-medium text-blue-700 text-lg">
+                Order Number #
+              </td>
+              <td className="py-1 text-lg">
+                {userDetails.orderNumber || "N/A"}
+              </td>
+            </tr>
+            <tr className="border-b border-blue-200">
+              <td className="py-1 font-medium text-blue-700 text-lg">
+                Order Date
+              </td>
+              <td className="py-1 text-lg">
+                {userDetails.orderDate || "N/A"}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-1 font-medium text-blue-700 text-lg">
+                Email ID
+              </td>
+              <td className="py-1 text-lg">
+                {userDetails.email ? (
+                  <a
+                    href={`mailto:${userDetails.email}`}
+                    className="text-blue-600 underline"
+                  >
+                    {userDetails.email}
+                  </a>
+                ) : (
+                  "N/A"
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+    </div>
+  )}
+</div>
 
-      {/* Main Content Area - flex-grow to push footer down */}
-      <div className="container mx-auto px-4 py-8 flex-grow">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Side - Data Table */}
-          <div className="lg:w-1/2">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <div className="text-lg font-medium text-blue-800 mb-4">
-                Use Case: {!showVerificationForm && userDetails.useCase ? userDetails.useCase : "Not selected"}
-              </div>
-              <table className="w-full text-base">
-                <tbody className="space-y-3">
-                  <tr className="border-b">
-                    <td className="py-3 font-medium text-blue-700 text-lg">Order Number #</td>
-                    <td className="py-3 text-lg">
-                      {!showVerificationForm && userDetails.orderNumber ? userDetails.orderNumber : "N/A"}
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-3 font-medium text-blue-700 text-lg">Order Date</td>
-                    <td className="py-3 text-lg">
-                      {!showVerificationForm && userDetails.orderDate ? userDetails.orderDate : "N/A"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 font-medium text-blue-700 text-lg">Email ID</td>
-                    <td className="py-3 text-lg">
-                      {!showVerificationForm && userDetails.email ? (
-                        <a href={`mailto:${userDetails.email}`} className="text-blue-600 underline">
-                          {userDetails.email}
-                        </a>
-                      ) : (
-                        "N/A"
-                      )}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
 
-          {/* Right Side - Action Buttons */}
-          <div className="lg:w-1/2 flex justify-center items-center">
-            <div className="flex gap-8">
-              {/* Start Call Button */}
-              <button onClick={toggleConversation} className="flex flex-col items-center group">
-                <div
-                  className={`w-24 h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${
-                    callStatus === "active"
-                      ? "bg-blue-600 border-blue-600"
-                      : "bg-white border-gray-300 group-hover:border-blue-600"
-                  }`}
+      {/* Support Widget - Bottom Right - Positioned higher to avoid chat widget overlap */}
+      {!showVerificationForm && (
+        <div className="fixed bottom-24 right-6 z-40">
+          {/* Main Support Button - Only show when no call is active and widget is closed */}
+          {!showSupportWidget && callStatus === "not-started" && (
+            <button
+              onClick={() => setShowSupportWidget(true)}
+              className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-blue-700 transition-colors"
+            >
+              <MoreVertical className="w-8 h-8" />
+            </button>
+          )}
+
+          {/* Support Options Popup - Improved Design */}
+          {showSupportWidget && callStatus === "not-started" && (
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden min-w-72">
+              <div className="space-y-1 p-2">
+                {/* Click to Call */}
+                <button
+                  onClick={() => {
+                    setShowSupportWidget(false)
+                    toggleConversation()
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl flex items-center gap-4 transition-colors"
                 >
-                  <Mic className={`w-8 h-8 ${callStatus === "active" ? "text-white" : "text-blue-600"}`} />
-                </div>
-                <span className="mt-3 text-blue-600 font-medium">
-                  {callStatus === "active" ? "End Call" : "Start Call"}
-                </span>
-              </button>
+                  <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <span className="font-medium">Click to Call</span>
+                </button>
 
-              {/* Click to Chat Button */}
-              <button
-                onClick={() => (window as any).voiceflow?.chat?.open()}
-                className="flex flex-col items-center group"
-              >
-                <div className="w-24 h-24 rounded-full border-4 border-gray-300 bg-white flex items-center justify-center group-hover:border-blue-600 transition-all duration-300">
-                  <MessageCircle className="w-8 h-8 text-blue-600" />
-                </div>
-                <span className="mt-3 text-blue-600 font-medium">Click to Chat</span>
-              </button>
+                {/* Click to Chat */}
+                <button
+                  onClick={() => {
+                    setShowSupportWidget(false)
+                    ;(window as any).voiceflow?.chat?.open()
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl flex items-center gap-4 transition-colors"
+                >
+                  <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-5 h-5" />
+                  </div>
+                  <span className="font-medium">Click to Chat</span>
+                </button>
 
-              {/* Watch History Button */}
-              <button
-                onClick={() => {
-                  setShowHistory(true)
-                  fetchCallHistory()
-                }}
-                className="flex flex-col items-center group"
-              >
-                <div className="w-24 h-24 rounded-full border-4 border-gray-300 bg-white flex items-center justify-center group-hover:border-blue-600 transition-all duration-300">
-                  <History className="w-8 h-8 text-blue-600" />
+                {/* Scan to Chat */}
+                <div className="w-full bg-blue-600 text-white p-4 rounded-xl flex items-center gap-4">
+                  <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center">
+                    <QrCode className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium mb-2">Scan to Chat</div>
+                    <div className="bg-white p-2 rounded-lg">
+                      <div className="w-16 h-16 bg-black flex items-center justify-center text-white text-xs font-mono">
+                        QR CODE
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span className="mt-3 text-blue-600 font-medium">Watch History</span>
-              </button>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          )}
 
-      {/* Footer */}
-      <div className="mt-auto">
-        <img src="/arlo/footer.png" alt="Arlo Footer" className="w-full h-auto" />
-      </div>
+          {/* Active Call Interface - Corrected Layout */}
+          {callStatus === "active" && (
+            <div className="bg-blue-600 rounded-2xl shadow-2xl w-80 h-96">
+              <div className="p-6 h-full flex flex-col">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-2">
+                    <MoreVertical className="w-5 h-5 text-white" />
+                    <Phone className="w-5 h-5 text-white" />
+                    <span className="text-white font-medium">Arlo Support</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      console.log("Close button clicked")
+                      setCallStatus("not-started")
+                      setCurrentCallId(null)
+                      setCallSummary(null)
+                    }}
+                    className="text-white hover:text-gray-200 p-1 z-50"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex-1 flex flex-col items-center justify-center space-y-8">
+                  <div className="text-white text-xl font-medium text-center">Call in Progress...</div>
+
+                  <button
+                    onClick={toggleConversation}
+                    disabled={callInProgress}
+                    className="w-20 h-20 bg-red-500 hover:bg-red-600 disabled:bg-red-400 rounded-full flex items-center justify-center transition-colors shadow-lg border-4 border-white"
+                  >
+                    <Phone className="w-10 h-10 text-white transform rotate-[135deg]" />
+                  </button>
+
+                  <div className="text-white text-sm font-medium">Tap to end call</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Post Call Interface with Inline Summary */}
+          {callStatus === "inactive" && (
+            <div className="bg-blue-600 rounded-2xl shadow-2xl w-80 min-h-96 max-h-[500px] overflow-y-auto">
+              <div className="p-6 h-full flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <MoreVertical className="w-5 h-5 text-white" />
+                    <Phone className="w-5 h-5 text-white" />
+                    <span className="text-white font-medium">Arlo Support</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCallStatus("not-started")
+                      setCurrentCallId(null)
+                      setCallSummary(null)
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex-1 flex flex-col space-y-4">
+                  {/* Click to call button */}
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="text-white text-lg font-medium">Click to call</div>
+                    <button
+                      onClick={() => {
+                        setCallStatus("not-started")
+                        toggleConversation()
+                      }}
+                      className="w-16 h-16 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"
+                    >
+                      <Phone className="w-8 h-8 text-blue-600" />
+                    </button>
+                  </div>
+
+                  {/* Call Summary Section */}
+                  <div className="border-t border-blue-500 pt-4 mt-4">
+                    <button
+                      onClick={() => {
+                        if (currentCallId) {
+                          // Always fetch fresh summary for current call
+                          fetchCallSummary(currentCallId)
+                        }
+                        setShowCallSummary(!showCallSummary)
+                      }}
+                      className="text-white font-medium mb-3 hover:text-blue-200 transition-colors"
+                    >
+                      View call Summary
+                    </button>
+
+                    {showCallSummary && (
+                      <div className="space-y-3 text-white text-sm">
+                        {callSummary ? (
+                          <div>
+                            <span className="text-blue-200">Customer had a concern on:</span>
+                            <div className="mt-1 text-white">
+                              {callSummary.call_summary || "Call completed successfully"}
+                            </div>
+                          </div>
+                        ) : currentCallId ? (
+                          <div className="text-white text-sm">
+                            <div className="text-blue-200">Loading call summary...</div>
+                            <div className="mt-2 flex space-x-1">
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-100"></div>
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-200"></div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-blue-200 text-sm">No recent call to summarize</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
