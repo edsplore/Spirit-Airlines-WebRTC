@@ -377,16 +377,7 @@ export default function ArloDemo() {
                       </option>
                     ))}
                   </select>
-                  <div className="mt-2 p-2 bg-gray-50 border rounded text-xs">
-                    <div className="font-medium text-blue-600 mb-1">Select Use case</div>
-                    <div className="space-y-1 text-gray-600">
-                      {useCaseOptions.map((option, index) => (
-                        <div key={index}>
-                          {index + 1}. {option}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+          
                 </div>
               </div>
 
