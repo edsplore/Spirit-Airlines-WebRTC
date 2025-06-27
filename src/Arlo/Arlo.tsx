@@ -109,6 +109,9 @@ export default function ArloDemo() {
                 verify: { projectID: '${projectId}' },
                 url: 'https://general-runtime.voiceflow.com',
                 versionID: 'production',
+                voice: {
+                  url: "https://runtime-api.voiceflow.com"
+                },
                 launch: {
                   event: {
                     type: "launch",
@@ -123,7 +126,7 @@ export default function ArloDemo() {
                 },
               });
             }
-            v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+            v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
           })(document, 'script');
         `
         document.body.appendChild(script)
