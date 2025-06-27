@@ -67,11 +67,7 @@ export default function ArloDemo() {
   const [currentCallId, setCurrentCallId] = useState<string | null>(null)
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-<<<<<<< HEAD
     orderNumber: "100RUN23W5",
-=======
-    orderNumber: "100RUN27134F",
->>>>>>> df1dfaa8c4acc4837fec7fcb2584b6197f15fd06
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "Installation help for the newly purchased camera",
@@ -348,11 +344,7 @@ export default function ArloDemo() {
                 <input
                   type="text"
                   name="orderNumber"
-<<<<<<< HEAD
                   defaultValue="100RUN23W5"
-=======
-                  defaultValue="100RUN27134F"
->>>>>>> df1dfaa8c4acc4837fec7fcb2584b6197f15fd06
                   className="flex-1 p-2 bg-gray-200 border border-gray-300 rounded text-sm font-medium"
                   required
                 />
