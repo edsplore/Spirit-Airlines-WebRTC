@@ -86,7 +86,7 @@ export default function ArloDemo() {
   const [dateFilter, setDateFilter] = useState("")
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-    orderNumber: "1WA1057270A28",
+    orderNumber: "100RUN27134F",
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "Installation help for the newly purchased camera",
