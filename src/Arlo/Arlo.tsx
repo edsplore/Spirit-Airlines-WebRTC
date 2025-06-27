@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { MessageCircle, QrCode, X, Phone, MoreVertical } from "lucide-react"
 import { RetellWebClient } from "retell-client-js-sdk"
 
@@ -35,11 +35,9 @@ const getOrderDate = () => {
   const today = new Date()
   const orderDate = new Date(today)
   orderDate.setDate(today.getDate() - 7)
-
   const day = orderDate.getDate()
   const month = orderDate.toLocaleString("default", { month: "short" })
   const year = orderDate.getFullYear().toString().slice(-2)
-
   const suffix =
     day === 1 || day === 21 || day === 31
       ? "st"
@@ -48,16 +46,8 @@ const getOrderDate = () => {
         : day === 3 || day === 23
           ? "rd"
           : "th"
-
   return `${day}${suffix} ${month}'${year}`
 }
-
-// const formatDuration = (durationMs: number) => {
-//   const seconds = Math.floor(durationMs / 1000)
-//   const minutes = Math.floor(seconds / 60)
-//   const remainingSeconds = seconds % 60
-//   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
-// }
 
 export default function ArloDemo() {
   const [showVerificationForm, setShowVerificationForm] = useState(true)
@@ -65,6 +55,8 @@ export default function ArloDemo() {
   const [callSummary, setCallSummary] = useState<CallSummary | null>(null)
   const [showCallSummary, setShowCallSummary] = useState(false)
   const [currentCallId, setCurrentCallId] = useState<string | null>(null)
+  // eslint-disable-next-line
+  const [chatWidgetLoaded, setChatWidgetLoaded] = useState(false)
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
     orderNumber: "100RUN23W5",
@@ -75,46 +67,123 @@ export default function ArloDemo() {
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
 
+  // Function to initialize chat widget
+  const initializeChatWidget = useCallback(() => {
+    console.log("Initializing chat widget...")
+
+    // Clean up existing widget first
+    if (window.voiceflow && window.voiceflow.chat) {
+      try {
+        window.voiceflow.chat.destroy()
+      } catch (error) {
+        console.log("No existing chat to destroy:", error)
+      }
+    }
+
+    // Remove existing script if present
+    const existingScript = document.querySelector('script[src*="voiceflow.com"]')
+    if (existingScript) {
+      existingScript.remove()
+    }
+
+    const script = document.createElement("script")
+    const projectId = "685e60329036e9e5b907027b"
+    script.type = "text/javascript"
+    script.innerHTML = `
+      (function(d, t) {
+        var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        v.onload = function() {
+          window.voiceflow.chat.load({
+            verify: { projectID: '${projectId}' },
+            url: 'https://general-runtime.voiceflow.com',
+            versionID: 'production',
+            voice: {
+              url: "https://runtime-api.voiceflow.com"
+            },
+            launch: {
+              event: {
+                type: "launch",
+                payload: {
+                  customer_name: "${userDetails.name}",
+                  order_number: "${userDetails.orderNumber}",
+                  order_date: "${userDetails.orderDate}",
+                  email: "${userDetails.email}",
+                  use_case: "${userDetails.useCase}"
+                }
+              }
+            },
+          });
+          
+          // Set loaded state after successful initialization
+          setTimeout(() => {
+            window.chatWidgetLoaded = true;
+          }, 1000);
+        }
+        v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; 
+        v.type = "text/javascript"; 
+        s.parentNode.insertBefore(v, s);
+      })(document, 'script');
+    `
+    document.body.appendChild(script)
+
+    // Set loaded state
+    setTimeout(() => {
+      setChatWidgetLoaded(true)
+    }, 2000)
+
+    return script
+  }, [userDetails])
+
+  // Function to safely open chat widget
+  const openChatWidget = useCallback(() => {
+    console.log("Attempting to open chat widget...")
+
+    const attemptOpen = () => {
+      if (window.voiceflow && window.voiceflow.chat) {
+        try {
+          window.voiceflow.chat.open()
+          console.log("Chat widget opened successfully")
+          return true
+        } catch (error) {
+          console.error("Error opening chat widget:", error)
+          return false
+        }
+      }
+      return false
+    }
+
+    // Try to open immediately
+    if (attemptOpen()) {
+      return
+    }
+
+    // If that fails, reinitialize and try again
+    console.log("Chat widget not ready, reinitializing...")
+    setChatWidgetLoaded(false)
+
+    // Reinitialize the widget
+    // eslint-disable-next-line
+    const script = initializeChatWidget()
+
+    // Wait for initialization and try again
+    const checkAndOpen = setInterval(() => {
+      if (window.voiceflow && window.voiceflow.chat) {
+        if (attemptOpen()) {
+          clearInterval(checkAndOpen)
+        }
+      }
+    }, 500)
+
+    // Clear interval after 10 seconds to prevent infinite checking
+    setTimeout(() => {
+      clearInterval(checkAndOpen)
+    }, 10000)
+  }, [initializeChatWidget])
+
   useEffect(() => {
     // Add chatbot script only after form submission
     if (!showVerificationForm) {
-      const addChatbotScript = () => {
-        const script = document.createElement("script")
-        const projectId = "685e60329036e9e5b907027b"
-        script.type = "text/javascript"
-        script.innerHTML = `
-          (function(d, t) {
-            var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-            v.onload = function() {
-              window.voiceflow.chat.load({
-                verify: { projectID: '${projectId}' },
-                url: 'https://general-runtime.voiceflow.com',
-                versionID: 'production',
-                voice: {
-                  url: "https://runtime-api.voiceflow.com"
-                },
-                launch: {
-                  event: {
-                    type: "launch",
-                    payload: {
-                      customer_name: "${userDetails.name}",
-                      order_number: "${userDetails.orderNumber}",
-                      order_date: "${userDetails.orderDate}",
-                      email: "${userDetails.email}",
-                      use_case: "${userDetails.useCase}"
-                    }
-                  }
-                },
-              });
-            }
-            v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-          })(document, 'script');
-        `
-        document.body.appendChild(script)
-        return script
-      }
-
-      const chatbotScript = addChatbotScript()
+      const chatbotScript = initializeChatWidget()
 
       return () => {
         if (chatbotScript && chatbotScript.parentNode) {
@@ -122,7 +191,7 @@ export default function ArloDemo() {
         }
       }
     }
-  }, [userDetails, showVerificationForm])
+  }, [showVerificationForm, initializeChatWidget])
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -135,7 +204,12 @@ export default function ArloDemo() {
       console.log("Conversation ended with code:", code, "reason:", reason)
       setCallStatus("inactive")
       setCallInProgress(false)
-      // Remove the automatic fetching - only fetch when user clicks
+
+      // Reinitialize chat widget after call ends to ensure it's ready
+      setTimeout(() => {
+        console.log("Reinitializing chat widget after call end...")
+        initializeChatWidget()
+      }, 1000)
     })
 
     webClient.on("error", (error) => {
@@ -157,7 +231,7 @@ export default function ArloDemo() {
         window.voiceflow.chat.destroy()
       }
     }
-  }, [currentCallId])
+  }, [initializeChatWidget])
 
   const handleSubmitDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -177,7 +251,6 @@ export default function ArloDemo() {
 
   const fetchCallSummary = async (callId: string) => {
     const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
-
     try {
       console.log("Fetching call summary for:", callId)
       const callDetailsResponse = await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
@@ -247,13 +320,16 @@ export default function ArloDemo() {
 
   const initiateConversation = async () => {
     const agentId = "agent_f2c6614fdd0ac4727823d04a4a"
+
     try {
       const registerCallResponse = await registerCall(agentId)
+
       if (registerCallResponse.callId) {
         setCurrentCallId(registerCallResponse.callId)
         // Clear previous call summary data when starting a new call
         setCallSummary(null)
         setShowCallSummary(false)
+
         console.log("Starting call with ID:", registerCallResponse.callId)
         await webClient.startCall({
           accessToken: registerCallResponse.access_token,
@@ -261,6 +337,7 @@ export default function ArloDemo() {
           sampleRate: registerCallResponse.sampleRate,
           enableUpdate: true,
         })
+
         setCallStatus("active")
         setShowSupportWidget(false) // Close the menu when call starts
       }
@@ -306,7 +383,6 @@ export default function ArloDemo() {
 
       const data = await response.json()
       console.log("Call registered successfully:", data)
-
       return {
         access_token: data.access_token,
         callId: data.call_id,
@@ -325,14 +401,17 @@ export default function ArloDemo() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-auto border shadow-lg">
             {/* Arlo Logo */}
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-gray-800">arlo</span>
-                <div className="w-6 h-6 bg-teal-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">✓</span>
-                </div>
-              </div>
-            </div>
+      <div className="flex justify-center mb-4">
+  <div className="flex items-center gap-2">
+    <img
+      src="/arlo/logo.png"  // <-- Replace with your actual logo path
+      alt="Arlo Logo"
+      className="h-8 w-auto"
+    />
+  
+  </div>
+</div>
+
 
             <h2 className="text-lg font-semibold text-blue-600 text-center mb-4">
               Enter Order Number for verification
@@ -366,7 +445,7 @@ export default function ArloDemo() {
                 <div className="flex-1">
                   <select
                     name="useCase"
-                    defaultValue=" "
+                    defaultValue=""
                     className="w-full p-2 border border-gray-300 rounded text-sm"
                     required
                   >
@@ -377,7 +456,6 @@ export default function ArloDemo() {
                       </option>
                     ))}
                   </select>
-          
                 </div>
               </div>
 
@@ -405,62 +483,44 @@ export default function ArloDemo() {
       )}
 
       {/* Hero Section with Overlaid Table */}
-    <div className="w-full h-screen relative">
-  <img
-    src="/arlo/bkgArlo.png"
-    alt="Arlo Hero Section"
-    className="w-full h-full object-cover"
-  />
+      <div className="w-full h-screen relative">
+        <img src="/arlo/bkgArlo.png" alt="Arlo Hero Section" className="w-full h-full object-cover" />
 
-  {/* Customer Details Table Overlay - Bottom Left/Middle */}
-  {!showVerificationForm && (
-    <div className="absolute bottom-3 left-1/4 -translate-x-[52%] w-[580px]">
-      <div className="bg-blue-50/95 backdrop-blur-sm border border-blue-200 rounded-lg p-4 shadow-lg">
-        <div className="text-lg font-medium text-blue-800 mb-3">
-          Use Case: {userDetails.useCase || "Not selected"}
-        </div>
-        <table className="w-full text-base">
-          <tbody>
-            <tr className="border-b border-blue-200">
-              <td className="py-1 font-medium text-blue-700 text-lg">
-                Order Number #
-              </td>
-              <td className="py-1 text-lg">
-                {userDetails.orderNumber || "N/A"}
-              </td>
-            </tr>
-            <tr className="border-b border-blue-200">
-              <td className="py-1 font-medium text-blue-700 text-lg">
-                Order Date
-              </td>
-              <td className="py-1 text-lg">
-                {userDetails.orderDate || "N/A"}
-              </td>
-            </tr>
-            <tr>
-              <td className="py-1 font-medium text-blue-700 text-lg">
-                Email ID
-              </td>
-              <td className="py-1 text-lg">
-                {userDetails.email ? (
-                  <a
-                    href={`mailto:${userDetails.email}`}
-                    className="text-blue-600 underline"
-                  >
-                    {userDetails.email}
-                  </a>
-                ) : (
-                  "N/A"
-                )}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {/* Customer Details Table Overlay - Bottom Left/Middle */}
+        {!showVerificationForm && (
+          <div className="absolute bottom-12 left-80 -translate-x-[52%] w-[580px]">
+            <div className="bg-blue-50/95 backdrop-blur-sm border border-blue-200 rounded-lg p-4 shadow-lg">
+              <div className="text-lg font-medium text-blue-800 mb-3">
+                Use Case: {userDetails.useCase || "Not selected"}
+              </div>
+              <table className="w-full text-base">
+                <tbody>
+                  <tr className="border-b border-blue-200">
+                    <td className="py-1 font-medium text-blue-700 text-lg">Order Number #</td>
+                    <td className="py-1 text-lg">{userDetails.orderNumber || "N/A"}</td>
+                  </tr>
+                  <tr className="border-b border-blue-200">
+                    <td className="py-1 font-medium text-blue-700 text-lg">Order Date</td>
+                    <td className="py-1 text-lg">{userDetails.orderDate || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-medium text-blue-700 text-lg">Email ID</td>
+                    <td className="py-1 text-lg">
+                      {userDetails.email ? (
+                        <a href={`mailto:${userDetails.email}`} className="text-blue-600 underline">
+                          {userDetails.email}
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  )}
-</div>
-
 
       {/* Support Widget - Bottom Right - Positioned higher to avoid chat widget overlap */}
       {!showVerificationForm && (
@@ -497,7 +557,7 @@ export default function ArloDemo() {
                 <button
                   onClick={() => {
                     setShowSupportWidget(false)
-                    ;(window as any).voiceflow?.chat?.open()
+                    openChatWidget()
                   }}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl flex items-center gap-4 transition-colors"
                 >
@@ -552,7 +612,6 @@ export default function ArloDemo() {
 
                 <div className="flex-1 flex flex-col items-center justify-center space-y-8">
                   <div className="text-white text-xl font-medium text-center">Call in Progress...</div>
-
                   <button
                     onClick={toggleConversation}
                     disabled={callInProgress}
@@ -560,7 +619,6 @@ export default function ArloDemo() {
                   >
                     <Phone className="w-10 h-10 text-white transform rotate-[135deg]" />
                   </button>
-
                   <div className="text-white text-sm font-medium">Tap to end call</div>
                 </div>
               </div>
@@ -618,7 +676,6 @@ export default function ArloDemo() {
                     >
                       View call Summary
                     </button>
-
                     {showCallSummary && (
                       <div className="space-y-3 text-white text-sm">
                         {callSummary ? (
