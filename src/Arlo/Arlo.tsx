@@ -372,7 +372,7 @@ export default function ArloDemo() {
     <div className="min-h-screen flex flex-col relative">
       {/* Hero Section with Overlaid Table */}
       <div className="w-full h-screen relative">
-        <img src="/arlo/bkgArlo.png" alt="Arlo Hero Section" className="w-full h-full object-cover" />
+        <img src="/arlo/bkgArlo.png" alt="Arlo Hero Section" className="w-full h-full object-fit" />
 
         {/* Customer Details Table Overlay - Bottom Left/Middle - Always visible now */}
         <div className="absolute bottom-12 left-80 -translate-x-[52%] w-[580px]">
