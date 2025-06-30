@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { MessageCircle, QrCode, X, Phone, MoreVertical } from "lucide-react"
+import { MessageCircle, QrCode, X, Phone, MoreVertical } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 
 interface UserDetails {
@@ -333,7 +333,7 @@ export default function ArloDemo() {
         <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-full object-fit" />
       </div>
 
-      <div className="fixed bottom-24 right-6 z-40">
+      <div className="fixed bottom-4 right-6 z-40">
         {!showSupportWidget && !showFormPanel && callStatus === "not-started" && (
           <button
             onClick={() => setShowSupportWidget(true)}
@@ -547,7 +547,7 @@ export default function ArloDemo() {
             <div className="p-6 flex flex-col">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+                  <Phone className="w-5 h-5 text-white" />
                   <span className="text-white font-medium">Arlo Support</span>
                 </div>
                 <button
