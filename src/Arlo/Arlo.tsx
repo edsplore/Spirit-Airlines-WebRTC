@@ -35,14 +35,13 @@ const useCaseOptions = [
   "3. Reported internet issues",
 ]
 
-// Function to get current date minus 7 days
 const getOrderDate = () => {
   const today = new Date()
-  const orderDate = new Date(today)
-  orderDate.setDate(today.getDate() - 7)
-  const day = orderDate.getDate()
-  const month = orderDate.toLocaleString("default", { month: "short" })
-  const year = orderDate.getFullYear().toString().slice(-2)
+  const d = new Date(today)
+  d.setDate(today.getDate() - 7)
+  const day = d.getDate()
+  const month = d.toLocaleString("default", { month: "short" })
+  const year = d.getFullYear().toString().slice(-2)
   const suffix =
     day === 1 || day === 21 || day === 31
       ? "st"
@@ -61,9 +60,9 @@ export default function ArloDemo() {
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-    orderNumber: "",
+    orderNumber: "100RUN23W5",
     orderDate: getOrderDate(),
-    email: "",
+    email: "jennifer1234@gmail.com",
     useCase: "",
   })
   const [selectedUseCase, setSelectedUseCase] = useState<string>("")
@@ -72,16 +71,12 @@ export default function ArloDemo() {
   const [currentCallId, setCurrentCallId] = useState<string | null>(null)
   const [callSummary, setCallSummary] = useState<CallSummary | null>(null)
   const [showCallSummary, setShowCallSummary] = useState(false)
-   // eslint-disable-next-line
-  const [chatWidgetLoaded, setChatWidgetLoaded] = useState(false)
 
   const initializeChatWidget = useCallback(() => {
-    if (window.voiceflow && window.voiceflow.chat) {
+    if (window.voiceflow?.chat) {
       try { window.voiceflow.chat.destroy() } catch {}
     }
-    const existing = document.querySelector('script[src*="voiceflow.com"]')
-    if (existing) existing.remove()
-
+    document.querySelector('script[src*="voiceflow.com"]')?.remove()
     const script = document.createElement("script")
     const projectId = "685e60329036e9e5b907027b"
     script.type = "text/javascript"
@@ -102,33 +97,24 @@ export default function ArloDemo() {
               use_case: "${userDetails.useCase}"
             } } },
           });
-          setTimeout(() => { window.chatWidgetLoaded = true }, 1000);
         }
         v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
         s.parentNode.insertBefore(v, s);
       })(document, 'script');
     `
     document.body.appendChild(script)
-    setTimeout(() => setChatWidgetLoaded(true), 2000)
     return script
   }, [userDetails])
 
   const openChatWidget = useCallback(() => {
-    const attemptOpen = () => {
-      if (window.voiceflow?.chat) {
-        try { window.voiceflow.chat.open(); return true }
-        catch { return false }
-      }
-      return false
+    const tryOpen = () => {
+      try { window.voiceflow?.chat.open(); return true }
+      catch { return false }
     }
-    if (attemptOpen()) return
-
-    setChatWidgetLoaded(false)
+    if (tryOpen()) return
     const scr = initializeChatWidget()
-    const checker = setInterval(() => {
-      if (attemptOpen()) clearInterval(checker)
-    }, 500)
-    setTimeout(() => clearInterval(checker), 10000)
+    const id = setInterval(() => { if (tryOpen()) clearInterval(id) }, 500)
+    setTimeout(() => clearInterval(id), 10000)
     return () => scr.parentNode?.removeChild(scr)
   }, [initializeChatWidget])
 
@@ -149,7 +135,6 @@ export default function ArloDemo() {
       setCallInProgress(false)
       setShowFormPanel(false)
       setShowPostCallPanel(true)
-      setTimeout(() => initializeChatWidget(), 1000)
     })
     webClient.on("error", () => {
       setCallStatus("inactive")
@@ -163,13 +148,73 @@ export default function ArloDemo() {
       webClient.off("error")
       if (window.voiceflow?.chat) window.voiceflow.chat.destroy()
     }
-  }, [initializeChatWidget])
+  }, [])
+
+  const registerCall = async (agentId: string): Promise<RegisterCallResponse> => {
+    const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
+      },
+      body: JSON.stringify({
+        agent_id: agentId,
+        retell_llm_dynamic_variables: {
+          customer_name: userDetails.name,
+          order_number: userDetails.orderNumber,
+          order_date: userDetails.orderDate,
+          email: userDetails.email,
+          use_case: userDetails.useCase,
+        },
+      }),
+    })
+    if (!resp.ok) throw new Error()
+    const data = await resp.json()
+    return {
+      access_token: data.access_token,
+      callId: data.call_id,
+      sampleRate: Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
+    }
+  }
+
+  const initiateConversation = async () => {
+    const { access_token, callId, sampleRate } = await registerCall("agent_f2c6614fdd0ac4727823d04a4a")
+    if (callId && access_token) {
+      setCurrentCallId(callId)
+      setCallSummary(null)
+      await webClient.startCall({ accessToken: access_token, callId, sampleRate, enableUpdate: true })
+      setCallStatus("active")
+    }
+    setCallInProgress(false)
+  }
+
+  const toggleConversation = async () => {
+    if (callInProgress) return
+    setCallInProgress(true)
+
+    if (callStatus === "active") {
+      try {
+        const res = webClient.stopCall()
+        if (res instanceof Promise) await res
+      } catch {}
+      setCallStatus("inactive")
+      setCallInProgress(false)
+      setShowFormPanel(false)
+      setShowPostCallPanel(true)
+    } else {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+        await initiateConversation()
+      } catch {
+        setCallInProgress(false)
+      }
+    }
+  }
 
   const fetchCallSummary = async (callId: string) => {
-    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
     try {
       const resp = await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
-        headers: { Authorization: `Bearer ${apiKey}` },
+        headers: { Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d` },
       })
       if (!resp.ok) throw new Error()
       const data = await resp.json()
@@ -204,98 +249,26 @@ export default function ArloDemo() {
     setSelectedUseCase("")
     setUserDetails({
       name: "Jennifer",
-      orderNumber: "",
+      orderNumber: "100RUN23W5",
       orderDate: getOrderDate(),
-      email: "",
+      email: "jennifer1234@gmail.com",
       useCase: "",
     })
-  }
-
-  const toggleConversation = async () => {
-    if (callInProgress) return
-    setCallInProgress(true)
-
-    if (callStatus === "active") {
-      try {
-        const result = webClient.stopCall()
-        if (result instanceof Promise) await result
-      } catch (err) {
-        console.error("Failed to stop call:", err)
-      } finally {
-        setCallStatus("inactive")
-        setCallInProgress(false)
-        setShowFormPanel(false)
-        setShowPostCallPanel(true)
-      }
-    } else {
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true })
-        await initiateConversation()
-      } catch (err) {
-        console.error("Could not start call:", err)
-        setCallInProgress(false)
-      }
-    }
-  }
-
-  const initiateConversation = async () => {
-    const agentId = "agent_f2c6614fdd0ac4727823d04a4a"
-    const { access_token, callId, sampleRate } = await registerCall(agentId)
-    if (callId && access_token) {
-      setCurrentCallId(callId)
-      setCallSummary(null)
-      await webClient.startCall({
-        accessToken: access_token,
-        callId,
-        sampleRate,
-        enableUpdate: true,
-      })
-      setCallStatus("active")
-    }
-    setCallInProgress(false)
-  }
-
-  const registerCall = async (agentId: string): Promise<RegisterCallResponse> => {
-    const apiKey = "key_2747254ddf6a6cdeea3935f67a5d"
-    const payload = {
-      agent_id: agentId,
-      retell_llm_dynamic_variables: {
-        customer_name: userDetails.name,
-        order_number: userDetails.orderNumber,
-        order_date: userDetails.orderDate,
-        email: userDetails.email,
-        use_case: userDetails.useCase,
-      },
-    }
-    const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(payload),
-    })
-    if (!resp.ok) throw new Error()
-    const data = await resp.json()
-    return {
-      access_token: data.access_token,
-      callId: data.call_id,
-      sampleRate: Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
-    }
   }
 
   const handleFormSubmit = () => {
     const form = document.getElementById("callForm") as HTMLFormElement
     if (!form) return
     const fd = new FormData(form)
-    const newDetails: UserDetails = {
+    const raw = fd.get("useCase") as string
+    const stripped = raw.replace(/^\d+\.\s*/, "")
+    setUserDetails({
       name: "Jennifer",
       orderNumber: fd.get("orderNumber") as string,
       orderDate: fd.get("orderDate") as string,
       email: fd.get("email") as string,
-      useCase: fd.get("useCase") as string,
-    }
-    setUserDetails(newDetails)
+      useCase: stripped,
+    })
     setFormSubmitted(true)
     toggleConversation()
   }
@@ -312,52 +285,38 @@ export default function ArloDemo() {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      <div className="w-full h-screen relative">
-        <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-full object-cover" />
-      </div>
+      <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-screen object-cover" />
 
       <div className="fixed bottom-4 right-6 z-40">
         {!showSupportWidget && !showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
           <button
             onClick={() => setShowSupportWidget(true)}
-            className="w-16 h-16 bg-[#115292] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#115292] transition-colors"
+            className="w-16 h-16 bg-[#115292] rounded-full flex items-center justify-center text-white shadow-lg"
           >
             <MoreVertical className="w-8 h-8" />
           </button>
         )}
 
         {showSupportWidget && (
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden min-w-72">
-            <div className="space-y-1 p-2">
-              <button
-                onClick={() => { setShowSupportWidget(false); setShowFormPanel(true) }}
-                className="w-full bg-[#115292] hover:bg-[#115292] text-white p-4 rounded-xl flex items-center gap-4 transition-colors"
-              >
-                <div className="w-10 h-10 bg-[#115292] rounded-full flex items-center justify-center">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <span className="font-medium">Click to Call</span>
-              </button>
-              <button
-                onClick={() => { setShowSupportWidget(false); openChatWidget() }}
-                className="w-full bg-[#115292] hover:bg-[#115292] text-white p-4 rounded-xl flex items-center gap-4 transition-colors"
-              >
-                <div className="w-10 h-10 bg-[#115292] rounded-full flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5" />
-                </div>
-                <span className="font-medium">Click to Chat</span>
-              </button>
-              <div className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-4">
-                <div className="w-10 h-10 bg-[#115292] rounded-full flex items-center justify-center">
-                  <QrCode className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium mb-2">Scan to Chat</div>
-                  <div className="bg-white p-2 rounded-lg">
-                    <div className="w-16 h-16 bg-black flex items-center justify-center text-white text-xs font-mono">
-                      QR CODE
-                    </div>
-                  </div>
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-2 space-y-2 min-w-72">
+            <button
+              onClick={() => { setShowSupportWidget(false); setShowFormPanel(true) }}
+              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-2"
+            >
+              <Phone className="w-5 h-5" /> Click to Call
+            </button>
+            <button
+              onClick={() => { setShowSupportWidget(false); openChatWidget() }}
+              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-2"
+            >
+              <MessageCircle className="w-5 h-5" /> Click to Chat
+            </button>
+            <div className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-2">
+              <QrCode className="w-5 h-5" />
+              <div>
+                <div className="font-medium mb-1">Scan to WhatsApp</div>
+                <div className="bg-white p-2 rounded-lg w-16 h-16 flex items-center justify-center text-xs font-mono">
+                  QR CODE
                 </div>
               </div>
             </div>
@@ -365,166 +324,143 @@ export default function ArloDemo() {
         )}
 
         {showFormPanel && (
-          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96">
-            <div className="p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
-                  <span className="text-white font-medium">Arlo Support</span>
-                </div>
-                <button onClick={closeAllPanels} className="text-white hover:text-gray-200">
-                  <X className="w-5 h-5" />
-                </button>
+          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+              <span className="text-white font-medium flex items-center gap-2">
+              Arlo Support
+              </span>
+              <X onClick={closeAllPanels} className="w-5 h-5 text-white cursor-pointer" />
+            </div>
+
+            <form id="callForm" className="flex-1 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">Order#</label>
+                <input
+                  name="orderNumber"
+                  defaultValue={userDetails.orderNumber}
+                  readOnly
+                  className="w-full p-2 bg-gray-200 border border-gray-300 text-gray-600 text-sm rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">Order Date</label>
+                <input
+                  name="orderDate"
+                  defaultValue={userDetails.orderDate}
+                  readOnly
+                  className="w-full p-2 bg-gray-200 border border-gray-300 text-gray-600 text-sm rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">Email id:</label>
+                <input
+                  name="email"
+                  type="email"
+                  defaultValue={userDetails.email}
+                  className="w-full p-2 bg-white border border-gray-300 text-gray-600 text-sm rounded"
+                />
               </div>
 
-              <form id="callForm" className="space-y-4 flex-1">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">Order#</label>
-                  <input
-                    type="text"
-                    name="orderNumber"
-                    defaultValue="100RUN23W5"
-                    disabled={callStatus === "active"}
-                    className="w-full p-2 bg-[#115292] border border-white text-white placeholder-white text-sm focus:outline-none focus:ring-2 focus:ring-white rounded disabled:opacity-50"
-                    required
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">Select Use Case</label>
+                <select
+                  name="useCase"
+                  value={selectedUseCase}
+                  onChange={e => setSelectedUseCase(e.target.value)}
+                  disabled={callStatus === "active"}
+                  className={`w-full p-2 text-sm rounded ${
+                    callStatus === "active"
+                      ? "bg-gray-200 text-gray-600 border border-gray-300"
+                      : "bg-[#115292] text-white border border-white"
+                  }`}
+                >
+                  <option value="" disabled>Select a use case</option>
+                  {useCaseOptions.map((opt, i) => (
+                    <option key={i} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">Order Date</label>
-                  <input
-                    type="text"
-                    name="orderDate"
-                    defaultValue={userDetails.orderDate}
-                    disabled={callStatus === "active"}
-                    className="w-full p-2 bg-[#115292] border border-white text-white placeholder-white text-sm focus:outline-none focus:ring-2 focus:ring-white rounded disabled:opacity-50"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">Email id:</label>
-                  <input
-                    type="email"
-                    name="email"
-                    defaultValue="jennifer1234@gmail.com"
-                    disabled={callStatus === "active"}
-                    className="w-full p-2 bg-[#115292] border border-white text-white placeholder-white text-sm focus:outline-none focus:ring-2 focus:ring-white rounded disabled:opacity-50"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">Select Use Case</label>
-                  <select
-                    name="useCase"
-                    value={selectedUseCase}
-                    onChange={(e) => setSelectedUseCase(e.target.value)}
-                    disabled={callStatus === "active"}
-                    className="w-full p-2 bg-[#115292] border border-white text-white text-sm focus:outline-none focus:ring-2 focus:ring-white rounded disabled:opacity-50"
-                    required
+              <div className="flex justify-center mb-4">
+                {callStatus === "not-started" && (
+                  <button
+                    type="button"
+                    onClick={handleFormSubmit}
+                    disabled={!selectedUseCase}
+                    className="w-16 h-16 bg-white rounded-full flex items-center justify-center disabled:opacity-50"
                   >
-                    <option value="" disabled>
-                      Select a use case
-                    </option>
-                    {useCaseOptions.map((option, idx) => (
-                      <option key={idx} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex justify-center mb-4">
-                  {callStatus === "not-started" && (
-                    <button
-                      type="button"
-                      onClick={handleFormSubmit}
-                      disabled={!selectedUseCase}
-                      className="w-16 h-16 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Phone className="w-8 h-8 text-[#115292]" />
-                    </button>
-                  )}
-                  {callStatus === "active" && (
-                    <button
-                      onClick={toggleConversation}
-                      disabled={callInProgress}
-                      className="w-20 h-20 bg-red-500 hover:bg-red-600 disabled:bg-red-400 rounded-full flex items-center justify-center transition-colors shadow-lg border-4 border-white"
-                    >
-                      <Phone className="w-10 h-10 text-white transform rotate-[135deg]" />
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex flex-col items-center mb-4">
-                  <span className="text-white mt-2 font-medium">
-                    {callStatus === "active" ? "Call in progress..." : "Click to call"}
-                  </span>
-                </div>
-              </form>
-
-              <div className="mt-auto pt-4 border-t border-white">
-                <div className="font-medium text-white mb-2 text-sm">Disclaimer:</div>
-                <ul className="space-y-1 text-xs text-white">
-                  <li className="flex items-start">
-                    <span className="mr-2 font-bold text-white">■</span>
-                    <span>The platform isn't integrated with company systems, so it requires authentication details.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2 font-bold text-white">■</span>
-                    <span>An email ID is needed for instant messages and confirmation.</span>
-                  </li>
-                </ul>
+                    <Phone className="w-8 h-8 text-[#115292]" />
+                  </button>
+                )}
+                {callStatus === "active" && (
+                  <button
+                    onClick={toggleConversation}
+                    disabled={callInProgress}
+                    className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center disabled:bg-red-400 border-4 border-white"
+                  >
+                    <Phone className="w-10 h-10 text-white transform rotate-[135deg]" />
+                  </button>
+                )}
               </div>
+
+              <div className="flex flex-col items-center">
+                <span className="text-white font-medium">
+                  {callStatus === "active" ? "Call in progress..." : "Click to call"}
+                </span>
+              </div>
+            </form>
+
+            <div className="mt-auto pt-4 border-t border-white text-xs text-gray-200">
+              <div className="font-medium mb-2">Disclaimer:</div>
+              <ul className="space-y-1">
+                <li>■ The platform isn't integrated with company systems, so it requires authentication details.</li>
+                <li>■ An email ID is needed for instant messages and confirmation.</li>
+              </ul>
             </div>
           </div>
         )}
 
         {showPostCallPanel && (
-          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 max-h-[500px] overflow-y-auto">
-            <div className="p-6 flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-white" />
-                  <span className="text-white font-medium">Arlo Support</span>
+          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+                            <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+
+              <span className="text-white font-medium flex items-center gap-2">
+              Arlo Support
+              </span>
+              <X onClick={closeAllPanels} className="w-5 h-5 text-white cursor-pointer" />
+            </div>
+
+            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+              <div className="text-white text-lg font-medium">Click to call</div>
+              <button
+                onClick={resetForNewCall}
+                className="w-16 h-16 bg-white rounded-full flex items-center justify-center"
+              >
+                <Phone className="w-8 h-8 text-[#115292]" />
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-white text-sm text-white">
+              <button
+                onClick={() => {
+                  currentCallId && fetchCallSummary(currentCallId)
+                  setShowCallSummary(v => !v)
+                }}
+                className="font-medium mb-3 hover:underline"
+              >
+                View call Summary
+              </button>
+              {showCallSummary && (
+                <div className="space-y-3">
+                  {callSummary ? (
+                    <div className="mt-1">{callSummary.call_summary}</div>
+                  ) : (
+                    <div>Loading call summary...</div>
+                  )}
                 </div>
-                <button onClick={closeAllPanels} className="text-white hover:text-gray-200">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex flex-col items-center space-y-4 mb-6">
-                <div className="text-white text-lg font-medium">Click to call</div>
-                <button
-                  onClick={resetForNewCall}
-                  className="w-16 h-16 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"
-                >
-                  <Phone className="w-8 h-8 text-[#115292]" />
-                </button>
-              </div>
-              <div className="border-t border-white pt-4 mt-4">
-                <button
-                  onClick={() => {
-                    currentCallId && fetchCallSummary(currentCallId)
-                    setShowCallSummary(!showCallSummary)
-                  }}
-                  className="text-white font-medium mb-3 hover:text-white transition-colors"
-                >
-                  View call Summary
-                </button>
-                {showCallSummary && (
-                  <div className="space-y-3 text-white text-sm">
-                    {callSummary ? (
-                      <>
-                        <div>Customer had a concern on:</div>
-                        <div className="mt-1">{callSummary.call_summary}</div>
-                      </>
-                    ) : (
-                      <div>Loading call summary...</div>
-                    )}
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         )}
