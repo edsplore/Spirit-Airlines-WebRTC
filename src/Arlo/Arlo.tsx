@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { MessageCircle, QrCode, X, Phone, MoreVertical } from 'lucide-react'
+import { MessageCircle, X, Phone, MoreVertical } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
+import QRCode from "react-qr-code"
 
 interface UserDetails {
   name: string
@@ -298,30 +299,34 @@ export default function ArloDemo() {
         )}
 
         {showSupportWidget && (
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-2 space-y-2 min-w-72">
+          <div className="bg-transparent rounded-2xl shadow-2xl border-none p-2 space-y-2 min-w-72">
             <button
               onClick={() => { setShowSupportWidget(false); setShowFormPanel(true) }}
-              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-2"
+              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center justify-between"
             >
-              <Phone className="w-5 h-5" /> Click to Call
+              <span>Click to Call</span>
+              <Phone className="w-5 h-5" />
             </button>
             <button
               onClick={() => { setShowSupportWidget(false); openChatWidget() }}
-              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-2"
+              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center justify-between"
             >
-              <MessageCircle className="w-5 h-5" /> Click to Chat
+              <span>Click to Chat</span>
+              <MessageCircle className="w-5 h-5" />
             </button>
-            <div className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center gap-2">
-              <QrCode className="w-5 h-5" />
-              <div>
-                <div className="font-medium mb-1">Scan to WhatsApp</div>
-                <div className="bg-white p-2 rounded-lg w-16 h-16 flex items-center justify-center text-xs font-mono">
-                  QR CODE
-                </div>
-              </div>
+            <div className="w-full bg-[#115292] text-white p-4 rounded-xl flex flex-col items-center gap-2">
+              <div className="font-medium">Scan to WhatsApp</div>
+              <QRCode
+                value="https://wa.me/15551234567"
+                size={60}
+                bgColor="#115292"
+                fgColor="#ffffff"
+              />
             </div>
           </div>
         )}
+
+
 
         {showFormPanel && (
           <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
@@ -422,7 +427,7 @@ export default function ArloDemo() {
         )}
 
         {showPostCallPanel && (
-          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
+  <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 h-[39rem] p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
                             <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
 
