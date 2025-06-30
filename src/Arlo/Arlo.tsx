@@ -285,7 +285,7 @@ export default function ArloDemo() {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-screen object-cover" />
+      <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-screen object-fit" />
 
       <div className="fixed bottom-4 right-6 z-40">
         {!showSupportWidget && !showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
