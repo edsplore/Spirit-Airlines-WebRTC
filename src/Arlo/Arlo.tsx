@@ -547,7 +547,7 @@ export default function ArloDemo() {
             <div className="p-6 flex flex-col">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-white" />
+                  <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
                   <span className="text-white font-medium">Arlo Support</span>
                 </div>
                 <button
