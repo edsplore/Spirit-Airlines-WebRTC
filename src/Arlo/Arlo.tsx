@@ -66,6 +66,7 @@ export default function ArloDemo() {
     email: "",
     useCase: "",
   })
+  const [selectedUseCase, setSelectedUseCase] = useState<string>("")
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
   const [currentCallId, setCurrentCallId] = useState<string | null>(null)
@@ -128,14 +129,13 @@ export default function ArloDemo() {
       if (attemptOpen()) clearInterval(checker)
     }, 500)
     setTimeout(() => clearInterval(checker), 10000)
-
     return () => scr.parentNode?.removeChild(scr)
   }, [initializeChatWidget])
 
   useEffect(() => {
     if (formSubmitted) {
       const scr = initializeChatWidget()
-      return () => scr.parentNode && scr.parentNode.removeChild(scr)
+      return () => scr.parentNode?.removeChild(scr)
     }
   }, [formSubmitted, initializeChatWidget])
 
@@ -201,6 +201,7 @@ export default function ArloDemo() {
     setCurrentCallId(null)
     setCallSummary(null)
     setShowCallSummary(false)
+    setSelectedUseCase("")
     setUserDetails({
       name: "Jennifer",
       orderNumber: "",
@@ -215,23 +216,18 @@ export default function ArloDemo() {
     setCallInProgress(true)
 
     if (callStatus === "active") {
-      // Ending an active call
       try {
         const result = webClient.stopCall()
-        if (result instanceof Promise) {
-          await result
-        }
+        if (result instanceof Promise) await result
       } catch (err) {
         console.error("Failed to stop call:", err)
       } finally {
         setCallStatus("inactive")
         setCallInProgress(false)
-        // Show post-call panel when user hangs up
         setShowFormPanel(false)
         setShowPostCallPanel(true)
       }
     } else {
-      // Starting a new call
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
         await initiateConversation()
@@ -422,7 +418,8 @@ export default function ArloDemo() {
                   <label className="block text-sm font-medium text-white mb-1">Select Use Case</label>
                   <select
                     name="useCase"
-                    defaultValue=""
+                    value={selectedUseCase}
+                    onChange={(e) => setSelectedUseCase(e.target.value)}
                     disabled={callStatus === "active"}
                     className="w-full p-2 bg-[#115292] border border-white text-white text-sm focus:outline-none focus:ring-2 focus:ring-white rounded disabled:opacity-50"
                     required
@@ -443,7 +440,8 @@ export default function ArloDemo() {
                     <button
                       type="button"
                       onClick={handleFormSubmit}
-                      className="w-16 h-16 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors"
+                      disabled={!selectedUseCase}
+                      className="w-16 h-16 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Phone className="w-8 h-8 text-[#115292]" />
                     </button>
@@ -488,7 +486,7 @@ export default function ArloDemo() {
             <div className="p-6 flex flex-col">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+                  <Phone className="w-5 h-5 text-white" />
                   <span className="text-white font-medium">Arlo Support</span>
                 </div>
                 <button onClick={closeAllPanels} className="text-white hover:text-gray-200">
