@@ -151,43 +151,69 @@ export default function ArloDemo() {
     }
   }, [])
 
-  const registerCall = async (agentId: string): Promise<RegisterCallResponse> => {
-    const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
+// ← replace your old registerCall with this
+const registerCall = async (
+  agentId: string,
+  details: UserDetails
+): Promise<RegisterCallResponse> => {
+  const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
+    },
+    body: JSON.stringify({
+      agent_id: agentId,
+      retell_llm_dynamic_variables: {
+        customer_name: details.name,
+        order_number: details.orderNumber,
+        order_date: details.orderDate,
+        email: details.email,       // ← now pulls from details
+        use_case: details.useCase,
       },
-      body: JSON.stringify({
-        agent_id: agentId,
-        retell_llm_dynamic_variables: {
-          customer_name: userDetails.name,
-          order_number: userDetails.orderNumber,
-          order_date: userDetails.orderDate,
-          email: userDetails.email,
-          use_case: userDetails.useCase,
-        },
-      }),
-    })
-    if (!resp.ok) throw new Error()
-    const data = await resp.json()
-    return {
-      access_token: data.access_token,
-      callId: data.call_id,
-      sampleRate: Number.parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
-    }
-  }
+    }),
+  });
+  if (!resp.ok) throw new Error("Failed to create call");
+  const data = await resp.json();
+  return {
+    access_token: data.access_token,
+    callId: data.call_id,
+    sampleRate: parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
+  };
+};
 
-  const initiateConversation = async () => {
-    const { access_token, callId, sampleRate } = await registerCall("agent_f2c6614fdd0ac4727823d04a4a")
-    if (callId && access_token) {
-      setCurrentCallId(callId)
-      setCallSummary(null)
-      await webClient.startCall({ accessToken: access_token, callId, sampleRate, enableUpdate: true })
-      setCallStatus("active")
-    }
-    setCallInProgress(false)
+
+// ← replace your old initiateConversation with this
+const initiateConversation = async (
+  overrideDetails?: Partial<UserDetails>
+) => {
+  // merge overrides on top of the current state
+  const details: UserDetails = {
+    ...userDetails,
+    ...overrideDetails!,
+  };
+  // sync state so initializeChatWidget also uses the new email
+  setUserDetails(details);
+
+  const { access_token, callId, sampleRate } = await registerCall(
+    "agent_f2c6614fdd0ac4727823d04a4a",
+    details
+  );
+
+  if (callId && access_token) {
+    setCurrentCallId(callId);
+    setCallSummary(null);
+    await webClient.startCall({
+      accessToken: access_token,
+      callId,
+      sampleRate,
+      enableUpdate: true,
+    });
+    setCallStatus("active");
   }
+  setCallInProgress(false);
+};
+
 
   const toggleConversation = async () => {
     if (callInProgress) return
@@ -257,22 +283,29 @@ export default function ArloDemo() {
     })
   }
 
-  const handleFormSubmit = () => {
-    const form = document.getElementById("callForm") as HTMLFormElement
-    if (!form) return
-    const fd = new FormData(form)
-    const raw = fd.get("useCase") as string
-    const stripped = raw.replace(/^\d+\.\s*/, "")
-    setUserDetails({
-      name: "Jennifer",
-      orderNumber: fd.get("orderNumber") as string,
-      orderDate: fd.get("orderDate") as string,
-      email: fd.get("email") as string,
-      useCase: stripped,
-    })
-    setFormSubmitted(true)
-    toggleConversation()
-  }
+// ← replace your old handleFormSubmit with this
+const handleFormSubmit = () => {
+  const form = document.getElementById("callForm") as HTMLFormElement;
+  if (!form) return;
+  const fd = new FormData(form);
+  const raw = fd.get("useCase") as string;
+  const stripped = raw.replace(/^\d+\.\s*/, "");
+
+  // build an override with the edited email
+  const overrideDetails: Partial<UserDetails> = {
+    orderNumber: fd.get("orderNumber") as string,
+    orderDate: fd.get("orderDate") as string,
+    email: fd.get("email") as string,        // ← freshly‐typed email
+    useCase: stripped,
+  };
+
+  setFormSubmitted(true);
+
+
+  // start call with form values immediately
+  initiateConversation(overrideDetails);
+};
+
 
   const closeAllPanels = () => {
     setShowSupportWidget(false)
