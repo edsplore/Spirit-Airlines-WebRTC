@@ -65,7 +65,7 @@ export default function ArloDemo() {
   // user + call state
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
-    orderNumber: "100RUN23W5",
+    orderNumber: "123RUN56V7",
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "",
@@ -257,7 +257,7 @@ export default function ArloDemo() {
     setSelectedUseCase("")
     setUserDetails({
       name: "Jennifer",
-      orderNumber: "100RUN23W5",
+      orderNumber: "123RUN56V7",
       orderDate: getOrderDate(),
       email: "jennifer1234@gmail.com",
       useCase: "",
