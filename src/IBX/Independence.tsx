@@ -83,7 +83,7 @@ export default function Independence() {
     | "Coverage & Benefits"
     | "Medical Card Replacement"
     | "Prescription Drug Coverage"
-    |"Medical Adherence"
+    |"Medical Adherence - Outbound"
   >("Coverage & Benefits");
 
   const [customerBehavior, setCustomerBehavior] = useState("Normal");
@@ -404,7 +404,7 @@ if (selectedScenario === "Coverage & Benefits") {
       ? "agent_ecb82d397828ed4289dab3e85f"
       : "agent_71f7f555e857ec893be87883f5";
   }
-} else if (selectedScenario === "Medical Adherence") {
+} else if (selectedScenario === "Medical Adherence - Outbound") {
   if (randomGender === "Male") {
     agentId = customerBehavior === "Normal"
       ? "agent_7b6a3d8d765884c278db47b075"
@@ -703,7 +703,7 @@ if (selectedScenario === "Coverage & Benefits") {
       ? "agent_ecb82d397828ed4289dab3e85f"
       : "agent_71f7f555e857ec893be87883f5";
   }
-} else if (selectedScenario === "Medical Adherence") {
+} else if (selectedScenario === "Medical Adherence - Outbound") {
   if (customerGender === "Male") {
     agentId = customerBehavior === "Normal"
       ? "agent_7b6a3d8d765884c278db47b075"
@@ -1065,7 +1065,7 @@ if (selectedScenario === "Coverage & Benefits") {
                            <div
   className="p-2 hover:bg-gray-100 cursor-pointer"
   onClick={() => {
-    setSelectedScenario("Medical Adherence");
+    setSelectedScenario("Medical Adherence - Outbound");
     setShowScenarioDropdown(false);
   }}
 >
