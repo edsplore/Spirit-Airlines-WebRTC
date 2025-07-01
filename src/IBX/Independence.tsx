@@ -1069,7 +1069,7 @@ if (selectedScenario === "Coverage & Benefits") {
     setShowScenarioDropdown(false);
   }}
 >
-  Medical Adherence
+  Medical Adherence - Outbound
 </div>
 
                               </div>
