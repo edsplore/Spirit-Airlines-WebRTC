@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { X, Phone, MoreVertical } from 'lucide-react'
+import { X, Phone } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 import QRCode from "react-qr-code"
 
@@ -56,6 +56,7 @@ const getOrderDate = () => {
 
 export default function ArloDemo() {
   // panel toggles
+   // eslint-disable-next-line
   const [showSupportWidget, setShowSupportWidget] = useState(false)
   const [showFormPanel, setShowFormPanel] = useState(false)
   const [showPostCallPanel, setShowPostCallPanel] = useState(false)
@@ -292,46 +293,65 @@ export default function ArloDemo() {
     setShowCallSummary(false)
   }
 
+    // New state for QR modal
+  const [showQRExpanded, setShowQRExpanded] = useState(false)
+
+
   return (
     <div className="min-h-screen flex flex-col relative">
       <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-screen object-fit" />
 
       <div className="fixed bottom-16 right-6 z-40">
         {/* support toggle */}
-{!showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
-  <div className="flex flex-col items-end space-y-2">
-    {/* — Scan to WhatsApp bubble */}
-    <button
-      onClick={() => { /* optionally open a larger QR modal */ }}
-      className="
-        flex items-center space-x-2
-        bg-[#115292] text-white
-        rounded-[14px] px-3.5 py-2
-        shadow-lg
-      "
-    >
-      <QRCode
-        value="https://wa.me/15551234567"
-        size={25}
-        bgColor="#115292"
-        fgColor="#ffffff"
-      />
-      <span className="text-sm">To WhatsApp</span>
-    </button>
+      {!showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
+          <div className="flex flex-col items-end space-y-2">
 
-    {/* — Click to Call bubble */}
-    <button
-      onClick={() => { setShowFormPanel(true) }}
-      className="flex items-center space-x-3 bg-[#115292] text-white rounded-full px-5 py-2.5 shadow-lg"
-    >
-      <Phone className="w-4 h-4" />
-      <span className="text-sm">Click to Call</span>
-    </button>
+            {/* — inline expanded QR panel */}
+            {showQRExpanded && (
+              <div className="bg-white rounded-2xl p-4 shadow-lg w-36 text-center">
+                <QRCode
+                  value="https://wa.me/15551234567"
+                  size={120}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  className="mx-auto"
+                />
+                <p className="mt-2 text-sm text-gray-600">Use this QR</p>
+              </div>
+            )}
 
-   
-  </div>
-)}
+            {/* — Scan to WhatsApp bubble */}
+            <button
+              onClick={() => setShowQRExpanded((v) => !v)}
+              className="
+                flex items-center space-x-2
+                bg-[#115292] text-white
+                rounded-[14px] px-3.5 py-2
+                shadow-lg
+              "
+            >
+              <QRCode
+                value="https://wa.me/15551234567"
+                size={25}
+                bgColor="#115292"
+                fgColor="#ffffff"
+              />
+              <span className="text-sm">To WhatsApp</span>
+            </button>
 
+            {/* — Click to Call bubble */}
+            <button
+              onClick={() => {
+                setShowFormPanel(true)
+                setShowQRExpanded(false)   // auto-collapse when you switch panels
+              }}
+              className="flex items-center space-x-3 bg-[#115292] text-white rounded-full px-5 py-2.5 shadow-lg"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="text-sm">Click to Call</span>
+            </button>
+          </div>
+        )}
 
 
         {/* form panel */}
