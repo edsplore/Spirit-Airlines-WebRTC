@@ -298,56 +298,40 @@ export default function ArloDemo() {
 
       <div className="fixed bottom-16 right-6 z-40">
         {/* support toggle */}
-        {!showSupportWidget && !showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
-          <button
-            onClick={() => setShowSupportWidget(true)}
-            className="w-16 h-16 bg-[#115292] rounded-full flex items-center justify-center text-white shadow-lg"
-          >
-            <MoreVertical className="w-8 h-8" />
-          </button>
-        )}
-      {showSupportWidget && (
-          <div className="flex flex-col items-end space-y-2">
-            {/* — Call bubble */}
+{!showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
+  <div className="flex flex-col items-end space-y-2">
+    {/* — Scan to WhatsApp bubble */}
+    <button
+      onClick={() => { /* optionally open a larger QR modal */ }}
+      className="
+        flex items-center space-x-2
+        bg-[#115292] text-white
+        rounded-[14px] px-3.5 py-2
+        shadow-lg
+      "
+    >
+      <QRCode
+        value="https://wa.me/15551234567"
+        size={25}
+        bgColor="#115292"
+        fgColor="#ffffff"
+      />
+      <span className="text-sm">To WhatsApp</span>
+    </button>
+
+    {/* — Click to Call bubble */}
+    <button
+      onClick={() => { setShowFormPanel(true) }}
+      className="flex items-center space-x-3 bg-[#115292] text-white rounded-full px-5 py-2.5 shadow-lg"
+    >
+      <Phone className="w-4 h-4" />
+      <span className="text-sm">Click to Call</span>
+    </button>
+
    
+  </div>
+)}
 
-            {/* — Scan to WhatsApp bubble */}
-  <button
-  onClick={() => { /* optionally open a larger QR modal */ }}
-  className="
-    flex flex-col
-    items-center justify-center
-    bg-[#115292] text-white
-    rounded-[14px] px-10 py-4
-    shadow-lg
-  "
->
-  <span className="text-xs mb-1">Scan To WhatsApp</span>
-  <QRCode
-    value="https://wa.me/15551234567"
-    size={40}
-    bgColor="#115292"
-    fgColor="#ffffff"
-  />
-</button>
-
-                     <button
-              onClick={() => { setShowSupportWidget(false); setShowFormPanel(true) }}
-              className="flex items-center space-x-5 bg-[#115292] text-white rounded-full px-4 py-3 shadow-lg"
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm">Click to Call</span>
-            </button>
-
-            {/* — close support widget */}
-            <button
-              onClick={closeAllPanels}
-              className="mt-1 text-gray-400 hover:text-gray-600 text-sm"
-            >
-              Close
-            </button>
-          </div>
-        )}
 
 
         {/* form panel */}
