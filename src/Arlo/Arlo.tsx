@@ -306,29 +306,49 @@ export default function ArloDemo() {
             <MoreVertical className="w-8 h-8" />
           </button>
         )}
+      {showSupportWidget && (
+          <div className="flex flex-col items-end space-y-2">
+            {/* — Call bubble */}
+   
 
-        {showSupportWidget && (
-          <div className="bg-transparent rounded-2xl shadow-2xl border-none p-2 space-y-2 min-w-72">
-            {/* only call */}
-            <button
+            {/* — Scan to WhatsApp bubble */}
+  <button
+  onClick={() => { /* optionally open a larger QR modal */ }}
+  className="
+    flex flex-col
+    items-center justify-center
+    bg-[#115292] text-white
+    rounded-[14px] px-10 py-4
+    shadow-lg
+  "
+>
+  <span className="text-xs mb-1">Scan To WhatsApp</span>
+  <QRCode
+    value="https://wa.me/15551234567"
+    size={40}
+    bgColor="#115292"
+    fgColor="#ffffff"
+  />
+</button>
+
+                     <button
               onClick={() => { setShowSupportWidget(false); setShowFormPanel(true) }}
-              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center justify-between"
+              className="flex items-center space-x-5 bg-[#115292] text-white rounded-full px-4 py-3 shadow-lg"
             >
-              <span>Click to Call</span>
-              <Phone className="w-5 h-5" />
+              <Phone className="w-4 h-4" />
+              <span className="text-sm">Click to Call</span>
             </button>
-            {/* only scan */}
-            <div className="w-full bg-[#115292] text-white p-4 rounded-xl flex flex-col items-center gap-2">
-              <div className="font-medium">Scan to WhatsApp</div>
-              <QRCode
-                value="https://wa.me/15551234567"
-                size={60}
-                bgColor="#115292"
-                fgColor="#ffffff"
-              />
-            </div>
+
+            {/* — close support widget */}
+            <button
+              onClick={closeAllPanels}
+              className="mt-1 text-gray-400 hover:text-gray-600 text-sm"
+            >
+              Close
+            </button>
           </div>
         )}
+
 
         {/* form panel */}
         {showFormPanel && (
