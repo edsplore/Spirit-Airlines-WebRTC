@@ -83,6 +83,7 @@ export default function Independence() {
     | "Coverage & Benefits"
     | "Medical Card Replacement"
     | "Prescription Drug Coverage"
+    |"Medical Adherence"
   >("Coverage & Benefits");
 
   const [customerBehavior, setCustomerBehavior] = useState("Normal");
@@ -383,34 +384,38 @@ export default function Independence() {
 
       // Determine the agentId based on selected scenario, randomized gender, and behavior
       let agentId;
-      if (selectedScenario === "Coverage & Benefits") {
-        if (randomGender === "Male") {
-          agentId =
-            customerBehavior === "Normal"
-              ? "agent_86f582156aef296a4df5abbc07"
-              : "agent_daba87b4e98a3d4f857f36ee09";
-        } else {
-          // Female
-          agentId =
-            customerBehavior === "Normal"
-              ? "agent_f41aeb86e38c7e6add943bc91d"
-              : "agent_a448fcfcdc61e91f865e175c01";
-        }
-      } else {
-        // Medical Card Replacement
-        if (randomGender === "Male") {
-          agentId =
-            customerBehavior === "Normal"
-              ? "agent_30840e1346b38fac1d68f38aa6"
-              : "agent_264722906847c49df34b2a29d7";
-        } else {
-          // Female
-          agentId =
-            customerBehavior === "Normal"
-              ? "agent_ecb82d397828ed4289dab3e85f"
-              : "agent_71f7f555e857ec893be87883f5";
-        }
-      }
+if (selectedScenario === "Coverage & Benefits") {
+  if (randomGender === "Male") {
+    agentId = customerBehavior === "Normal"
+      ? "agent_86f582156aef296a4df5abbc07"
+      : "agent_daba87b4e98a3d4f857f36ee09";
+  } else {
+    agentId = customerBehavior === "Normal"
+      ? "agent_f41aeb86e38c7e6add943bc91d"
+      : "agent_a448fcfcdc61e91f865e175c01";
+  }
+} else if (selectedScenario === "Medical Card Replacement") {
+  if (randomGender === "Male") {
+    agentId = customerBehavior === "Normal"
+      ? "agent_30840e1346b38fac1d68f38aa6"
+      : "agent_264722906847c49df34b2a29d7";
+  } else {
+    agentId = customerBehavior === "Normal"
+      ? "agent_ecb82d397828ed4289dab3e85f"
+      : "agent_71f7f555e857ec893be87883f5";
+  }
+} else if (selectedScenario === "Medical Adherence") {
+  if (randomGender === "Male") {
+    agentId = customerBehavior === "Normal"
+      ? "agent_1234567890abcdef_male_normal"
+      : "agent_1234567890abcdef_male_escalated";
+  } else {
+    agentId = customerBehavior === "Normal"
+      ? "agent_1234567890abcdef_female_normal"
+      : "agent_1234567890abcdef_female_escalated";
+  }
+}
+
 
       // Store the current agent ID for later use
       setCurrentAgentId(agentId);
@@ -678,52 +683,40 @@ export default function Independence() {
   const registerCall = async (): Promise<RegisterCallResponse> => {
     // Use the already set customerGender, selected scenario, and behavior
     let agentId;
+if (selectedScenario === "Coverage & Benefits") {
+  if (customerGender === "Male") {
+    agentId = customerBehavior === "Normal"
+      ? "agent_86f582156aef296a4df5abbc07"
+      : "agent_daba87b4e98a3d4f857f36ee09";
+  } else {
+    agentId = customerBehavior === "Normal"
+      ? "agent_f41aeb86e38c7e6add943bc91d"
+      : "agent_a448fcfcdc61e91f865e175c01";
+  }
+} else if (selectedScenario === "Medical Card Replacement") {
+  if (customerGender === "Male") {
+    agentId = customerBehavior === "Normal"
+      ? "agent_30840e1346b38fac1d68f38aa6"
+      : "agent_264722906847c49df34b2a29d7";
+  } else {
+    agentId = customerBehavior === "Normal"
+      ? "agent_ecb82d397828ed4289dab3e85f"
+      : "agent_71f7f555e857ec893be87883f5";
+  }
+} else if (selectedScenario === "Medical Adherence") {
+  if (customerGender === "Male") {
+    agentId = customerBehavior === "Normal"
+      ? "agent_1234567890abcdef_male_normal"
+      : "agent_1234567890abcdef_male_escalated";
+  } else {
+    agentId = customerBehavior === "Normal"
+      ? "agent_1234567890abcdef_female_normal"
+      : "agent_1234567890abcdef_female_escalated";
+  }
+}
 
-    if (selectedScenario === "Coverage & Benefits") {
-      if (customerGender === "Male") {
-        agentId =
-          customerBehavior === "Normal"
-            ? "agent_86f582156aef296a4df5abbc07"
-            : "agent_daba87b4e98a3d4f857f36ee09";
-      } else {
-        // Female
-        agentId =
-          customerBehavior === "Normal"
-            ? "agent_f41aeb86e38c7e6add943bc91d"
-            : "agent_a448fcfcdc61e91f865e175c01";
-      }
-    } else if (selectedScenario === "Medical Card Replacement") {
-      if (customerGender === "Male") {
-        agentId =
-          customerBehavior === "Normal"
-            ? "agent_30840e1346b38fac1d68f38aa6"
-            : "agent_264722906847c49df34b2a29d7";
-      } else {
-        // Female
-        agentId =
-          customerBehavior === "Normal"
-            ? "agent_ecb82d397828ed4289dab3e85f"
-            : "agent_71f7f555e857ec893be87883f5";
-      }
-    }
 
-    // Commented out: Prescription Drug Coverage scenario
-    /*
-    else if (selectedScenario === "Prescription Drug Coverage") {
-      if (customerGender === "Male") {
-        agentId =
-          customerBehavior === "Normal"
-            ? "agent_dfe63bcd6ef1801648d2b23c54"
-            : "agent_c93d67cf74c1210a3bc3552dd5";
-      } else {
-        // Female
-        agentId =
-          customerBehavior === "Normal"
-            ? "agent_dfe63bcd6ef1801648d2b23c54"
-            : "agent_c93d67cf74c1210a3bc3552dd5";
-      }
-    }
-    */
+
 
     // Store the current agent ID for later use
     setCurrentAgentId(agentId);
@@ -1069,17 +1062,16 @@ export default function Independence() {
                                 >
                                   Medical Card Replacement
                                 </div>
-                                {/* <div
-                                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedScenario(
-                                      "Prescription Drug Coverage"
-                                    );
-                                    setShowScenarioDropdown(false);
-                                  }}
-                                >
-                                  Prescription Drug Coverage
-                                </div> */}
+                           <div
+  className="p-2 hover:bg-gray-100 cursor-pointer"
+  onClick={() => {
+    setSelectedScenario("Medical Adherence");
+    setShowScenarioDropdown(false);
+  }}
+>
+  Medical Adherence
+</div>
+
                               </div>
                             )}
                           </div>

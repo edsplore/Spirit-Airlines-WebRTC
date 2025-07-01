@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { MessageCircle, X, Phone, MoreVertical } from 'lucide-react'
+import { X, Phone, MoreVertical } from 'lucide-react'
 import { RetellWebClient } from "retell-client-js-sdk"
 import QRCode from "react-qr-code"
 
@@ -55,10 +55,14 @@ const getOrderDate = () => {
 }
 
 export default function ArloDemo() {
+  // panel toggles
   const [showSupportWidget, setShowSupportWidget] = useState(false)
   const [showFormPanel, setShowFormPanel] = useState(false)
   const [showPostCallPanel, setShowPostCallPanel] = useState(false)
+  // eslint-disable-next-line
   const [formSubmitted, setFormSubmitted] = useState(false)
+
+  // user + call state
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: "Jennifer",
     orderNumber: "100RUN23W5",
@@ -73,6 +77,7 @@ export default function ArloDemo() {
   const [callSummary, setCallSummary] = useState<CallSummary | null>(null)
   const [showCallSummary, setShowCallSummary] = useState(false)
 
+  // load voiceflow chat widget immediately (independent of call)
   const initializeChatWidget = useCallback(() => {
     if (window.voiceflow?.chat) {
       try { window.voiceflow.chat.destroy() } catch {}
@@ -90,13 +95,7 @@ export default function ArloDemo() {
             url: 'https://general-runtime.voiceflow.com',
             versionID: 'production',
             voice: { url: "https://runtime-api.voiceflow.com" },
-            launch: { event: { type: "launch", payload: {
-              customer_name: "${userDetails.name}",
-              order_number: "${userDetails.orderNumber}",
-              order_date: "${userDetails.orderDate}",
-              email: "${userDetails.email}",
-              use_case: "${userDetails.useCase}"
-            } } },
+            // no automatic launch event here; user clicks default bubble
           });
         }
         v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
@@ -104,28 +103,17 @@ export default function ArloDemo() {
       })(document, 'script');
     `
     document.body.appendChild(script)
-    return script
-  }, [userDetails])
-
-  const openChatWidget = useCallback(() => {
-    const tryOpen = () => {
-      try { window.voiceflow?.chat.open(); return true }
-      catch { return false }
+    return () => {
+      document.body.removeChild(script)
+      if (window.voiceflow?.chat) window.voiceflow.chat.destroy()
     }
-    if (tryOpen()) return
-    const scr = initializeChatWidget()
-    const id = setInterval(() => { if (tryOpen()) clearInterval(id) }, 500)
-    setTimeout(() => clearInterval(id), 10000)
-    return () => scr.parentNode?.removeChild(scr)
-  }, [initializeChatWidget])
+  }, [])
 
   useEffect(() => {
-    if (formSubmitted) {
-      const scr = initializeChatWidget()
-      return () => scr.parentNode?.removeChild(scr)
-    }
-  }, [formSubmitted, initializeChatWidget])
+    initializeChatWidget()
+  }, [initializeChatWidget])
 
+  // Retell call event handlers
   useEffect(() => {
     webClient.on("conversationStarted", () => {
       setCallStatus("active")
@@ -147,73 +135,66 @@ export default function ArloDemo() {
       webClient.off("conversationStarted")
       webClient.off("conversationEnded")
       webClient.off("error")
-      if (window.voiceflow?.chat) window.voiceflow.chat.destroy()
     }
   }, [])
 
-// ← replace your old registerCall with this
-const registerCall = async (
-  agentId: string,
-  details: UserDetails
-): Promise<RegisterCallResponse> => {
-  const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
-    },
-    body: JSON.stringify({
-      agent_id: agentId,
-      retell_llm_dynamic_variables: {
-        customer_name: details.name,
-        order_number: details.orderNumber,
-        order_date: details.orderDate,
-        email: details.email,       // ← now pulls from details
-        use_case: details.useCase,
+  const registerCall = async (
+    agentId: string,
+    details: UserDetails
+  ): Promise<RegisterCallResponse> => {
+    const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
       },
-    }),
-  });
-  if (!resp.ok) throw new Error("Failed to create call");
-  const data = await resp.json();
-  return {
-    access_token: data.access_token,
-    callId: data.call_id,
-    sampleRate: parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
-  };
-};
-
-
-// ← replace your old initiateConversation with this
-const initiateConversation = async (
-  overrideDetails?: Partial<UserDetails>
-) => {
-  // merge overrides on top of the current state
-  const details: UserDetails = {
-    ...userDetails,
-    ...overrideDetails!,
-  };
-  // sync state so initializeChatWidget also uses the new email
-  setUserDetails(details);
-
-  const { access_token, callId, sampleRate } = await registerCall(
-    "agent_f2c6614fdd0ac4727823d04a4a",
-    details
-  );
-
-  if (callId && access_token) {
-    setCurrentCallId(callId);
-    setCallSummary(null);
-    await webClient.startCall({
-      accessToken: access_token,
-      callId,
-      sampleRate,
-      enableUpdate: true,
-    });
-    setCallStatus("active");
+      body: JSON.stringify({
+        agent_id: agentId,
+        retell_llm_dynamic_variables: {
+          customer_name: details.name,
+          order_number: details.orderNumber,
+          order_date: details.orderDate,
+          email: details.email,
+          use_case: details.useCase,
+        },
+      }),
+    })
+    if (!resp.ok) throw new Error("Failed to create call")
+    const data = await resp.json()
+    return {
+      access_token: data.access_token,
+      callId: data.call_id,
+      sampleRate: parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
+    }
   }
-  setCallInProgress(false);
-};
 
+  const initiateConversation = async (
+    overrideDetails?: Partial<UserDetails>
+  ) => {
+    const details: UserDetails = {
+      ...userDetails,
+      ...overrideDetails!,
+    }
+    setUserDetails(details)
+
+    const { access_token, callId, sampleRate } = await registerCall(
+      "agent_f2c6614fdd0ac4727823d04a4a",
+      details
+    )
+
+    if (callId && access_token) {
+      setCurrentCallId(callId)
+      setCallSummary(null)
+      await webClient.startCall({
+        accessToken: access_token,
+        callId,
+        sampleRate,
+        enableUpdate: true,
+      })
+      setCallStatus("active")
+    }
+    setCallInProgress(false)
+  }
 
   const toggleConversation = async () => {
     if (callInProgress) return
@@ -283,29 +264,23 @@ const initiateConversation = async (
     })
   }
 
-// ← replace your old handleFormSubmit with this
-const handleFormSubmit = () => {
-  const form = document.getElementById("callForm") as HTMLFormElement;
-  if (!form) return;
-  const fd = new FormData(form);
-  const raw = fd.get("useCase") as string;
-  const stripped = raw.replace(/^\d+\.\s*/, "");
+  const handleFormSubmit = () => {
+    const form = document.getElementById("callForm") as HTMLFormElement
+    if (!form) return
+    const fd = new FormData(form)
+    const raw = fd.get("useCase") as string
+    const stripped = raw.replace(/^\d+\.\s*/, "")
 
-  // build an override with the edited email
-  const overrideDetails: Partial<UserDetails> = {
-    orderNumber: fd.get("orderNumber") as string,
-    orderDate: fd.get("orderDate") as string,
-    email: fd.get("email") as string,        // ← freshly‐typed email
-    useCase: stripped,
-  };
+    const overrideDetails: Partial<UserDetails> = {
+      orderNumber: fd.get("orderNumber") as string,
+      orderDate: fd.get("orderDate") as string,
+      email: fd.get("email") as string,
+      useCase: stripped,
+    }
 
-  setFormSubmitted(true);
-
-
-  // start call with form values immediately
-  initiateConversation(overrideDetails);
-};
-
+    setFormSubmitted(true)
+    initiateConversation(overrideDetails)
+  }
 
   const closeAllPanels = () => {
     setShowSupportWidget(false)
@@ -321,7 +296,8 @@ const handleFormSubmit = () => {
     <div className="min-h-screen flex flex-col relative">
       <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-screen object-fit" />
 
-      <div className="fixed bottom-4 right-6 z-40">
+      <div className="fixed bottom-16 right-6 z-40">
+        {/* support toggle */}
         {!showSupportWidget && !showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
           <button
             onClick={() => setShowSupportWidget(true)}
@@ -333,6 +309,7 @@ const handleFormSubmit = () => {
 
         {showSupportWidget && (
           <div className="bg-transparent rounded-2xl shadow-2xl border-none p-2 space-y-2 min-w-72">
+            {/* only call */}
             <button
               onClick={() => { setShowSupportWidget(false); setShowFormPanel(true) }}
               className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center justify-between"
@@ -340,13 +317,7 @@ const handleFormSubmit = () => {
               <span>Click to Call</span>
               <Phone className="w-5 h-5" />
             </button>
-            <button
-              onClick={() => { setShowSupportWidget(false); openChatWidget() }}
-              className="w-full bg-[#115292] text-white p-4 rounded-xl flex items-center justify-between"
-            >
-              <span>Click to Chat</span>
-              <MessageCircle className="w-5 h-5" />
-            </button>
+            {/* only scan */}
             <div className="w-full bg-[#115292] text-white p-4 rounded-xl flex flex-col items-center gap-2">
               <div className="font-medium">Scan to WhatsApp</div>
               <QRCode
@@ -359,19 +330,17 @@ const handleFormSubmit = () => {
           </div>
         )}
 
-
-
+        {/* form panel */}
         {showFormPanel && (
           <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
-              <span className="text-white font-medium flex items-center gap-2">
-              Arlo Support
-              </span>
+              <span className="text-white font-medium">Arlo Support</span>
               <X onClick={closeAllPanels} className="w-5 h-5 text-white cursor-pointer" />
             </div>
 
             <form id="callForm" className="flex-1 space-y-4">
+              {/* order#, date, email */}
               <div>
                 <label className="block text-sm font-medium text-white mb-1">Order#</label>
                 <input
@@ -391,7 +360,7 @@ const handleFormSubmit = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-1">Email id:</label>
+                <label className="block text-sm font-medium text-white mb-1">Email:</label>
                 <input
                   name="email"
                   type="email"
@@ -400,6 +369,7 @@ const handleFormSubmit = () => {
                 />
               </div>
 
+              {/* use case */}
               <div>
                 <label className="block text-sm font-medium text-white mb-1">Select Use Case</label>
                 <select
@@ -420,6 +390,7 @@ const handleFormSubmit = () => {
                 </select>
               </div>
 
+              {/* call button */}
               <div className="flex justify-center mb-4">
                 {callStatus === "not-started" && (
                   <button
@@ -449,24 +420,23 @@ const handleFormSubmit = () => {
               </div>
             </form>
 
+            {/* disclaimer */}
             <div className="mt-auto pt-4 border-t border-white text-xs text-gray-200">
               <div className="font-medium mb-2">Disclaimer:</div>
               <ul className="space-y-1">
-                <li>■ The platform isn't integrated with company systems, so it requires authentication details.</li>
-                <li>■ An email ID is needed for instant messages and confirmation.</li>
+                <li>■ Platform isn't integrated, so requires authentication.</li>
+                <li>■ Email ID needed for confirmations.</li>
               </ul>
             </div>
           </div>
         )}
 
+        {/* post-call panel */}
         {showPostCallPanel && (
-  <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 h-[39rem] p-6 flex flex-col">
+          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 h-[39rem] p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
-                            <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
-
-              <span className="text-white font-medium flex items-center gap-2">
-              Arlo Support
-              </span>
+              <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+              <span className="text-white font-medium">Arlo Support</span>
               <X onClick={closeAllPanels} className="w-5 h-5 text-white cursor-pointer" />
             </div>
 
