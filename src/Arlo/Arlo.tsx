@@ -1,67 +1,67 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useCallback } from "react"
-import { X, Phone } from 'lucide-react'
-import { RetellWebClient } from "retell-client-js-sdk"
-import QRCode from "react-qr-code"
+import { useEffect, useState, useCallback } from "react";
+import { X, Phone } from "lucide-react";
+import { RetellWebClient } from "retell-client-js-sdk";
+import QRCode from "react-qr-code";
 
 interface UserDetails {
-  name: string
-  orderNumber: string
-  orderDate: string
-  email: string
-  useCase: string
+  name: string;
+  orderNumber: string;
+  orderDate: string;
+  email: string;
+  useCase: string;
 }
 
 interface CallSummary {
-  call_id: string
-  call_summary?: string
-  user_sentiment?: string
-  call_successful?: boolean
-  duration_ms?: number
-  transcript?: string
+  call_id: string;
+  call_summary?: string;
+  user_sentiment?: string;
+  call_successful?: boolean;
+  duration_ms?: number;
+  transcript?: string;
 }
 
 interface RegisterCallResponse {
-  access_token?: string
-  callId?: string
-  sampleRate: number
+  access_token?: string;
+  callId?: string;
+  sampleRate: number;
 }
 
-const webClient = new RetellWebClient()
+const webClient = new RetellWebClient();
 
 const useCaseOptions = [
   "1. Tracked an online order",
   "2. Requested help with camera setup",
   "3. Reported internet issues",
-]
+];
 
 const getOrderDate = () => {
-  const today = new Date()
-  const d = new Date(today)
-  d.setDate(today.getDate() - 7)
-  const day = d.getDate()
-  const month = d.toLocaleString("default", { month: "short" })
-  const year = d.getFullYear().toString().slice(-2)
+  const today = new Date();
+  const d = new Date(today);
+  d.setDate(today.getDate() - 7);
+  const day = d.getDate();
+  const month = d.toLocaleString("default", { month: "short" });
+  const year = d.getFullYear().toString().slice(-2);
   const suffix =
     day === 1 || day === 21 || day === 31
       ? "st"
       : day === 2 || day === 22
-        ? "nd"
-        : day === 3 || day === 23
-          ? "rd"
-          : "th"
-  return `${day}${suffix} ${month}'${year}`
-}
+      ? "nd"
+      : day === 3 || day === 23
+      ? "rd"
+      : "th";
+  return `${day}${suffix} ${month}'${year}`;
+};
 
 export default function ArloDemo() {
   // panel toggles
-   // eslint-disable-next-line
-  const [showSupportWidget, setShowSupportWidget] = useState(false)
-  const [showFormPanel, setShowFormPanel] = useState(false)
-  const [showPostCallPanel, setShowPostCallPanel] = useState(false)
   // eslint-disable-next-line
-  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [showSupportWidget, setShowSupportWidget] = useState(false);
+  const [showFormPanel, setShowFormPanel] = useState(false);
+  const [showPostCallPanel, setShowPostCallPanel] = useState(false);
+  // eslint-disable-next-line
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   // user + call state
   const [userDetails, setUserDetails] = useState<UserDetails>({
@@ -70,23 +70,27 @@ export default function ArloDemo() {
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "",
-  })
-  const [selectedUseCase, setSelectedUseCase] = useState<string>("")
-  const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
-  const [callInProgress, setCallInProgress] = useState(false)
-  const [currentCallId, setCurrentCallId] = useState<string | null>(null)
-  const [callSummary, setCallSummary] = useState<CallSummary | null>(null)
-  const [showCallSummary, setShowCallSummary] = useState(false)
+  });
+  const [selectedUseCase, setSelectedUseCase] = useState<string>("");
+  const [callStatus, setCallStatus] = useState<
+    "not-started" | "active" | "inactive"
+  >("not-started");
+  const [callInProgress, setCallInProgress] = useState(false);
+  const [currentCallId, setCurrentCallId] = useState<string | null>(null);
+  const [callSummary, setCallSummary] = useState<CallSummary | null>(null);
+  const [showCallSummary, setShowCallSummary] = useState(false);
 
   // load voiceflow chat widget immediately (independent of call)
   const initializeChatWidget = useCallback(() => {
     if (window.voiceflow?.chat) {
-      try { window.voiceflow.chat.destroy() } catch {}
+      try {
+        window.voiceflow.chat.destroy();
+      } catch {}
     }
-    document.querySelector('script[src*="voiceflow.com"]')?.remove()
-    const script = document.createElement("script")
-    const projectId = "685e60329036e9e5b907027b"
-    script.type = "text/javascript"
+    document.querySelector('script[src*="voiceflow.com"]')?.remove();
+    const script = document.createElement("script");
+    const projectId = "685e60329036e9e5b907027b";
+    script.type = "text/javascript";
     script.innerHTML = `
       (function(d, t) {
         var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
@@ -102,42 +106,42 @@ export default function ArloDemo() {
         v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
         s.parentNode.insertBefore(v, s);
       })(document, 'script');
-    `
-    document.body.appendChild(script)
+    `;
+    document.body.appendChild(script);
     return () => {
-      document.body.removeChild(script)
-      if (window.voiceflow?.chat) window.voiceflow.chat.destroy()
-    }
-  }, [])
+      document.body.removeChild(script);
+      if (window.voiceflow?.chat) window.voiceflow.chat.destroy();
+    };
+  }, []);
 
   useEffect(() => {
-    initializeChatWidget()
-  }, [initializeChatWidget])
+    initializeChatWidget();
+  }, [initializeChatWidget]);
 
   // Retell call event handlers
   useEffect(() => {
     webClient.on("conversationStarted", () => {
-      setCallStatus("active")
-      setCallInProgress(false)
-    })
+      setCallStatus("active");
+      setCallInProgress(false);
+    });
     webClient.on("conversationEnded", () => {
-      setCallStatus("inactive")
-      setCallInProgress(false)
-      setShowFormPanel(false)
-      setShowPostCallPanel(true)
-    })
+      setCallStatus("inactive");
+      setCallInProgress(false);
+      setShowFormPanel(false);
+      setShowPostCallPanel(true);
+    });
     webClient.on("error", () => {
-      setCallStatus("inactive")
-      setCallInProgress(false)
-      setShowFormPanel(false)
-      setShowPostCallPanel(true)
-    })
+      setCallStatus("inactive");
+      setCallInProgress(false);
+      setShowFormPanel(false);
+      setShowPostCallPanel(true);
+    });
     return () => {
-      webClient.off("conversationStarted")
-      webClient.off("conversationEnded")
-      webClient.off("error")
-    }
-  }, [])
+      webClient.off("conversationStarted");
+      webClient.off("conversationEnded");
+      webClient.off("error");
+    };
+  }, []);
 
   const registerCall = async (
     agentId: string,
@@ -159,15 +163,18 @@ export default function ArloDemo() {
           use_case: details.useCase,
         },
       }),
-    })
-    if (!resp.ok) throw new Error("Failed to create call")
-    const data = await resp.json()
+    });
+    if (!resp.ok) throw new Error("Failed to create call");
+    const data = await resp.json();
     return {
       access_token: data.access_token,
       callId: data.call_id,
-      sampleRate: parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10),
-    }
-  }
+      sampleRate: parseInt(
+        process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000",
+        10
+      ),
+    };
+  };
 
   const initiateConversation = async (
     overrideDetails?: Partial<UserDetails>
@@ -175,58 +182,61 @@ export default function ArloDemo() {
     const details: UserDetails = {
       ...userDetails,
       ...overrideDetails!,
-    }
-    setUserDetails(details)
+    };
+    setUserDetails(details);
 
     const { access_token, callId, sampleRate } = await registerCall(
       "agent_f2c6614fdd0ac4727823d04a4a",
       details
-    )
+    );
 
     if (callId && access_token) {
-      setCurrentCallId(callId)
-      setCallSummary(null)
+      setCurrentCallId(callId);
+      setCallSummary(null);
       await webClient.startCall({
         accessToken: access_token,
         callId,
         sampleRate,
         enableUpdate: true,
-      })
-      setCallStatus("active")
+      });
+      setCallStatus("active");
     }
-    setCallInProgress(false)
-  }
+    setCallInProgress(false);
+  };
 
   const toggleConversation = async () => {
-    if (callInProgress) return
-    setCallInProgress(true)
+    if (callInProgress) return;
+    setCallInProgress(true);
 
     if (callStatus === "active") {
       try {
-        const res = webClient.stopCall()
-        if (res instanceof Promise) await res
+        const res = webClient.stopCall();
+        if (res instanceof Promise) await res;
       } catch {}
-      setCallStatus("inactive")
-      setCallInProgress(false)
-      setShowFormPanel(false)
-      setShowPostCallPanel(true)
+      setCallStatus("inactive");
+      setCallInProgress(false);
+      setShowFormPanel(false);
+      setShowPostCallPanel(true);
     } else {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true })
-        await initiateConversation()
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        await initiateConversation();
       } catch {
-        setCallInProgress(false)
+        setCallInProgress(false);
       }
     }
-  }
+  };
 
   const fetchCallSummary = async (callId: string) => {
     try {
-      const resp = await fetch(`https://api.retellai.com/v2/get-call/${callId}`, {
-        headers: { Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d` },
-      })
-      if (!resp.ok) throw new Error()
-      const data = await resp.json()
+      const resp = await fetch(
+        `https://api.retellai.com/v2/get-call/${callId}`,
+        {
+          headers: { Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d` },
+        }
+      );
+      if (!resp.ok) throw new Error();
+      const data = await resp.json();
       setCallSummary({
         call_id: data.call_id,
         call_summary: data.call_analysis.call_summary,
@@ -234,7 +244,7 @@ export default function ArloDemo() {
         call_successful: data.call_analysis.call_successful,
         duration_ms: data.duration_ms,
         transcript: data.transcript,
-      })
+      });
     } catch {
       setCallSummary({
         call_id: callId,
@@ -243,130 +253,142 @@ export default function ArloDemo() {
         call_successful: true,
         duration_ms: 0,
         transcript: "Transcript not available",
-      })
+      });
     }
-  }
+  };
 
   const resetForNewCall = () => {
-    setFormSubmitted(false)
-    setShowFormPanel(true)
-    setShowPostCallPanel(false)
-    setCallStatus("not-started")
-    setCurrentCallId(null)
-    setCallSummary(null)
-    setShowCallSummary(false)
-    setSelectedUseCase("")
+    setFormSubmitted(false);
+    setShowFormPanel(true);
+    setShowPostCallPanel(false);
+    setCallStatus("not-started");
+    setCurrentCallId(null);
+    setCallSummary(null);
+    setShowCallSummary(false);
+    setSelectedUseCase("");
     setUserDetails({
       name: "Jennifer",
       orderNumber: "123RUN56V7",
       orderDate: getOrderDate(),
       email: "jennifer1234@gmail.com",
       useCase: "",
-    })
-  }
+    });
+  };
 
   const handleFormSubmit = () => {
-    const form = document.getElementById("callForm") as HTMLFormElement
-    if (!form) return
-    const fd = new FormData(form)
-    const raw = fd.get("useCase") as string
-    const stripped = raw.replace(/^\d+\.\s*/, "")
+    const form = document.getElementById("callForm") as HTMLFormElement;
+    if (!form) return;
+    const fd = new FormData(form);
+    const raw = fd.get("useCase") as string;
+    const stripped = raw.replace(/^\d+\.\s*/, "");
 
     const overrideDetails: Partial<UserDetails> = {
       orderNumber: fd.get("orderNumber") as string,
       orderDate: fd.get("orderDate") as string,
       email: fd.get("email") as string,
       useCase: stripped,
-    }
+    };
 
-    setFormSubmitted(true)
-    initiateConversation(overrideDetails)
-  }
+    setFormSubmitted(true);
+    initiateConversation(overrideDetails);
+  };
 
   const closeAllPanels = () => {
-    setShowSupportWidget(false)
-    setShowFormPanel(false)
-    setShowPostCallPanel(false)
-    setCallStatus("not-started")
-    setCurrentCallId(null)
-    setCallSummary(null)
-    setShowCallSummary(false)
-  }
+    setShowSupportWidget(false);
+    setShowFormPanel(false);
+    setShowPostCallPanel(false);
+    setCallStatus("not-started");
+    setCurrentCallId(null);
+    setCallSummary(null);
+    setShowCallSummary(false);
+  };
 
-    // New state for QR modal
-  const [showQRExpanded, setShowQRExpanded] = useState(false)
-
+  // New state for QR modal
+  const [showQRExpanded, setShowQRExpanded] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      <img src="/arlo/bkgArlo.jpeg" alt="Arlo Hero" className="w-full h-screen object-fit" />
+      <img
+        src="/arlo/bkgArlo.jpeg"
+        alt="Arlo Hero"
+        className="w-full h-screen object-fit"
+      />
 
       <div className="fixed bottom-16 right-6 z-40">
         {/* support toggle */}
-      {!showFormPanel && !showPostCallPanel && callStatus === "not-started" && (
-          <div className="flex flex-col items-end space-y-2">
+        {!showFormPanel &&
+          !showPostCallPanel &&
+          callStatus === "not-started" && (
+            <div className="flex flex-col items-end space-y-2">
+              {/* — inline expanded QR panel */}
+              {showQRExpanded && (
+                <div className="bg-white rounded-2xl p-4 shadow-lg w-36 text-center">
+                  <QRCode
+                    value="https://wa.me/16508008958"
+                    size={120}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    className="mx-auto"
+                  />
+                 
+                </div>
+              )}
 
-            {/* — inline expanded QR panel */}
-            {showQRExpanded && (
-              <div className="bg-white rounded-2xl p-4 shadow-lg w-36 text-center">
-                <QRCode
-                  value="https://wa.me/15551234567"
-                  size={120}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  className="mx-auto"
-                />
-                <p className="mt-2 text-sm text-gray-600">Use this QR</p>
-              </div>
-            )}
-
-            {/* — Scan to WhatsApp bubble */}
-            <button
-              onClick={() => setShowQRExpanded((v) => !v)}
-              className="
+              {/* — Scan to WhatsApp bubble */}
+              <button
+                onClick={() => setShowQRExpanded((v) => !v)}
+                className="
                 flex items-center space-x-2
                 bg-[#115292] text-white
                 rounded-[18px] px-3.5 py-2
                 shadow-lg
               "
-            >
-              <QRCode
-                value="https://wa.me/15551234567"
-                size={23}
-                bgColor="#115292"
-                fgColor="#ffffff"
-              />
-              <span className="text-sm">To WhatsApp</span>
-            </button>
+              >
+                <QRCode
+                  value="https://wa.me/16508008958"
+                  size={23}
+                  bgColor="#115292"
+                  fgColor="#ffffff"
+                />
+                <span className="text-sm">To WhatsApp</span>
+              </button>
 
-            {/* — Click to Call bubble */}
-            <button
-              onClick={() => {
-                setShowFormPanel(true)
-                setShowQRExpanded(false)   // auto-collapse when you switch panels
-              }}
-              className="flex items-center space-x-3 bg-[#115292] text-white rounded-full px-5 py-2.5 shadow-lg"
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm">Click to Call</span>
-            </button>
-          </div>
-        )}
-
+              {/* — Click to Call bubble */}
+              <button
+                onClick={() => {
+                  setShowFormPanel(true);
+                  setShowQRExpanded(false); // auto-collapse when you switch panels
+                }}
+                className="flex items-center space-x-3 bg-[#115292] text-white rounded-full px-5 py-2.5 shadow-lg"
+              >
+                <Phone className="w-4 h-4" />
+                <span className="text-sm">Click to Call</span>
+              </button>
+            </div>
+          )}
 
         {/* form panel */}
         {showFormPanel && (
           <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+              <img
+                src="/arlo/ARLO.png"
+                alt="Company Logo"
+                className="w-6 h-6"
+              />
               <span className="text-white font-medium">Arlo Support</span>
-              <X onClick={closeAllPanels} className="w-5 h-5 text-white cursor-pointer" />
+              <X
+                onClick={closeAllPanels}
+                className="w-5 h-5 text-white cursor-pointer"
+              />
             </div>
 
             <form id="callForm" className="flex-1 space-y-4">
               {/* order#, date, email */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">Order#</label>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Order#
+                </label>
                 <input
                   name="orderNumber"
                   defaultValue={userDetails.orderNumber}
@@ -375,7 +397,9 @@ export default function ArloDemo() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-1">Order Date</label>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Order Date
+                </label>
                 <input
                   name="orderDate"
                   defaultValue={userDetails.orderDate}
@@ -384,7 +408,9 @@ export default function ArloDemo() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-1">Email:</label>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Email:
+                </label>
                 <input
                   name="email"
                   type="email"
@@ -395,11 +421,13 @@ export default function ArloDemo() {
 
               {/* use case */}
               <div>
-                <label className="block text-sm font-medium text-white mb-1">Select Use Case</label>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Select Use Case
+                </label>
                 <select
                   name="useCase"
                   value={selectedUseCase}
-                  onChange={e => setSelectedUseCase(e.target.value)}
+                  onChange={(e) => setSelectedUseCase(e.target.value)}
                   disabled={callStatus === "active"}
                   className={`w-full p-2 text-sm rounded ${
                     callStatus === "active"
@@ -407,9 +435,13 @@ export default function ArloDemo() {
                       : "bg-[#115292] text-white border border-white"
                   }`}
                 >
-                  <option value="" disabled>Select a use case</option>
+                  <option value="" disabled>
+                    Select a use case
+                  </option>
                   {useCaseOptions.map((opt, i) => (
-                    <option key={i} value={opt}>{opt}</option>
+                    <option key={i} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -439,7 +471,9 @@ export default function ArloDemo() {
 
               <div className="flex flex-col items-center">
                 <span className="text-white font-medium">
-                  {callStatus === "active" ? "Call in progress..." : "Click to call"}
+                  {callStatus === "active"
+                    ? "Call in progress..."
+                    : "Click to call"}
                 </span>
               </div>
             </form>
@@ -448,7 +482,9 @@ export default function ArloDemo() {
             <div className="mt-auto pt-4 border-t border-white text-xs text-gray-200">
               <div className="font-medium mb-2">Disclaimer:</div>
               <ul className="space-y-1">
-                <li>■ Platform isn't integrated, so requires authentication.</li>
+                <li>
+                  ■ Platform isn't integrated, so requires authentication.
+                </li>
                 <li>■ Email ID needed for confirmations.</li>
               </ul>
             </div>
@@ -459,13 +495,22 @@ export default function ArloDemo() {
         {showPostCallPanel && (
           <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 h-[39rem] p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
-              <img src="/arlo/ARLO.png" alt="Company Logo" className="w-6 h-6" />
+              <img
+                src="/arlo/ARLO.png"
+                alt="Company Logo"
+                className="w-6 h-6"
+              />
               <span className="text-white font-medium">Arlo Support</span>
-              <X onClick={closeAllPanels} className="w-5 h-5 text-white cursor-pointer" />
+              <X
+                onClick={closeAllPanels}
+                className="w-5 h-5 text-white cursor-pointer"
+              />
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-              <div className="text-white text-lg font-medium">Click to call</div>
+              <div className="text-white text-lg font-medium">
+                Click to call
+              </div>
               <button
                 onClick={resetForNewCall}
                 className="w-16 h-16 bg-white rounded-full flex items-center justify-center"
@@ -477,8 +522,8 @@ export default function ArloDemo() {
             <div className="pt-4 border-t border-white text-sm text-white">
               <button
                 onClick={() => {
-                  currentCallId && fetchCallSummary(currentCallId)
-                  setShowCallSummary(v => !v)
+                  currentCallId && fetchCallSummary(currentCallId);
+                  setShowCallSummary((v) => !v);
                 }}
                 className="font-medium mb-3 hover:underline"
               >
@@ -498,5 +543,5 @@ export default function ArloDemo() {
         )}
       </div>
     </div>
-  )
+  );
 }
