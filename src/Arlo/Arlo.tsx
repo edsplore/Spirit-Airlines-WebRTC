@@ -326,13 +326,13 @@ export default function ArloDemo() {
               className="
                 flex items-center space-x-2
                 bg-[#115292] text-white
-                rounded-[14px] px-3.5 py-2
+                rounded-[18px] px-3.5 py-2
                 shadow-lg
               "
             >
               <QRCode
                 value="https://wa.me/15551234567"
-                size={25}
+                size={23}
                 bgColor="#115292"
                 fgColor="#ffffff"
               />
