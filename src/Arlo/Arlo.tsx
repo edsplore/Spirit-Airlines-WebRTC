@@ -11,6 +11,7 @@ interface UserDetails {
   orderDate: string;
   email: string;
   useCase: string;
+  phoneNumber?: string;
 }
 
 interface CallSummary {
@@ -70,6 +71,7 @@ export default function ArloDemo() {
     orderDate: getOrderDate(),
     email: "jennifer1234@gmail.com",
     useCase: "",
+    phoneNumber: "",
   });
   const [selectedUseCase, setSelectedUseCase] = useState<string>("");
   const [callStatus, setCallStatus] = useState<
@@ -147,25 +149,52 @@ export default function ArloDemo() {
     agentId: string,
     details: UserDetails
   ): Promise<RegisterCallResponse> => {
-    const resp = await fetch("https://api.retellai.com/v2/create-web-call", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
-      },
-      body: JSON.stringify({
-        agent_id: agentId,
-        retell_llm_dynamic_variables: {
-          customer_name: details.name,
-          order_number: details.orderNumber,
-          order_date: details.orderDate,
-          email: details.email,
-          use_case: details.useCase,
-        },
-      }),
-    });
-    if (!resp.ok) throw new Error("Failed to create call");
-    const data = await resp.json();
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer key_2747254ddf6a6cdeea3935f67a5d`,
+    };
+
+    let resp, data;
+    if (details.phoneNumber) {
+      // Phone call
+      resp = await fetch("https://api.retellai.com/v2/create-phone-call", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          agent_id: agentId,
+          from_number: "+16073899157",
+          to_number: details.phoneNumber,
+          retell_llm_dynamic_variables: {
+            customer_name: details.name,
+            order_number: details.orderNumber,
+            order_date: details.orderDate,
+            email: details.email,
+            use_case: details.useCase,
+          },
+        }),
+      });
+      if (!resp.ok) throw new Error("Failed to create phone call");
+      data = await resp.json();
+    } else {
+      // Web call
+      resp = await fetch("https://api.retellai.com/v2/create-web-call", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          agent_id: agentId,
+          retell_llm_dynamic_variables: {
+            customer_name: details.name,
+            order_number: details.orderNumber,
+            order_date: details.orderDate,
+            email: details.email,
+            use_case: details.useCase,
+          },
+        }),
+      });
+      if (!resp.ok) throw new Error("Failed to create web call");
+      data = await resp.json();
+    }
+
     return {
       access_token: data.access_token,
       callId: data.call_id,
@@ -272,6 +301,7 @@ export default function ArloDemo() {
       orderDate: getOrderDate(),
       email: "jennifer1234@gmail.com",
       useCase: "",
+      phoneNumber: "",
     });
   };
 
@@ -287,6 +317,7 @@ export default function ArloDemo() {
       orderDate: fd.get("orderDate") as string,
       email: fd.get("email") as string,
       useCase: stripped,
+      phoneNumber: (fd.get("phoneNumber") as string) || "",
     };
 
     setFormSubmitted(true);
@@ -330,7 +361,6 @@ export default function ArloDemo() {
                     fgColor="#000000"
                     className="mx-auto"
                   />
-                 
                 </div>
               )}
 
@@ -357,7 +387,7 @@ export default function ArloDemo() {
               <button
                 onClick={() => {
                   setShowFormPanel(true);
-                  setShowQRExpanded(false); // auto-collapse when you switch panels
+                  setShowQRExpanded(false);
                 }}
                 className="flex items-center space-x-3 bg-[#115292] text-white rounded-full px-5 py-2.5 shadow-lg"
               >
@@ -369,7 +399,17 @@ export default function ArloDemo() {
 
         {/* form panel */}
         {showFormPanel && (
-          <div className="bg-[#115292] rounded-2xl shadow-2xl w-80 min-h-96 p-6 flex flex-col">
+          <div   className="
+    bg-[#115292]
+    rounded-2xl
+    shadow-2xl
+    w-80
+    max-h-50
+    p-4
+    flex flex-col
+    overflow-y-auto
+  "
+>
             <div className="flex items-center justify-between mb-4">
               <img
                 src="/arlo/ARLO.png"
@@ -415,6 +455,20 @@ export default function ArloDemo() {
                   name="email"
                   type="email"
                   defaultValue={userDetails.email}
+                  className="w-full p-2 bg-white border border-gray-300 text-gray-600 text-sm rounded"
+                />
+              </div>
+
+              {/* phone number */}
+              <div>
+                <label className="block text-sm font-medium text-white mb-1">
+                  Phone Number
+                </label>
+                <input
+                  name="phoneNumber"
+                  type="tel"
+                  placeholder="+11234567890"
+                  defaultValue={userDetails.phoneNumber}
                   className="w-full p-2 bg-white border border-gray-300 text-gray-600 text-sm rounded"
                 />
               </div>
