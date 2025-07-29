@@ -41,7 +41,7 @@ export default function SpiritAirlinesDemo() {
     // Add chatbot script
     const addChatbotScript = () => {
       const script = document.createElement("script")
-      const projectId = "675e58a4bdfd5f757cea0976"
+      const projectId = "6888e899a02f1edef6b0c33a"
       script.type = "text/javascript"
       script.innerHTML = `
         (function(d, t) {
@@ -51,6 +51,9 @@ export default function SpiritAirlinesDemo() {
               verify: { projectID: '${projectId}' },
               url: 'https://general-runtime.voiceflow.com',
               versionID: 'production',
+              voice: {
+                url: "https://runtime-api.voiceflow.com"
+              },
               launch: {
                 event: {
                   type: "launch",
@@ -67,7 +70,7 @@ export default function SpiritAirlinesDemo() {
               },
             });
           }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+          v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
         })(document, 'script');
       `
       document.body.appendChild(script)
@@ -134,13 +137,13 @@ export default function SpiritAirlinesDemo() {
     setShowVerificationForm(false)
 
     // Reload the chatbot script with new user details
-    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]')
+    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget-next/bundle.mjs"]')
     if (existingScript && existingScript.parentNode) {
       existingScript.parentNode.removeChild(existingScript)
     }
     const addChatbotScript = () => {
       const script = document.createElement("script")
-      const projectId = "675e58a4bdfd5f757cea0976"
+      const projectId = "6888e899a02f1edef6b0c33a"
       script.type = "text/javascript"
       script.innerHTML = `
         (function(d, t) {
@@ -150,6 +153,9 @@ export default function SpiritAirlinesDemo() {
               verify: { projectID: '${projectId}' },
               url: 'https://general-runtime.voiceflow.com',
               versionID: 'production',
+              voice: {
+                url: "https://runtime-api.voiceflow.com"
+              },
               launch: {
                 event: {
                   type: "launch",
@@ -166,7 +172,7 @@ export default function SpiritAirlinesDemo() {
               },
             });
           }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+          v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
         })(document, 'script');
       `
       document.body.appendChild(script)
