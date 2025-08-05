@@ -37,51 +37,7 @@ export default function SpiritAirlinesDemo() {
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started")
   const [callInProgress, setCallInProgress] = useState(false)
 
-  useEffect(() => {
-    // Add chatbot script
-    const addChatbotScript = () => {
-      const script = document.createElement("script")
-      const projectId = "675e58a4bdfd5f757cea0976"
-      script.type = "text/javascript"
-      script.innerHTML = `
-        (function(d, t) {
-          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-          v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: '${projectId}' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production',
-              launch: {
-                event: {
-                  type: "launch",
-                  payload: {
-                    customer_name: "${userDetails.name}",
-                    email: "${userDetails.email}",
-                    address: "${userDetails.address}",
-                    zipcode: "${userDetails.zipCode}",
-                    language: "${userDetails.language}",
-                     bookingId: "${userDetails.bookingId}",
-                    claimReferenceNumber: "${userDetails.claimReferenceNumber}"
-                  }
-                }
-              },
-            });
-          }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-        })(document, 'script');
-      `
-      document.body.appendChild(script)
-      return script
-    }
-
-    const chatbotScript = addChatbotScript()
-
-    return () => {
-      if (chatbotScript && chatbotScript.parentNode) {
-        chatbotScript.parentNode.removeChild(chatbotScript)
-      }
-    }
-  }, [userDetails])
+  // Don't load chatbot initially - only after form submission
 
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -127,20 +83,15 @@ export default function SpiritAirlinesDemo() {
       zipCode: formData.get("zipCode") as string,
       bookingId: formData.get("bookingId") as string,
       claimReferenceNumber: formData.get("claimReferenceNumber") as string,
-
       language: "English",
     }
     setUserDetails(newUserDetails)
     setShowVerificationForm(false)
 
-    // Reload the chatbot script with new user details
-    const existingScript = document.querySelector('script[src="https://cdn.voiceflow.com/widget/bundle.mjs"]')
-    if (existingScript && existingScript.parentNode) {
-      existingScript.parentNode.removeChild(existingScript)
-    }
+    // Load the chatbot script for the first time after form submission
     const addChatbotScript = () => {
       const script = document.createElement("script")
-      const projectId = "675e58a4bdfd5f757cea0976"
+      const projectId = "6888e899a02f1edef6b0c33a"
       script.type = "text/javascript"
       script.innerHTML = `
         (function(d, t) {
@@ -150,6 +101,9 @@ export default function SpiritAirlinesDemo() {
               verify: { projectID: '${projectId}' },
               url: 'https://general-runtime.voiceflow.com',
               versionID: 'production',
+              voice: {
+                url: "https://runtime-api.voiceflow.com"
+              },
               launch: {
                 event: {
                   type: "launch",
@@ -159,14 +113,14 @@ export default function SpiritAirlinesDemo() {
                     address: "${newUserDetails.address}",
                     zipcode: "${newUserDetails.zipCode}",
                     language: "${newUserDetails.language}",
-                   bookingId: "${userDetails.bookingId}",
-                    claimReferenceNumber: "${userDetails.claimReferenceNumber}"
+                    bookingId: "${newUserDetails.bookingId}",
+                    claimReferenceNumber: "${newUserDetails.claimReferenceNumber}"
                   }
                 }
               },
             });
           }
-          v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+          v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
         })(document, 'script');
       `
       document.body.appendChild(script)
