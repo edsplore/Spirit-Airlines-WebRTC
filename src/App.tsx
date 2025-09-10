@@ -16,6 +16,7 @@ import Independence from "./IBX/Independence.tsx";
 import SGSientificGames from "./SGGames/SGSientificGames.tsx";
 import ArloDemo from "./Arlo/Arlo.tsx";
 import GameStopDemo from "./GameStop/GameStop.tsx";
+import WellCareBasic from "./WellCare/WellCare.tsx";
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
       <Route path="/demo/games/SGGames" element={<SGSientificGames />} />
       <Route path="/demo/security/Arlo" element={<ArloDemo />} />
       <Route path="/demo/gaming/GameStop" element={<GameStopDemo />} />
+      <Route path="/demo/wellness/wellcare" element={<WellCareBasic />} />
 
 
       <Route path="*" element={<div>Coming Soon</div>} />
