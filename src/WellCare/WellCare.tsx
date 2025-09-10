@@ -98,33 +98,48 @@ export default function WellCareBasic() {
       </nav>
 
       {/* Blue background with centered button */}
-      <div className="flex-1 bg-[#0072CE] flex flex-col items-center justify-center gap-6">
+      <div className="flex-1 bg-[#0072CE] flex flex-col items-center justify-center gap-6 relative">
         <button
           onClick={toggleConversation}
           disabled={callInProgress}
-          className={`relative flex flex-col items-center focus:outline-none transition-transform ${
-            callInProgress ? "opacity-70 cursor-not-allowed" : "hover:scale-105"
-          }`}
+          className="relative flex flex-col items-center focus:outline-none"
         >
-          {/* Outer glow when active */}
+          {/* Pulsing waves when active */}
+          {callStatus === "active" && (
+            <>
+              <span className="absolute w-[220px] h-[220px] rounded-full bg-red-400/30 animate-ping"></span>
+              <span className="absolute w-[300px] h-[300px] rounded-full bg-red-400/20 animate-ping delay-150"></span>
+            </>
+          )}
+
+          {/* Main button */}
           <div
-            className={`p-16 rounded-full shadow-2xl border-4 transition-all duration-300 ${
-              callStatus === "active"
-                ? "bg-red-500 border-red-600 animate-pulse"
-                : "bg-white border-gray-200"
-            }`}
+            className={`relative p-16 rounded-full shadow-2xl border transition-all duration-500 backdrop-blur-xl 
+              ${callStatus === "active"
+                ? "bg-red-500/90 border-red-400 shadow-red-500/50 animate-bounce-slow"
+                : "bg-white/70 border-white/40 hover:shadow-lg hover:scale-105"}
+            `}
           >
             <Mic
-              className={`w-20 h-20 transition-colors duration-300 ${
-                callStatus === "active" ? "text-white" : "text-[#0072CE]"
+              className={`w-20 h-20 transition-transform duration-500 ${
+                callStatus === "active" ? "text-white scale-110" : "text-[#0072CE]"
               }`}
             />
           </div>
-          <span className="mt-6 text-3xl font-bold text-white tracking-wide drop-shadow-lg">
+
+          {/* Label */}
+          <span className="mt-6 text-3xl font-semibold text-white/90 tracking-wide">
             {callStatus === "active" ? "Call End" : "Call Start"}
           </span>
         </button>
       </div>
+
+      {/* Extra animation styles */}
+      <style>{`
+        .animate-bounce-slow {
+          animation: bounce 2s infinite;
+        }
+      `}</style>
     </div>
   );
 }
