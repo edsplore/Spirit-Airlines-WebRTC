@@ -121,12 +121,5 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "NORTHWEST ALLIED PHYSICIANS",
   },
   // 15th entry to make a full 15. Replace with a real row if you add more.
-  {
-    agent_name: "Maya",
-    plan_name: "Wellcare of Alabama",
-    practitioner_name: "SAMPLE PRACTITIONER",
-    office_phone: "9999999999",
-    address: "100 MAIN ST",
-    practice_name: "SAMPLE PRACTICE LLC",
-  },
+
 ];

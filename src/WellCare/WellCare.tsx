@@ -191,7 +191,7 @@ const response = await fetch("https://api.retellai.com/v2/create-web-call", {
                 onClick={() => setIsModalOpen(false)}
                 className="rounded-lg bg-[#0072CE] px-4 py-2 font-medium text-white hover:opacity-90"
               >
-                Use these details
+                Initiate Audit
               </button>
             </div>
           </div>
