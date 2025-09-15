@@ -72,9 +72,8 @@ export default function WellCareBasic() {
     }
   };
 
- // eslint-disable-next-line
+  // eslint-disable-next-line
   const assembleVariables = () => {
-    // Only the fields you asked for + runtime current_time
     const current_time = new Date().toISOString();
     return {
       ...customer,
@@ -84,26 +83,26 @@ export default function WellCareBasic() {
 
   const initiateConversation = async () => {
     try {
-const response = await fetch("https://api.retellai.com/v2/create-web-call", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${RETELL_API_KEY}`,
-  },
-  body: JSON.stringify({
-    agent_id: RETELL_AGENT_ID,
-    retell_llm_dynamic_variables: {
-      call_center_script_name: customer.call_center_script_name,
-      plan_name: customer.plan_name,
-      practitioner_name: customer.practitioner_name,
-      current_time: new Date().toISOString(), // runtime
-      office_phone: customer.office_phone,
-      address: customer.address,
-      practice_name: customer.practice_name,
-    },
-  }),
-});
-
+      const response = await fetch("https://api.retellai.com/v2/create-web-call", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RETELL_API_KEY}`,
+        },
+        body: JSON.stringify({
+          agent_id: RETELL_AGENT_ID,
+          retell_llm_dynamic_variables: {
+            call_center_script_name: customer.call_center_script_name,
+            health_plan: customer.health_plan,
+            practitioner_name: customer.practitioner_name,
+            office_phone: customer.office_phone,
+            address: customer.address,
+            provider_name: customer.provider_name,
+            speciality: customer.speciality, // <-- ADDED
+            current_time: new Date().toISOString(), // runtime
+          },
+        }),
+      });
 
       if (!response.ok) throw new Error(`Error: ${response.status}`);
       const data = await response.json();
@@ -143,38 +142,50 @@ const response = await fetch("https://api.retellai.com/v2/create-web-call", {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 py-6">
-              {/* call_center_script_name fixed as 'Maya' but editable if you want */}
               <LabeledInput
                 label="Script Name"
                 value={customer.call_center_script_name}
                 onChange={(v) => setCustomer((c) => ({ ...c, call_center_script_name: v }))}
+                required
               />
               <LabeledInput
-                label="Plan Name"
-                value={customer.plan_name}
-                onChange={(v) => setCustomer((c) => ({ ...c, plan_name: v }))}
+                label="Health Plan"
+                value={customer.health_plan}
+                onChange={(v) => setCustomer((c) => ({ ...c, health_plan: v }))}
+                required
               />
               <LabeledInput
                 label="Practitioner Name"
                 value={customer.practitioner_name}
                 onChange={(v) => setCustomer((c) => ({ ...c, practitioner_name: v }))}
+                required
               />
               <LabeledInput
                 label="Office Phone"
                 value={customer.office_phone}
                 onChange={(v) => setCustomer((c) => ({ ...c, office_phone: v }))}
+                required
               />
               <LabeledInput
                 label="Address"
                 value={customer.address}
                 onChange={(v) => setCustomer((c) => ({ ...c, address: v }))}
+                required
               />
               <LabeledInput
-                label="Practice Name"
-                value={customer.practice_name}
-                onChange={(v) => setCustomer((c) => ({ ...c, practice_name: v }))}
+                label="Provider Name"
+                value={customer.provider_name}
+                onChange={(v) => setCustomer((c) => ({ ...c, provider_name: v }))}
+                required
               />
-              {/* current_time is added at call time (no input needed) */}
+              {/* NEW FIELD */}
+              <LabeledInput
+                label="Speciality"
+                value={customer.speciality ?? ""}
+                onChange={(v) => setCustomer((c) => ({ ...c, speciality: v }))}
+                required
+              />
+              {/* current_time note */}
               <div className="col-span-1 md:col-span-2 text-sm text-gray-500">
                 <span className="font-medium">current_time</span> is auto-filled when the call starts.
               </div>
@@ -247,17 +258,22 @@ function LabeledInput({
   label,
   value,
   onChange,
+  required,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  required?: boolean;
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-gray-600">{label}</span>
+      <span className="text-xs font-medium text-gray-600">
+        {label} {required && <span className="text-red-500">*</span>}
+      </span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        required={required}
         className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0072CE]"
       />
     </label>
