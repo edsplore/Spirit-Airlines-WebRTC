@@ -4,7 +4,7 @@ export interface WellCareCustomer {
   practitioner_name: string;        // e.g., "JENNIFER NELSON"
   office_phone: string;             // digits only
   address: string;                  // full address
-  provider_name: string;            // clinic/practice
+  provider_name: string;            // clinic/practice (from Provider_Name column)
   speciality: string;               // from Excel (N column)
 }
 
@@ -15,7 +15,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "TIMOTHY WHALEN",
     office_phone: "2563252627",
     address: "600 SUN TEMPLE DR, MADISON, AL 35758",
-    provider_name: "INTEGRATED BEHAVIORAL HEALTH",
+    provider_name: "NULL",
     speciality: "Behavioral Health",
   },
   {
@@ -51,7 +51,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "RACHEL HOADLEY-CLAUSEN",
     office_phone: "2516335125",
     address: "6720 GRELOT RD STE A, MOBILE, AL 36695",
-    provider_name: "KOPP MEDICAL LLC",
+    provider_name: "NEUROMUSCULAR SPINE AND JOINT CENTE",
     speciality: "Behavioral Health",
   },
   {
@@ -69,7 +69,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "KATHERINE ZAMECKI VEDDER",
     office_phone: "2032644002",
     address: "1449 OLD WATERBURY RD 1 RESERVOIR OFFICE PARK STE 203, SOUTHBURY, CT 06488",
-    provider_name: "DANBURY EYE PHYSICIANS SURGEON",
+    provider_name: "CONNECTICUT EYE CONSULTANTS P.C.",
     speciality: "Ophthalmologists",
   },
   {
@@ -87,7 +87,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "BALAGOPALAN NAIR",
     office_phone: "5019063000",
     address: "1601 N WEST AVE, EL DORADO, AR 71730",
-    provider_name: "CENTRAL ARKANSAS RADIATION THE",
+    provider_name: "CENTRAL AR RADIATION THERAPY INSTIT",
     speciality: "Oncologists",
   },
   {
@@ -114,7 +114,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "ANURADHA KUNTHUR",
     office_phone: "5016868000",
     address: "4301 W MARKHAM ST 783, LITTLE ROCK, AR 72205",
-    provider_name: "THE UNIVERSITY OF ARKANSAS FOR",
+    provider_name: "MEDICAL COLLEGE PHYSICIANS GROUP",
     speciality: "Oncologists",
   },
   {
@@ -123,7 +123,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "AHINOAM CHAVEZ",
     office_phone: "4806411165",
     address: "7565 E EAGLE CREST DR STE 101, MESA, AZ 85207",
-    provider_name: "LIFELINE PROFESSIONAL COUNSELI",
+    provider_name: "LIFELINE PROFESSIONAL COUNSELING SE",
     speciality: "Behavioral Health",
   },
   {
@@ -132,7 +132,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "PATRICK OUZTS",
     office_phone: "5209016350",
     address: "1521 E TANGERINE RD STE 315, ORO VALLEY, AZ 85741",
-    provider_name: "NORTHWEST ALLIED PHYSICIANS",
+    provider_name: "NORTHWEST ALLIED PHYSICIANS LLC",
     speciality: "PCP",
   },
 ];
