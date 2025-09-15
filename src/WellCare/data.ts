@@ -1,5 +1,5 @@
 export interface WellCareCustomer {
-  agent_name: string;         // always "Maya" (from your screenshot)
+  call_center_script_name: string;         // always "Maya" (from your screenshot)
   plan_name: string;          // e.g., "Wellcare of Alabama"
   practitioner_name: string;  // e.g., "JENNIFER NELSON"
   office_phone: string;       // digits only
@@ -9,7 +9,7 @@ export interface WellCareCustomer {
 
 export const wellCareCustomers: WellCareCustomer[] = [
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Alabama",
     practitioner_name: "TIMOTHY WHALEN",
     office_phone: "2563252627",
@@ -17,7 +17,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "INTEGRATED BEHAVIORAL HEALTH",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Alabama",
     practitioner_name: "JENNIFER NELSON",
     office_phone: "2056189899",
@@ -25,7 +25,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "KOLBE CLINIC LLC",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Alabama",
     practitioner_name: "JONATHAN TODD",
     office_phone: "2516628000",
@@ -33,7 +33,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "ALTAPOINTE HEALTH SYSTEMS INC",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Alabama",
     practitioner_name: "GEORGE MELNYK",
     office_phone: "2568453150",
@@ -41,7 +41,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "INTEGRATED BEHAVIORAL HEALTH",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Alabama",
     practitioner_name: "RACHEL HOADLEY-CLAUSEN",
     office_phone: "2516335125",
@@ -49,7 +49,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "KOPP MEDICAL LLC",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Alabama",
     practitioner_name: "HARRISON PEARL",
     office_phone: "2519526659",
@@ -57,7 +57,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "FOLEY CLINC CORP",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Connecticut",
     practitioner_name: "KATHERINE ZAMECKI VEDDER",
     office_phone: "2032644002",
@@ -65,7 +65,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "DANBURY EYE PHYSICIANS SURGEON",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arkansas",
     practitioner_name: "ANDREA STILLWELL",
     office_phone: "5012364110",
@@ -73,7 +73,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "COUNSELING CLINIC INC",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arkansas",
     practitioner_name: "BALAGOPALAN NAIR",
     office_phone: "5019063000",
@@ -81,7 +81,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "CENTRAL ARKANSAS RADIATION THE",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arkansas",
     practitioner_name: "RICHARD WHITE",
     office_phone: "8705805280",
@@ -89,7 +89,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "HIGHLANDS ONCOLOGY GROUP PA",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arkansas",
     practitioner_name: "DAVID PRUITT",
     office_phone: "5016222100",
@@ -97,7 +97,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "HOT SPRINGS RADIATION ONCOLOGY",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arkansas",
     practitioner_name: "ANURADHA KUNTHUR",
     office_phone: "5016868000",
@@ -105,7 +105,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "THE UNIVERSITY OF ARKANSAS FOR",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arizona",
     practitioner_name: "AHINOAM CHAVEZ",
     office_phone: "4806411165",
@@ -113,7 +113,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practice_name: "LIFELINE PROFESSIONAL COUNSELI",
   },
   {
-    agent_name: "Maya",
+    call_center_script_name: "Maya",
     plan_name: "Wellcare of Arizona",
     practitioner_name: "PATRICK OUZTS",
     office_phone: "5209016350",

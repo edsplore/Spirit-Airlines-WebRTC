@@ -93,7 +93,7 @@ const response = await fetch("https://api.retellai.com/v2/create-web-call", {
   body: JSON.stringify({
     agent_id: RETELL_AGENT_ID,
     retell_llm_dynamic_variables: {
-      agent_name: customer.agent_name,
+      call_center_script_name: customer.call_center_script_name,
       plan_name: customer.plan_name,
       practitioner_name: customer.practitioner_name,
       current_time: new Date().toISOString(), // runtime
@@ -143,34 +143,34 @@ const response = await fetch("https://api.retellai.com/v2/create-web-call", {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 py-6">
-              {/* agent_name fixed as 'Maya' but editable if you want */}
+              {/* call_center_script_name fixed as 'Maya' but editable if you want */}
               <LabeledInput
-                label="agent_name"
-                value={customer.agent_name}
-                onChange={(v) => setCustomer((c) => ({ ...c, agent_name: v }))}
+                label="Script Name"
+                value={customer.call_center_script_name}
+                onChange={(v) => setCustomer((c) => ({ ...c, call_center_script_name: v }))}
               />
               <LabeledInput
-                label="plan_name"
+                label="Plan Name"
                 value={customer.plan_name}
                 onChange={(v) => setCustomer((c) => ({ ...c, plan_name: v }))}
               />
               <LabeledInput
-                label="practitioner_name"
+                label="Practitioner Name"
                 value={customer.practitioner_name}
                 onChange={(v) => setCustomer((c) => ({ ...c, practitioner_name: v }))}
               />
               <LabeledInput
-                label="office_phone"
+                label="Office Phone"
                 value={customer.office_phone}
                 onChange={(v) => setCustomer((c) => ({ ...c, office_phone: v }))}
               />
               <LabeledInput
-                label="address"
+                label="Address"
                 value={customer.address}
                 onChange={(v) => setCustomer((c) => ({ ...c, address: v }))}
               />
               <LabeledInput
-                label="practice_name"
+                label="Practice Name"
                 value={customer.practice_name}
                 onChange={(v) => setCustomer((c) => ({ ...c, practice_name: v }))}
               />
