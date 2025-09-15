@@ -131,7 +131,7 @@ export default function WellCareBasic() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b px-6 py-4">
-              <h2 className="text-lg font-semibold">Customer details</h2>
+              <h2 className="text-lg font-semibold">Well Care - Directory Audit</h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="p-2 rounded-md hover:bg-gray-100"
