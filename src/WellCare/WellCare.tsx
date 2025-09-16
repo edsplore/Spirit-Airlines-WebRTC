@@ -19,7 +19,7 @@ export default function WellCareBasic() {
 
   // --- Your keys ---
   const RETELL_API_KEY = "02e501b4-1b05-40f4-af3e-351f0819e13f";
-  const RETELL_AGENT_ID = "agent_0f31a285431ea0e89f8e0c215b";
+  const RETELL_AGENT_ID = "agent_29b3bf98f7e4b26a4b6b58e88a";
   // ------------------
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function WellCareBasic() {
             practitioner_name: customer.practitioner_name,
             office_phone: customer.office_phone,
             address: customer.address,
-            provider_name: customer.provider_name,
+            practice_name: customer.practice_name,
             speciality: customer.speciality, // <-- ADDED
             current_time: new Date().toISOString(), // runtime
           },
@@ -173,9 +173,9 @@ export default function WellCareBasic() {
                 required
               />
               <LabeledInput
-                label="Provider Name"
-                value={customer.provider_name}
-                onChange={(v) => setCustomer((c) => ({ ...c, provider_name: v }))}
+                label="Practice Name"
+                value={customer.practice_name}
+                onChange={(v) => setCustomer((c) => ({ ...c, practice_name: v }))}
                 required
               />
               {/* NEW FIELD */}

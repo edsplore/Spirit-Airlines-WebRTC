@@ -4,7 +4,7 @@ export interface WellCareCustomer {
   practitioner_name: string;        // e.g., "JENNIFER NELSON"
   office_phone: string;             // digits only
   address: string;                  // full address
-  provider_name: string;            // clinic/practice (from Provider_Name column)
+  practice_name: string;            // clinic/practice (from Provider_Name column)
   speciality: string;               // from Excel (N column)
 }
 
@@ -15,7 +15,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "TIMOTHY WHALEN",
     office_phone: "2563252627",
     address: "600 SUN TEMPLE DR, MADISON, AL 35758",
-    provider_name: "NULL",
+    practice_name: "NULL",
     speciality: "Behavioral Health",
   },
   {
@@ -24,7 +24,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "JENNIFER NELSON",
     office_phone: "2056189899",
     address: "109 FOOTHILLS PKWY STE 113, CHELSEA, AL 35043",
-    provider_name: "KOLBE CLINIC LLC",
+    practice_name: "KOLBE CLINIC LLC",
     speciality: "Behavioral Health",
   },
   {
@@ -33,7 +33,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "JONATHAN TODD",
     office_phone: "2516628000",
     address: "2419 GORDON SMITH DR, MOBILE, AL 36617",
-    provider_name: "ALTAPOINTE HEALTH SYSTEMS INC",
+    practice_name: "ALTAPOINTE HEALTH SYSTEMS INC",
     speciality: "Behavioral Health",
   },
   {
@@ -42,7 +42,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "GEORGE MELNYK",
     office_phone: "2568453150",
     address: "600 SUN TEMPLE DR, MADISON, AL 35758",
-    provider_name: "INTEGRATED BEHAVIORAL HEALTH",
+    practice_name: "INTEGRATED BEHAVIORAL HEALTH",
     speciality: "Behavioral Health",
   },
   {
@@ -51,7 +51,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "RACHEL HOADLEY-CLAUSEN",
     office_phone: "2516335125",
     address: "6720 GRELOT RD STE A, MOBILE, AL 36695",
-    provider_name: "NEUROMUSCULAR SPINE AND JOINT CENTE",
+    practice_name: "NEUROMUSCULAR SPINE AND JOINT CENTE ",
     speciality: "Behavioral Health",
   },
   {
@@ -60,7 +60,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "HARRISON PEARL",
     office_phone: "2519526659",
     address: "1711 N MCKENZIE ST STE 102, FOLEY, AL 36535",
-    provider_name: "FOLEY CLINC CORP",
+    practice_name: " FOLEY CLINC CORP",
     speciality: "Behavioral Health",
   },
   {
@@ -69,7 +69,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "KATHERINE ZAMECKI VEDDER",
     office_phone: "2032644002",
     address: "1449 OLD WATERBURY RD 1 RESERVOIR OFFICE PARK STE 203, SOUTHBURY, CT 06488",
-    provider_name: "CONNECTICUT EYE CONSULTANTS P.C.",
+    practice_name: "CONNECTICUT EYE CONSULTANTS P.C.",
     speciality: "Ophthalmologists",
   },
   {
@@ -78,7 +78,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "ANDREA STILLWELL",
     office_phone: "5012364110",
     address: "110 PEARSON, BENTON, AR 72015",
-    provider_name: "COUNSELING CLINIC INC",
+    practice_name: "COUNSELING CLINIC INC",
     speciality: "Behavioral Health",
   },
   {
@@ -87,7 +87,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "BALAGOPALAN NAIR",
     office_phone: "5019063000",
     address: "1601 N WEST AVE, EL DORADO, AR 71730",
-    provider_name: "CENTRAL AR RADIATION THERAPY INSTIT",
+    practice_name: "CENTRAL AR RADIATION THERAPY INSTIT",
     speciality: "Oncologists",
   },
   {
@@ -96,7 +96,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "RICHARD WHITE",
     office_phone: "8705805280",
     address: "639 HOSPITAL DR, MOUNTAIN HOME, AR 72653",
-    provider_name: "HIGHLANDS ONCOLOGY GROUP PA",
+    practice_name: "HIGHLANDS ONCOLOGY GROUP PA",
     speciality: "Oncologists",
   },
   {
@@ -105,7 +105,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "DAVID PRUITT",
     office_phone: "5016222100",
     address: "1455 HIGDON FERRY RD STE C, HOT SPRINGS, AR 71913",
-    provider_name: "HOT SPRINGS RADIATION ONCOLOGY",
+    practice_name: "HOT SPRINGS RADIATION ONCOLOGY",
     speciality: "Oncologists",
   },
   {
@@ -114,7 +114,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "ANURADHA KUNTHUR",
     office_phone: "5016868000",
     address: "4301 W MARKHAM ST 783, LITTLE ROCK, AR 72205",
-    provider_name: "MEDICAL COLLEGE PHYSICIANS GROUP",
+    practice_name: "MEDICAL COLLEGE PHYSICIANS GROUP",
     speciality: "Oncologists",
   },
   {
@@ -123,7 +123,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "AHINOAM CHAVEZ",
     office_phone: "4806411165",
     address: "7565 E EAGLE CREST DR STE 101, MESA, AZ 85207",
-    provider_name: "LIFELINE PROFESSIONAL COUNSELING SE",
+    practice_name: " LIFELINE PROFESSIONAL COUNSELING SE ",
     speciality: "Behavioral Health",
   },
   {
@@ -132,7 +132,7 @@ export const wellCareCustomers: WellCareCustomer[] = [
     practitioner_name: "PATRICK OUZTS",
     office_phone: "5209016350",
     address: "1521 E TANGERINE RD STE 315, ORO VALLEY, AZ 85741",
-    provider_name: "NORTHWEST ALLIED PHYSICIANS LLC",
+    practice_name: "NORTHWEST ALLIED PHYSICIANS LLC ",
     speciality: "PCP",
   },
 ];
