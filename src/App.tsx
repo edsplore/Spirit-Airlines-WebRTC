@@ -46,7 +46,7 @@ export default function App() {
       <Route path="/demo/security/Arlo" element={<ArloDemo />} />
       <Route path="/demo/gaming/GameStop" element={<GameStopDemo />} />
       <Route path="/demo/wellness/wellcare" element={<WellCareBasic />} />
-            <Route path="/demo/customer/everise" element={<Everise />} />
+            <Route path="/demo/Wellbeing /everise" element={<Everise />} />
 
 
 

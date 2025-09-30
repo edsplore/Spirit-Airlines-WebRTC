@@ -141,10 +141,24 @@ const endCall = async () => {
                   <td className="p-3 font-semibold border">Sentiment</td>
                   <td className="p-3 border">{callDetails.call_analysis?.user_sentiment || "N/A"}</td>
                 </tr>
-                <tr>
-                  <td className="p-3 font-semibold border">Duration</td>
-                  <td className="p-3 border">{Math.floor((callDetails.duration_ms || 0) / 1000)}s</td>
-                </tr>
+               <tr>
+  <td className="p-3 font-semibold border">Call Duration</td>
+  <td className="p-3 border">
+    {(() => {
+      const totalSeconds = Math.floor((callDetails.duration_ms || 0) / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      return [
+        hours.toString().padStart(2, "0"),
+        minutes.toString().padStart(2, "0"),
+        seconds.toString().padStart(2, "0"),
+      ].join(":");
+    })()}
+  </td>
+</tr>
+
               </tbody>
             </table>
           </div>
