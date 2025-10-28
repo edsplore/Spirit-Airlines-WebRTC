@@ -18,6 +18,7 @@ import ArloDemo from "./Arlo/Arlo.tsx";
 import GameStopDemo from "./GameStop/GameStop.tsx";
 import WellCareBasic from "./WellCare/WellCare.tsx";
 import Everise from "./Everise/Everise.tsx";
+import SignifyHealth from "./SignifyHealth/SignifyHealth.tsx";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
       <Route path="/demo/wellness/wellcare" element={<WellCareBasic />} />
        <Route path="/demo/Wellbeing/everise" element={<Everise />} />
 
+       <Route path="/demo/healthcare/signifyhealth" element={<SignifyHealth />} />
 
 
       <Route path="*" element={<div>Coming Soon</div>} />
