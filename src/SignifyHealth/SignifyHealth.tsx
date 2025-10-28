@@ -257,7 +257,12 @@ const SignifyHealth: React.FC = () => {
             city: memberData.city,
             residence_type: memberData.residence_type,
             member_availability: memberData.member_availability,
+            // zip_code: memberData.zip_code,
+            // callback_datetime: memberData.callback_datetime,
+            // state: memberData.state,
+            // DOB: memberData.dob,
             phone_number: memberData.phone_number,
+            // visit_date: memberData.visit_date,
           },
         }),
       })
@@ -305,6 +310,7 @@ const SignifyHealth: React.FC = () => {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between px-4 py-8 gap-8">
+        {/* Table */}
         <div className="w-full md:w-1/2">
           <table className="min-w-full border border-gray-200 rounded-lg text-sm sm:text-base">
             <thead className="bg-[#CADA63]">
@@ -373,6 +379,7 @@ const SignifyHealth: React.FC = () => {
             </p>
           </div>
 
+          {/* CHAT */}
           <div className="flex flex-col items-center cursor-pointer mt-10 ml-10" onClick={handleChatClick}>
             <div className="rounded-full shadow-lg p-6 bg-white hover:scale-105 transition-transform">
               <img src="/signifyhealth/chat.png" alt="Chatbot" className="w-20 h-20 rounded-full object-contain" />
