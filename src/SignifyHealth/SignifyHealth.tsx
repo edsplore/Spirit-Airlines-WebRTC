@@ -29,7 +29,7 @@ interface Member {
 const members: Member[] = [
   {
     member_name: "Mike Blood",
-    address: "543 Montgomery BLVD NE NA Albuquerque NM 87109",
+    address: "543 Montgomery BLVD NE Albuquerque NM 87109",
     entry_instructions: "No",
     gift_card: "Yes - Visa gift card $100",
     city: "Albuquerque",
@@ -309,47 +309,53 @@ const SignifyHealth: React.FC = () => {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between px-4 py-8 gap-8">
-        {/* Table */}
-        <div className="w-full md:w-1/2">
-          <table className="min-w-full border border-gray-200 rounded-lg text-sm sm:text-base">
-            <thead className="bg-[#CADA63]">
-              <tr>
-                <th className="p-3 text-left text-black font-bold w-1/2">Authentication Parameter</th>
-                <th className="p-3 text-left text-black font-bold">Member Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b">
-                <td className="p-3 text-[#295C94] font-semibold">Member Name</td>
-                <td className="p-3">{memberData.member_name}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-3 text-[#295C94] font-semibold">DOB</td>
-                <td className="p-3">{memberData.dob}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-3 text-[#295C94] font-semibold">Address</td>
-                <td className="p-3">{memberData.address}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-3 text-[#295C94] font-semibold">Phone No.</td>
-                <td className="p-3">{memberData.phone_number}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-3 text-[#295C94] font-semibold">Gift Card</td>
-                <td className="p-3">{memberData.gift_card}</td>
-              </tr>
-              <tr>
-                <td className="p-3 text-[#295C94] font-semibold">Visit Date</td>
-                <td className="p-3">{memberData.visit_date}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+     <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between px-4 py-8 gap-8">
+  {/* Table */}
+  <div className="w-full md:w-1/2"> {/* shifted slightly left */}
+    <table
+      className="table-fixed w-[580px] h-[220px] border border-gray-200 text-sm sm:text-base overflow-hidden"
+    >
+      <thead className="bg-[#CADA63]">
+        <tr>
+          <th className="p-2 text-left text-black font-bold w-[40%]">
+            Authentication Parameter
+          </th>
+          <th className="p-2 text-left text-black font-bold w-[60%]">
+            Member Details
+          </th>
+        </tr>
+      </thead>
+      <tbody className="align-top">
+        <tr className="border-b">
+          <td className="p-2 text-[#295C94] font-semibold">Member Name</td>
+          <td className="p-2 truncate">{memberData.member_name}</td>
+        </tr>
+        <tr className="border-b">
+          <td className="p-2 text-[#295C94] font-semibold">DOB</td>
+          <td className="p-2 truncate">{memberData.dob}</td>
+        </tr>
+        <tr className="border-b">
+          <td className="p-2 text-[#295C94] font-semibold">Address</td>
+          <td className="p-2 truncate">{memberData.address}</td>
+        </tr>
+        <tr className="border-b">
+          <td className="p-2 text-[#295C94] font-semibold">Phone No.</td>
+          <td className="p-2 truncate">{memberData.phone_number}</td>
+        </tr>
+        <tr className="border-b">
+          <td className="p-2 text-[#295C94] font-semibold">Gift Card</td>
+          <td className="p-2 truncate">{memberData.gift_card}</td>
+        </tr>
+        <tr>
+          <td className="p-2 text-[#295C94] font-semibold">Visit Date</td>
+          <td className="p-2 truncate">{memberData.visit_date}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
         {/* Right Buttons */}
-        <div className="w-full md:w-1/2 grid grid-cols-2 gap-6 justify-items-center">
+        <div className="w-full md:w-1/2 grid grid-cols-2 gap-6 justify-items-center ml-20">
           {/* MIC */}
           <div className="flex flex-col items-center cursor-pointer mt-10 ml-10" onClick={toggleConversation}>
             <div
