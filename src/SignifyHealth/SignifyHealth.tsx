@@ -383,7 +383,7 @@ const SignifyHealth: React.FC = () => {
           {/* MIC */}
           <div className="flex flex-col items-center cursor-pointer mt-10 ml-10" onClick={toggleConversation}>
             <div
-              className={`relative rounded-full shadow-lg p-6 bg-white transition-transform duration-300 hover:scale-105 ${
+              className={`relative rounded-full shadow-lg p-7 bg-white transition-transform duration-300 hover:scale-105 ${
                 callStatus === "active" ? "animate-pulse ring-4 ring-red-400 ring-offset-4 ring-offset-white" : ""
               }`}
             >
