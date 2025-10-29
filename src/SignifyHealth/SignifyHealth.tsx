@@ -258,11 +258,11 @@ const SignifyHealth: React.FC = () => {
             residence_type: memberData.residence_type,
             member_availability: memberData.member_availability,
             // zip_code: memberData.zip_code,
-            callback_datetime: memberData.callback_datetime,
+            // callback_datetime: memberData.callback_datetime,
             // state: memberData.state,
             DOB: memberData.dob,
             phone_number: memberData.phone_number,
-            visit_date: memberData.visit_date,
+            // visit_date: memberData.visit_date,
           },
         }),
       })
