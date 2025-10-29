@@ -26,6 +26,30 @@ interface Member {
   visit_date: string
 }
 
+const getNextDateFormatted = (): string => {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
+
+  const day = tomorrow.getDate()
+  const month = tomorrow.toLocaleString("default", { month: "long" })
+  const year = tomorrow.getFullYear()
+
+  // Add ordinal suffix (st, nd, rd, th)
+  const suffix =
+    day % 10 === 1 && day !== 11
+      ? "st"
+      : day % 10 === 2 && day !== 12
+      ? "nd"
+      : day % 10 === 3 && day !== 13
+      ? "rd"
+      : "th"
+
+  return `${day}${suffix} ${month} ${year}`
+}
+
+const nextVisitDate = getNextDateFormatted()
+
 const members: Member[] = [
   {
     member_name: "Mike Blood",
@@ -40,7 +64,7 @@ const members: Member[] = [
     state: "NM",
     dob: "March 10th 1985",
     phone_number: "4051231234",
-    visit_date: "29th October 2025",
+    visit_date: nextVisitDate,
   },
   {
     member_name: "Legna Garcia",
@@ -55,7 +79,7 @@ const members: Member[] = [
     state: "OK",
     dob: "July 22nd 1990",
     phone_number: "5051231234",
-    visit_date: "29th October 2025",
+    visit_date: nextVisitDate,
   },
   {
     member_name: "Chris Bennett",
@@ -70,14 +94,14 @@ const members: Member[] = [
     state: "OK",
     dob: "November 5th 1988",
     phone_number: "4073214321",
-    visit_date: "29th October 2025",
+    visit_date: nextVisitDate,
   },
   {
     member_name: "Derrick Barela",
     dob: "May 18th 1982",
     address: "2584 Sify DR, Dallas TX 75001",
     phone_number: "2033214321",
-    visit_date: "29th October 2025",
+    visit_date: nextVisitDate,
     gift_card: "Yes - Visa gift card $50",
     member_availability: "Yes",
     callback_datetime: "N/A",
@@ -257,12 +281,12 @@ const SignifyHealth: React.FC = () => {
             city: memberData.city,
             residence_type: memberData.residence_type,
             member_availability: memberData.member_availability,
-            // zip_code: memberData.zip_code,
-            // callback_datetime: memberData.callback_datetime,
-            // state: memberData.state,
+            zip_code: memberData.zip_code,
+            callback_datetime: memberData.callback_datetime,
+            state: memberData.state,
             DOB: memberData.dob,
             phone_number: memberData.phone_number,
-            // visit_date: memberData.visit_date,
+            visit_date: memberData.visit_date,
           },
         }),
       })
@@ -313,7 +337,7 @@ const SignifyHealth: React.FC = () => {
   {/* Table */}
   <div className="w-full md:w-1/2"> {/* shifted slightly left */}
     <table
-      className="table-fixed w-[580px] h-[220px] border border-gray-200 text-sm sm:text-base overflow-hidden"
+      className="table-fixed w-[580px] h-[220px] border border-gray-200 text-sm sm:text-base overflow-hidden -ml-20"
     >
       <thead className="bg-[#CADA63]">
         <tr>
