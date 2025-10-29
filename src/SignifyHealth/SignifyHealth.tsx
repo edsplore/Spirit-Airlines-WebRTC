@@ -44,7 +44,7 @@ const members: Member[] = [
   },
   {
     member_name: "Legna Garcia",
-    address: "234 Western AVE Apt 204",
+    address: "234 Western AVE Apt 204 , Moore OK 73160",
     entry_instructions: "No",
     gift_card: "No",
     city: "Moore",
@@ -59,7 +59,7 @@ const members: Member[] = [
   },
   {
     member_name: "Chris Bennett",
-    address: "150 Montano BLVD Apt 23",
+    address: "150 Montano BLVD Apt 23 , Yukon OK 73131",
     entry_instructions: "Yes - Gate Code is 5431",
     gift_card: "Yes - Visa gift card $75",
     city: "Yukon",
@@ -75,7 +75,7 @@ const members: Member[] = [
   {
     member_name: "Derrick Barela",
     dob: "May 18th 1982",
-    address: "2584 Sify DR, Dallas, TX 75001",
+    address: "2584 Sify DR, Dallas TX 75001",
     phone_number: "2033214321",
     visit_date: "29th October 2025",
     gift_card: "Yes - Visa gift card $50",
@@ -260,7 +260,7 @@ const SignifyHealth: React.FC = () => {
             // zip_code: memberData.zip_code,
             // callback_datetime: memberData.callback_datetime,
             // state: memberData.state,
-            // DOB: memberData.dob,
+            DOB: memberData.dob,
             phone_number: memberData.phone_number,
             // visit_date: memberData.visit_date,
           },
