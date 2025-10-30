@@ -112,6 +112,7 @@ const members: Member[] = [
   },
 ]
 
+
 const webClient = new RetellWebClient()
 
 const SignifyHealth: React.FC = () => {
@@ -181,7 +182,7 @@ const SignifyHealth: React.FC = () => {
   //   }
   // }, [memberData])
 
-  
+
   // Retell WebClient events
   useEffect(() => {
     webClient.on("conversationStarted", () => {
