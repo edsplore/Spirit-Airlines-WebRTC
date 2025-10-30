@@ -35,7 +35,6 @@ const getNextDateFormatted = (): string => {
   const month = tomorrow.toLocaleString("default", { month: "long" })
   const year = tomorrow.getFullYear()
 
-  // Add ordinal suffix (st, nd, rd, th)
   const suffix =
     day % 10 === 1 && day !== 11
       ? "st"
