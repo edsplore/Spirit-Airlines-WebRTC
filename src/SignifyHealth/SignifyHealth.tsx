@@ -52,7 +52,7 @@ const nextVisitDate = getNextDateFormatted()
 const members: Member[] = [
   {
     member_name: "Mike Blood",
-    address: "543 Montgomery BLVD NE Albuquerque NM 87109",
+    address: "543 Montgomery Boulevard NE Albuquerque NM 87109",
     entry_instructions: "No",
     gift_card: "Yes - Visa gift card $100",
     city: "Albuquerque",
@@ -67,7 +67,7 @@ const members: Member[] = [
   },
   {
     member_name: "Legna Garcia",
-    address: "234 Western AVE Apt 204 , Moore OK 73160",
+    address: "234 Western Avenue Apt 204 , Moore OK 73160",
     entry_instructions: "No",
     gift_card: "No",
     city: "Moore",
@@ -82,7 +82,7 @@ const members: Member[] = [
   },
   {
     member_name: "Chris Bennett",
-    address: "150 Montano BLVD Apt 23 , Yukon OK 73131",
+    address: "150 Montano Boulevard Apt 23 , Yukon OK 73131",
     entry_instructions: "Yes - Gate Code is 5431",
     gift_card: "Yes - Visa gift card $75",
     city: "Yukon",
@@ -98,7 +98,7 @@ const members: Member[] = [
   {
     member_name: "Derrick Barela",
     dob: "May 18th 1982",
-    address: "2584 Sify DR, Dallas TX 75001",
+    address: "2584 Sify Drive Dallas TX 75001",
     phone_number: "2033214321",
     visit_date: nextVisitDate,
     gift_card: "Yes - Visa gift card $50",
@@ -124,63 +124,64 @@ const SignifyHealth: React.FC = () => {
     setMemberData(randomMember)
   }, [])
 
-  useEffect(() => {
-    if (!memberData) return
+  // useEffect(() => {
+  //   if (!memberData) return
 
-    const addChatbotScript = () => {
-      const script = document.createElement("script")
-      const projectId = "68ffc14027f31bb8c491da5c"
-      script.type = "text/javascript"
-      script.innerHTML = `
-        (function(d, t) {
-          var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
-          v.onload = function() {
-            window.voiceflow.chat.load({
-              verify: { projectID: '${projectId}' },
-              url: 'https://general-runtime.voiceflow.com',
-              versionID: 'production',
-              voice: {
-                url: "https://runtime-api.voiceflow.com"
-              },
-              launch: {
-                event: {
-                  type: "launch",
-                  payload: {
-                    member_name: "${memberData.member_name}",
-                    address: "${memberData.address}",
-                    entry_instructions: "${memberData.entry_instructions}",
-                    gift_card: "${memberData.gift_card}",
-                    city: "${memberData.city}",
-                    residence_type: "${memberData.residence_type}",
-                    member_availability: "${memberData.member_availability}",
-                    zip_code: "${memberData.zip_code}",
-                    callback_datetime: "${memberData.callback_datetime}",
-                    state: "${memberData.state}",
-                    dob: "${memberData.dob}",
-                    phone_number: "${memberData.phone_number}",
-                    visit_date: "${memberData.visit_date}"
-                  }
-                }
-              }
-            });
-          }
-          v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; 
-          v.type = "text/javascript"; 
-          s.parentNode.insertBefore(v, s);
-        })(document, 'script');
-      `
-      document.body.appendChild(script)
-    }
+  //   const addChatbotScript = () => {
+  //     const script = document.createElement("script")
+  //     const projectId = "68ffc14027f31bb8c491da5c"
+  //     script.type = "text/javascript"
+  //     script.innerHTML = `
+  //       (function(d, t) {
+  //         var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+  //         v.onload = function() {
+  //           window.voiceflow.chat.load({
+  //             verify: { projectID: '${projectId}' },
+  //             url: 'https://general-runtime.voiceflow.com',
+  //             versionID: 'production',
+  //             voice: {
+  //               url: "https://runtime-api.voiceflow.com"
+  //             },
+  //             launch: {
+  //               event: {
+  //                 type: "launch",
+  //                 payload: {
+  //                   member_name: "${memberData.member_name}",
+  //                   address: "${memberData.address}",
+  //                   entry_instructions: "${memberData.entry_instructions}",
+  //                   gift_card: "${memberData.gift_card}",
+  //                   city: "${memberData.city}",
+  //                   residence_type: "${memberData.residence_type}",
+  //                   member_availability: "${memberData.member_availability}",
+  //                   zip_code: "${memberData.zip_code}",
+  //                   callback_datetime: "${memberData.callback_datetime}",
+  //                   state: "${memberData.state}",
+  //                   dob: "${memberData.dob}",
+  //                   phone_number: "${memberData.phone_number}",
+  //                   visit_date: "${memberData.visit_date}"
+  //                 }
+  //               }
+  //             }
+  //           });
+  //         }
+  //         v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; 
+  //         v.type = "text/javascript"; 
+  //         s.parentNode.insertBefore(v, s);
+  //       })(document, 'script');
+  //     `
+  //     document.body.appendChild(script)
+  //   }
 
-    addChatbotScript()
+  //   addChatbotScript()
 
-    return () => {
-      if (window.voiceflow && window.voiceflow.chat) {
-        window.voiceflow.chat.destroy()
-      }
-    }
-  }, [memberData])
+  //   return () => {
+  //     if (window.voiceflow && window.voiceflow.chat) {
+  //       window.voiceflow.chat.destroy()
+  //     }
+  //   }
+  // }, [memberData])
 
+  
   // Retell WebClient events
   useEffect(() => {
     webClient.on("conversationStarted", () => {
@@ -409,12 +410,12 @@ const SignifyHealth: React.FC = () => {
           </div>
 
           {/* CHAT */}
-          <div className="flex flex-col items-center cursor-pointer mt-10 ml-10" onClick={handleChatClick}>
+          {/* <div className="flex flex-col items-center cursor-pointer mt-10 ml-10" onClick={handleChatClick}>
             <div className="rounded-full shadow-lg p-6 bg-white hover:scale-105 transition-transform">
               <img src="/signifyhealth/chat.png" alt="Chatbot" className="w-20 h-20 rounded-full object-contain" />
             </div>
             <p className="mt-3 text-lg font-semibold text-[#295C94]">Click to Chat</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
