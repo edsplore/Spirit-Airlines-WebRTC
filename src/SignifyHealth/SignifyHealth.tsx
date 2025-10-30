@@ -308,11 +308,11 @@ const SignifyHealth: React.FC = () => {
     }
   }
 
-  const handleChatClick = () => {
-    if (window.voiceflow && window.voiceflow.chat) {
-      window.voiceflow.chat.open()
-    }
-  }
+  // const handleChatClick = () => {
+  //   if (window.voiceflow && window.voiceflow.chat) {
+  //     window.voiceflow.chat.open()
+  //   }
+  // }
 
   if (!memberData) {
     return (
