@@ -283,7 +283,7 @@ const SignifyHealth: React.FC = () => {
             zip_code: memberData.zip_code,
             callback_datetime: memberData.callback_datetime,
             state: memberData.state,
-            DOB: memberData.dob,
+            dob: memberData.dob,
             phone_number: memberData.phone_number,
             visit_date: memberData.visit_date,
           },
